@@ -8,8 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist"
-  }
-},
+  },
+  "engines": {
+    "node": ">=20.19 <21 || >=22.12"
+  },
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
@@ -30,3 +32,4 @@
     "typescript-eslint": "^8.39.0",
     "vite": "^7.1.0"
   }
+}
