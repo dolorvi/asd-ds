@@ -515,37 +515,44 @@ export default function ASDDecisionSupportMVP() {
   const chipWarn = classNames("rounded px-2 py-0.5 text-xs", isNight ? "bg-amber-600/30 text-amber-200" : "bg-amber-100 text-amber-700");
 
   // ---------------------------- UI ----------------------------
-  return (
-    <div className={classNames("min-h-screen", pageBg, pageText)}>
-      <div className="mx-auto max-w-6xl p-6">
-        <header className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">ASD Decision Support — MVP (v3)</h1>
-            <p className={classNames("text-sm", mutedText)}>
-              DSM-5-TR aligned decision support. No proprietary item content. Do not use real patient data in this demo.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              className={classNames("rounded-2xl px-4 py-2 text-white shadow", accent)}
-              onClick={() => window.print()}
-            >
-              Export/Print Report
-            </button>
-            <div className="flex items-center gap-2">
-              <span className={classNames("text-xs", mutedText)}>Day</span>
-              <label className="relative inline-flex cursor-pointer items-center">
-                <input
-                  type="checkbox"
-                  className="peer sr-only"
-                  checked={isNight}
-                  onChange={() => setTheme((t) => (t === "night" ? "day" : "night"))}
-                />
-                <div className="peer h-6 w-11 rounded-full bg-slate-400 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-indigo-600 peer-checked:after:translate-x-full" />
-              </label>
-              <span className={classNames("text-xs", mutedText)}>Night</span>
-            </div>
-          </div>
+return (
+  <div className="app-shell">
+    <div className="topbar">
+      <div>
+        <h1 className="title">ASD Decision Support — MVP</h1>
+        <div className="subtitle">DSM-5-TR aligned • draft build</div>
+      </div>
+      <div className="toolbar">
+        <button onClick={() => window.print()}>Export</button>
+      </div>
+    </div>
+
+    <div className="grid">
+      <section className="card stack">
+        <h2 className="section-title">SRS-2</h2>
+        {/* ⬇️ move your existing SRS-2 controls here */}
+      </section>
+
+      <section className="card stack">
+        <h2 className="section-title">ABAS-3</h2>
+        {/* ⬇️ move your existing ABAS-3 controls here */}
+      </section>
+
+      <section className="card stack">
+        <h2 className="section-title">WISC</h2>
+        {/* ⬇️ move your existing WISC controls here */}
+      </section>
+
+      <section className="card stack">
+        <h2 className="section-title">Summary</h2>
+        {/* ⬇️ move your existing summary/likelihood/report UI here */}
+        {/* Example meter: */}
+        {/* <label>Overall likelihood</label>
+        <div className="meter"><span style={{ width: "68%" }} /></div> */}
+      </section>
+    </div>
+  </div>
+);
         </header>
 
         {/* Dev fixtures loader */}
