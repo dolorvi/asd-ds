@@ -12,41 +12,23 @@ export default function App() {
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
   const [activeTab, setActiveTab] = useState(0);
   const TABS = ["ASD Measures", "Adaptive", "History", "Comorbidity", "Advanced"];
-
-  // Dev panel
   const [devOpen, setDevOpen] = useState(false);
 
-  // Generic instruments
   const [instruments, setInstruments] = useState(
     DEFAULT_CONFIG.defaultInstruments.map((i) => ({ name: i.name, value: undefined as number | undefined, band: "" }))
   );
-
-  // Domain states
   const [srs2, setSRS2] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
-
-  // Collapse controls per instrument (hide/show subtests)
   const [collapsed, setCollapsed] = useState<{ [k: string]: boolean }>({ srs2: false, wisc: true, abas: false });
 
-  // MIGDAS
-  const [migdas, setMIGDAS] = useState({
-    consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
-    notes: [""] as string[],
-  });
-
-  // History & obs
+  const [migdas, setMIGDAS] = useState({ consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear", notes: [""] as string[] });
   const [history, setHistory] = useState({ developmentalConcerns: "", earlyOnset: false, crossContextImpairment: false, maskingIndicators: false });
   const [observation, setObservation] = useState({ A1: 0, A2: 0, A3: 0, B1: 0, B2: 0, B3: 0, B4: 0, notes: "" });
-
-  // Diff
   const [diff, setDiff] = useState({ ADHD: false, DLD: false, ID: false, Anxiety: false, Depression: false, TraumaPTSD: false, FASD: false, Tics: false, Other: "" });
-
-  // Clinician/admin
   const [clinician, setClinician] = useState({ name: "", date: new Date().toISOString().slice(0, 10), attested: false });
   const [reportVoice, setReportVoice] = useState<"clinical" | "dual">("dual");
 
-  // Engine
   const { datasetStatus, evidence, model, supportEstimate, recommendation } = useAsdEngine(
     config,
     srs2,
@@ -59,7 +41,19 @@ export default function App() {
     instruments
   );
 
-  // Dataset ribbon
+  // ---------- categorical wording (no % in summary export) ----------
+  const likelihoodBand = useMemo(() => {
+    if (model.p >= 0.70) return "High likelihood";
+    if (model.p >= model.cut) return "Moderate likelihood";
+    return "Low likelihood";
+  }, [model]);
+
+  const consistencyBand = useMemo(() => {
+    if (migdas.consistency === "inconsistent") return "Inconsistent with autism";
+    return model.p >= model.cut ? "Consistent with autism" : "Not currently consistent with autism";
+  }, [model, migdas]);
+
+  // ---------- dataset ribbon ----------
   const ribbon = useMemo(() => {
     const need: string[] = [];
     const r = config.minDataset;
@@ -69,40 +63,19 @@ export default function App() {
     if (r.requireHistory && !c.historyOk) need.push("history");
     if (r.requireObservation && !c.observationOk) need.push("observation");
     if (c.effectiveInstrumentCount < r.minInstruments) need.push(`min instruments ${r.minInstruments}`);
-    const met = datasetStatus.passes ? "All requirements met" : `${c.effectiveInstrumentCount}/${r.minInstruments} met — need: ${need.join(", ") || "—"}`;
-    return met;
+    return datasetStatus.passes ? "All requirements met" : `${c.effectiveInstrumentCount}/${r.minInstruments} met — need: ${need.join(", ") || "—"}`;
   }, [datasetStatus, config.minDataset]);
 
-  // Report
-  const reportMarkdown = useMemo(() => {
-    const lines: string[] = [];
-    lines.push(`# ASD Decision Support — Structured Summary`);
-    lines.push("");
-    lines.push(`Clinician: ${clinician.name || "—"}  Date: ${clinician.date}`);
-    lines.push("");
-    lines.push(`**Overall ASD likelihood:** ${(model.p * 100).toFixed(1)}% (cutpoint ${(model.cut * 100).toFixed(0)}%)`);
-    lines.push(`**Criterion A signal:** ${(model.pA * 100).toFixed(0)}%   **Criterion B signal:** ${(model.pB * 100).toFixed(0)}%`);
-    lines.push(`**Provisional support needs:** ${supportEstimate}`);
-    lines.push("");
-    lines.push(`## Findings (prose)`);
-    lines.push(
-      `SRS-2 domain ratings (severity labels only) and MIGDAS qualitative impressions were combined with developmental history and adaptive functioning to estimate the likelihood of autism. Adaptive functioning bands informed a provisional support estimate.`
-    );
-    lines.push("");
-    lines.push(`## Recommendations`);
-    recommendation.forEach((r) => lines.push(`- ${r}`));
-    if (reportVoice === "dual") {
-      lines.push("");
-      lines.push(`## Family Summary`);
-      lines.push(`- Based on questionnaires, observations, and history, current indicators suggest ${(model.p * 100).toFixed(0)}% likelihood.`);
-      lines.push(`- Your clinician will discuss next steps and supports.`);
-    }
-    lines.push("");
-    lines.push(`**Safety & Governance:** Decision support only; clinician judgement prevails. Config v5; audit JSON available.`);
-    return lines.join("\n");
-  }, [clinician, model, supportEstimate, recommendation, reportVoice]);
+  // ---------- summary-only export ----------
+  const exportSummary = () => {
+    document.body.classList.add("print-summary");
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => document.body.classList.remove("print-summary"), 0);
+    }, 0);
+  };
 
-  // Fixture load handler (in dev panel)
+  // ---------- fixture loader ----------
   const loadFixture = () => {
     const select = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
     if (!select) return;
@@ -133,18 +106,14 @@ export default function App() {
     }));
   };
 
-  // ---------- UI helpers ----------
+  // ---------- tab content helpers (chips only) ----------
   const SrsDomainGrid = (
     <div className="grid">
       {config.srs2Domains.map((d) => (
         <section key={d.key} className="card">
           <div className="stack">
             <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
-            <ChipGroup
-              options={d.severities}
-              value={srs2[d.key]?.severity || ""}
-              onChange={(val) => setSRS2((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))}
-            />
+            <ChipGroup options={d.severities} value={srs2[d.key]?.severity || ""} onChange={(val) => setSRS2((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))} />
           </div>
         </section>
       ))}
@@ -157,11 +126,7 @@ export default function App() {
         <section key={d.key} className="card">
           <div className="stack">
             <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
-            <ChipGroup
-              options={d.severities}
-              value={abas[d.key]?.severity || ""}
-              onChange={(val) => setABAS((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))}
-            />
+            <ChipGroup options={d.severities} value={abas[d.key]?.severity || ""} onChange={(val) => setABAS((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))} />
           </div>
         </section>
       ))}
@@ -174,11 +139,7 @@ export default function App() {
         <section key={d.key} className="card">
           <div className="stack">
             <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
-            <ChipGroup
-              options={d.severities}
-              value={wisc[d.key]?.severity || ""}
-              onChange={(val) => setWISC((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))}
-            />
+            <ChipGroup options={d.severities} value={wisc[d.key]?.severity || ""} onChange={(val) => setWISC((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))} />
           </div>
         </section>
       ))}
@@ -188,7 +149,6 @@ export default function App() {
   // -------------- Render --------------
   return (
     <div className="app-shell">
-      {/* Top Bar */}
       <div className="topbar" style={{ position: "sticky", top: 0, zIndex: 10 }}>
         <div>
           <h1 className="title">ASD Decision Support — MVP</h1>
@@ -196,16 +156,14 @@ export default function App() {
         </div>
         <div className="toolbar">
           <button onClick={() => setDevOpen((v) => !v)} title="Developer fixtures">Dev</button>
-          <button onClick={() => window.print()}>Export</button>
+          <button onClick={() => window.print()}>Export (full)</button>
         </div>
       </div>
 
-      {/* Dataset ribbon */}
       <div className="card" style={{ margin: "12px 0", padding: 12, borderLeft: datasetStatus.passes ? "4px solid #10b981" : "4px solid #f59e0b" }}>
         <span className="small"><b>Minimum dataset:</b> {ribbon}</span>
       </div>
 
-      {/* Dev floating panel */}
       {devOpen && (
         <div className="card" style={{ position: "relative", marginBottom: 12 }}>
           <div className="row" style={{ gap: 8 }}>
@@ -222,18 +180,13 @@ export default function App() {
         </div>
       )}
 
-      {/* Tabs + Sticky summary layout */}
-      <TabBar tabs={TABS} active={activeTab} onSelect={setActiveTab} />
+      <TabBar tabs={[...TABS]} active={activeTab} onSelect={setActiveTab} />
 
       <div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
-        {/* Left: tab content */}
         <div style={{ flex: 1, minWidth: 0 }}>
           {activeTab === 0 && (
             <>
-              <Card
-                title="SRS-2 — Domain Entries"
-                right={<button className="small" onClick={() => setCollapsed((s) => ({ ...s, srs2: !s.srs2 }))}>{collapsed.srs2 ? "Show" : "Hide"}</button>}
-              >
+              <Card title="SRS-2 — Domain Entries" right={<button className="small" onClick={() => setCollapsed((s) => ({ ...s, srs2: !s.srs2 }))}>{collapsed.srs2 ? "Show" : "Hide"}</button>}>
                 {!collapsed.srs2 && SrsDomainGrid}
               </Card>
               <Card title="MIGDAS — Qualitative Profile">
@@ -244,15 +197,7 @@ export default function App() {
                         key={opt}
                         onClick={() => setMIGDAS((m) => ({ ...m, consistency: opt as any }))}
                         className={"chip" + (migdas.consistency === opt ? " chip-active" : "")}
-                        style={{
-                          padding: "6px 10px",
-                          borderRadius: 999,
-                          border: "1px solid rgba(255,255,255,0.15)",
-                          background: migdas.consistency === opt ? "#3b82f6" : "transparent",
-                          color: migdas.consistency === opt ? "#0b1220" : "inherit",
-                          fontSize: 12,
-                          fontWeight: 600,
-                        }}
+                        style={{ padding: "6px 10px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.15)", background: migdas.consistency === opt ? "#3b82f6" : "transparent", color: migdas.consistency === opt ? "#0b1220" : "inherit", fontSize: 12, fontWeight: 600 }}
                       >
                         {opt === "unclear" ? "Unclear" : opt === "consistent" ? "Consistent with autism" : "Inconsistent with autism"}
                       </button>
@@ -261,12 +206,7 @@ export default function App() {
                 </Field>
                 <div className="stack">
                   {migdas.notes.map((n, i) => (
-                    <input
-                      key={i}
-                      placeholder={`Brief observation note ${i + 1}`}
-                      value={n}
-                      onChange={(e) => setMIGDAS((m) => ({ ...m, notes: m.notes.map((x, j) => (j === i ? e.target.value : x)) }))}
-                    />
+                    <input key={i} placeholder={`Brief observation note ${i + 1}`} value={n} onChange={(e) => setMIGDAS((m) => ({ ...m, notes: m.notes.map((x, j) => (j === i ? e.target.value : x)) }))} />
                   ))}
                   <button onClick={() => setMIGDAS((m) => ({ ...m, notes: [...m.notes, ""] }))}>+ Add note</button>
                 </div>
@@ -275,10 +215,7 @@ export default function App() {
           )}
 
           {activeTab === 1 && (
-            <Card
-              title="ABAS-3 — Domain Entries"
-              right={<button className="small" onClick={() => setCollapsed((s) => ({ ...s, abas: !s.abas }))}>{collapsed.abas ? "Show" : "Hide"}</button>}
-            >
+            <Card title="ABAS-3 — Domain Entries" right={<button className="small" onClick={() => setCollapsed((s) => ({ ...s, abas: !s.abas }))}>{collapsed.abas ? "Show" : "Hide"}</button>}>
               {!collapsed.abas && AbasDomainGrid}
               <p className="small">ABAS-3 domain bands influence the <b>impairment</b> feature and support estimate.</p>
             </Card>
@@ -289,12 +226,7 @@ export default function App() {
               <div className="grid">
                 <div className="stack">
                   <label>Developmental History</label>
-                  <textarea
-                    placeholder="Summarise early development, social communication history, restricted/repetitive patterns."
-                    value={history.developmentalConcerns}
-                    onChange={(e) => setHistory((s) => ({ ...s, developmentalConcerns: e.target.value }))}
-                    style={{ height: 120 }}
-                  />
+                  <textarea placeholder="Summarise early development, social communication history, restricted/repetitive patterns." value={history.developmentalConcerns} onChange={(e) => setHistory((s) => ({ ...s, developmentalConcerns: e.target.value }))} style={{ height: 120 }} />
                   <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     <label className="row"><input type="checkbox" checked={history.earlyOnset} onChange={(e) => setHistory((s) => ({ ...s, earlyOnset: e.target.checked }))} /> Early developmental onset evident</label>
                     <label className="row"><input type="checkbox" checked={history.crossContextImpairment} onChange={(e) => setHistory((s) => ({ ...s, crossContextImpairment: e.target.checked }))} /> Cross‑context functional impairment</label>
@@ -310,12 +242,7 @@ export default function App() {
                       </Field>
                     ))}
                   </div>
-                  <textarea
-                    placeholder="Objective notes (setting, salient behaviours)."
-                    value={(observation as any).notes}
-                    onChange={(e) => setObservation((s) => ({ ...s, notes: e.target.value }))}
-                    style={{ height: 80 }}
-                  />
+                  <textarea placeholder="Objective notes (setting, salient behaviours)." value={(observation as any).notes} onChange={(e) => setObservation((s) => ({ ...s, notes: e.target.value }))} style={{ height: 80 }} />
                 </div>
               </div>
             </Card>
@@ -324,24 +251,11 @@ export default function App() {
           {activeTab === 3 && (
             <Card title="Comorbidity / Differential Flags">
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 8 }}>
-                {([
-                  ["ADHD", "ADHD"],
-                  ["DLD", "Language Disorder (DLD)"],
-                  ["ID", "Intellectual Disability"],
-                  ["Anxiety", "Anxiety"],
-                  ["Depression", "Depression"],
-                  ["TraumaPTSD", "Trauma/PTSD"],
-                  ["FASD", "FASD"],
-                  ["Tics", "Tic Disorder"],
-                ] as const).map(([key, label]) => (
-                  <label key={key} className="row">
-                    <input type="checkbox" checked={(diff as any)[key]} onChange={(e) => setDiff((s) => ({ ...s, [key]: e.target.checked }))} /> {label}
-                  </label>
+                {([["ADHD", "ADHD"],["DLD", "Language Disorder (DLD)"],["ID", "Intellectual Disability"],["Anxiety", "Anxiety"],["Depression", "Depression"],["TraumaPTSD", "Trauma/PTSD"],["FASD", "FASD"],["Tics", "Tic Disorder"]] as const).map(([key, label]) => (
+                  <label key={key} className="row"><input type="checkbox" checked={(diff as any)[key]} onChange={(e) => setDiff((s) => ({ ...s, [key]: e.target.checked }))} /> {label}</label>
                 ))}
               </div>
-              <Field label="Other differential notes">
-                <input value={diff.Other} onChange={(e) => setDiff((s) => ({ ...s, Other: e.target.value }))} />
-              </Field>
+              <Field label="Other differential notes"><input value={diff.Other} onChange={(e) => setDiff((s) => ({ ...s, Other: e.target.value }))} /></Field>
             </Card>
           )}
 
@@ -366,23 +280,8 @@ export default function App() {
                           <button className="small" onClick={() => setInstruments((arr) => arr.filter((_, i) => i !== idx))}>Remove</button>
                         </div>
                         <div className="grid" style={{ gridTemplateColumns: "1fr 2fr", gap: 12 }}>
-                          <Field label="Score">
-                            <input
-                              type="number"
-                              value={inst.value ?? ""}
-                              onChange={(e) => {
-                                const val = e.target.value === "" ? undefined : Number(e.target.value);
-                                setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, value: val } : x)));
-                              }}
-                            />
-                          </Field>
-                          <Field label="Band (optional)">
-                            <input
-                              placeholder="e.g., Mild / Moderate / Severe"
-                              value={(inst as any).band || ""}
-                              onChange={(e) => setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, band: (e.target as HTMLInputElement).value } : x)))}
-                            />
-                          </Field>
+                          <Field label="Score"><input type="number" value={inst.value ?? ""} onChange={(e) => { const val = e.target.value === "" ? undefined : Number(e.target.value); setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, value: val } : x))); }} /></Field>
+                          <Field label="Band (optional)"><input placeholder="e.g., Mild / Moderate / Severe" value={(inst as any).band || ""} onChange={(e) => setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, band: (e.target as HTMLInputElement).value } : x)))} /></Field>
                         </div>
                       </div>
                     </section>
@@ -392,23 +291,16 @@ export default function App() {
 
               <Card title="Explainability — Evidence Contributions">
                 <div className="grid">
-                  {model.terms
-                    .sort((a, b) => Math.abs(b.product) - Math.abs(a.product))
-                    .slice(0, 5)
-                    .map((t, i) => (
-                      <section key={i} className="card">
-                        <div className="row" style={{ justifyContent: "space-between" }}>
-                          <span style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace" }}>{String(t.key)}</span>
-                          <span>{t.product.toFixed(2)}</span>
-                        </div>
-                        <div className="meter" style={{ marginTop: 8 }}>
-                          <span style={{ width: `${Math.min(100, Math.abs(t.product) * 20)}%`, background: t.product >= 0 ? "linear-gradient(90deg,#34d399,#60a5fa)" : "#f43f5e" }} />
-                        </div>
-                        <div className="small" style={{ marginTop: 4 }}>
-                          value {t.value.toFixed(2)} × weight {t.weight.toFixed(2)}
-                        </div>
-                      </section>
-                    ))}
+                  {model.terms.sort((a, b) => Math.abs(b.product) - Math.abs(a.product)).slice(0, 5).map((t, i) => (
+                    <section key={i} className="card">
+                      <div className="row" style={{ justifyContent: "space-between" }}>
+                        <span style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace" }}>{String(t.key)}</span>
+                        <span>{t.product.toFixed(2)}</span>
+                      </div>
+                      <div className="meter" style={{ marginTop: 8 }}><span style={{ width: `${Math.min(100, Math.abs(t.product) * 20)}%`, background: t.product >= 0 ? "linear-gradient(90deg,#34d399,#60a5fa)" : "#f43f5e" }} /></div>
+                      <div className="small" style={{ marginTop: 4 }}>value {t.value.toFixed(2)} × weight {t.weight.toFixed(2)}</div>
+                    </section>
+                  ))}
                 </div>
               </Card>
 
@@ -423,9 +315,7 @@ export default function App() {
                       <label className="row"><input type="checkbox" checked={config.minDataset.requireObservation} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireObservation: e.target.checked } }))} /> Require observation</label>
                       <Field label="Min instruments"><input type="number" min={0} value={config.minDataset.minInstruments} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, minInstruments: Number(e.target.value) } }))} /></Field>
                     </div>
-                    <div className="small" style={{ marginTop: 8 }}>
-                      Status: {datasetStatus.passes ? <span className="badge ok">Meets minimum</span> : <span className="badge warn">Does not meet minimum</span>}
-                    </div>
+                    <div className="small" style={{ marginTop: 8 }}>Status: {datasetStatus.passes ? <span className="badge ok">Meets minimum</span> : <span className="badge warn">Does not meet minimum</span>}</div>
                   </section>
 
                   <section className="card">
@@ -438,63 +328,72 @@ export default function App() {
           )}
         </div>
 
-        {/* Right: sticky summary */}
-        <aside style={{ width: 340, position: "sticky", top: 64 }}>
+        {/* Sticky Summary */}
+        <aside id="summary-section" className="summary-only" style={{ width: 340, position: "sticky", top: 64 }}>
           <Card title="Summary">
-            <div className="row" style={{ alignItems: "flex-end", gap: 24 }}>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 800 }}>{(model.p * 100).toFixed(1)}%</div>
-                <div className="small">Overall ASD likelihood</div>
-                <div className="small">Cutpoint: {(model.cut * 100).toFixed(0)}% ({config.riskTolerance})</div>
+            {/* Screen-only numeric view */}
+            <div className="screen-only">
+              <div className="row" style={{ alignItems: "flex-end", gap: 24 }}>
+                <div>
+                  <div style={{ fontSize: 32, fontWeight: 800 }}>{(model.p * 100).toFixed(1)}%</div>
+                  <div className="small">Overall ASD likelihood</div>
+                  <div className="small">Cutpoint: {(model.cut * 100).toFixed(0)}% ({config.riskTolerance})</div>
+                </div>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <div className="row" style={{ justifyContent: "space-between" }}><span className="small">Criterion A</span><span className="small">{(model.pA * 100).toFixed(0)}%</span></div>
+                <div className="meter"><span style={{ width: `${Math.round(model.pA * 100)}%` }} /></div>
+                <div className="row" style={{ justifyContent: "space-between", marginTop: 12 }}><span className="small">Criterion B</span><span className="small">{(model.pB * 100).toFixed(0)}%</span></div>
+                <div className="meter"><span style={{ width: `${Math.round(model.pB * 100)}%` }} /></div>
               </div>
             </div>
-            <div style={{ marginTop: 12 }}>
-              <div className="row" style={{ justifyContent: "space-between" }}><span className="small">Criterion A</span><span className="small">{(model.pA * 100).toFixed(0)}%</span></div>
-              <div className="meter"><span style={{ width: `${Math.round(model.pA * 100)}%` }} /></div>
-              <div className="row" style={{ justifyContent: "space-between", marginTop: 12 }}><span className="small">Criterion B</span><span className="small">{(model.pB * 100).toFixed(0)}%</span></div>
-              <div className="meter"><span style={{ width: `${Math.round(model.pB * 100)}%` }} /></div>
+
+            {/* Print-only categorical summary */}
+            <div className="print-only" style={{ display: "none" }}>
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Summary</div>
+              <div><b>Likelihood:</b> {likelihoodBand}</div>
+              <div><b>Overall pattern:</b> {consistencyBand}</div>
+              <div style={{ marginTop: 8 }}><b>Provisional support needs:</b> {supportEstimate}</div>
+              <ul style={{ marginTop: 8, paddingLeft: 18 }}>
+                {recommendation.slice(0, 5).map((r, i) => (
+                  <li key={i} style={{ fontSize: 13 }}>{r}</li>
+                ))}
+              </ul>
             </div>
+
             <div style={{ marginTop: 12 }}>
               Decision: {model.p >= model.cut ? <span className="badge ok">Above threshold — proceed</span> : <span className="badge warn">Below threshold — consider more data</span>}
             </div>
             <div className="card" style={{ textAlign: "center", marginTop: 12 }}>{supportEstimate}</div>
-            <button style={{ width: "100%", marginTop: 12 }} onClick={() => window.print()}>Export summary</button>
+            <div className="row" style={{ gap: 8, marginTop: 12 }}>
+              <button style={{ flex: 1 }} onClick={exportSummary}>Export summary</button>
+              <button style={{ flex: 1 }} onClick={() => window.print()}>Export full</button>
+            </div>
           </Card>
 
           <Card title="Clinician & Governance">
-            <Field label="Clinician">
-              <input value={clinician.name} onChange={(e) => setClinician((s) => ({ ...s, name: e.target.value }))} placeholder="Dr Jane Citizen" />
-            </Field>
-            <Field label="Date">
-              <input type="date" value={clinician.date} onChange={(e) => setClinician((s) => ({ ...s, date: e.target.value }))} />
-            </Field>
+            <Field label="Clinician"><input value={clinician.name} onChange={(e) => setClinician((s) => ({ ...s, name: e.target.value }))} placeholder="Dr Jane Citizen" /></Field>
+            <Field label="Date"><input type="date" value={clinician.date} onChange={(e) => setClinician((s) => ({ ...s, date: e.target.value }))} /></Field>
             <label className="row"><input type="checkbox" checked={clinician.attested} onChange={(e) => setClinician((s) => ({ ...s, attested: e.target.checked }))} /> I attest that clinical judgement prevails.</label>
-            <Field label="Report Voice">
-              <select value={reportVoice} onChange={(e) => setReportVoice(e.target.value as any)}>
-                <option value="clinical">Clinical only</option>
-                <option value="dual">Clinical + Family summary</option>
-              </select>
-            </Field>
-            <Field label="Risk Tolerance">
-              <select value={config.riskTolerance} onChange={(e) => setConfig((c) => ({ ...c, riskTolerance: e.target.value as any }))}>
-                <option value="sensitive">Sensitive</option>
-                <option value="balanced">Balanced</option>
-                <option value="specific">Specific</option>
-              </select>
-            </Field>
+            <Field label="Report Voice"><select value={reportVoice} onChange={(e) => setReportVoice(e.target.value as any)}><option value="clinical">Clinical only</option><option value="dual">Clinical + Family summary</option></select></Field>
+            <Field label="Risk Tolerance"><select value={config.riskTolerance} onChange={(e) => setConfig((c) => ({ ...c, riskTolerance: e.target.value as any }))}><option value="sensitive">Sensitive</option><option value="balanced">Balanced</option><option value="specific">Specific</option></select></Field>
             <Field label="Prior (log-odds)"><input type="number" step={0.1} value={config.prior} onChange={(e) => setConfig((c) => ({ ...c, prior: Number(e.target.value) }))} /></Field>
           </Card>
         </aside>
       </div>
 
-      {/* Report preview (print-friendly) */}
-      <Card title="Structured Report (preview)"><pre style={{ whiteSpace: "pre-wrap", padding: 12 }}>{reportMarkdown}</pre></Card>
+      <footer style={{ margin: "40px 0", textAlign: "center" }} className="small">© {new Date().getFullYear()} ASD Decision Support MVP — Demonstration only.</footer>
 
-      <footer style={{ margin: "40px 0", textAlign: "center" }} className="small">
-        © {new Date().getFullYear()} ASD Decision Support MVP — Demonstration only.
-      </footer>
-
-      <style>{`@media print { body { background: white; } .no-print { display: none; } }`}</style>
+      {/* print-only CSS for summary export */}
+      <style>{`
+        @media print {
+          body.print-summary * { visibility: hidden !important; }
+          body.print-summary #summary-section, body.print-summary #summary-section * { visibility: visible !important; }
+          body.print-summary #summary-section { position: absolute; left: 0; top: 0; width: 100%; }
+          body.print-summary .screen-only { display: none !important; }
+          body.print-summary .print-only { display: block !important; }
+        }
+      `}</style>
     </div>
   );
 }
