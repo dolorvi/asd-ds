@@ -553,8 +553,6 @@ return (
     </div>
   </div>
 );
-        </header>
-
         {/* Dev fixtures loader */}
         <Card title="Dev/Test Fixtures" right={
           <div className="flex items-center gap-2">
