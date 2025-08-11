@@ -8,12 +8,13 @@ import {
   ABAS3_SEVERITIES,
   MIGDAS_CONSISTENCY,
   CANONICAL_CASES,
-} from "./data/testData";
+} from "./data/testData"; // ⬅️ change to "./testData" if your file lives at src/testData.ts
 
 /**
- * ASD Decision Support MVP — React prototype (v3)
- * - Fixes: removed duplicate component block; fixed unterminated string; imports label data from src/data/testData.ts
- * - Adds: Dev fixtures loader; counts domain-based instruments toward the minimum dataset; dark/day theme remains.
+ * ASD Decision Support — MVP (clean rewrite)
+ * - Plain CSS classes (no Tailwind/shadcn)
+ * - Tiny UI helpers: <Card>, <Field>
+ * - Single export default App()
  */
 
 // ----------------------------- Types -----------------------------
@@ -43,63 +44,50 @@ type InstrumentBandMap = Partial<Record<CriterionKey, number>> & {
   impairment?: number;
 };
 
-type InstrumentThreshold = {
-  band: string; // label only
-  min?: number; // not used (no proprietary ranges)
-  max?: number;
-  map: InstrumentBandMap; // evidence contributions when this band applies
-};
-
-type InstrumentConfig = {
-  name: string;
-  scoreField: "raw" | "standard" | "t" | "scaled" | "index" | "composite"; // label only
-  thresholds: InstrumentThreshold[]; // optional, used by generic score fields
-};
-
-type SeverityOption = string; // e.g. "Mild", "Moderate", "Severe"
-
 type DomainConfig = {
-  key: string; // e.g., "srs_awareness"
-  label: string; // UX label
-  severities: Array<SeverityOption>; // allowed severity bands
-  // Map by severity to DSM evidence contributions (qualitative → weights)
+  key: string;
+  label: string;
+  severities: string[];
   mapBySeverity: Record<string, InstrumentBandMap>;
 };
 
 type MinDatasetRules = {
-  minInstruments: number; // generic count (now includes domain-based instruments)
-  requireASDInstrument: boolean; // ≥1 from SRS/ADOS/MIGDAS/GARS
-  requireAdaptive: boolean; // ABAS/Vineland
-  requireHistory: boolean; // history section
-  requireObservation: boolean; // clinician observation section
+  minInstruments: number;
+  requireASDInstrument: boolean;
+  requireAdaptive: boolean;
+  requireHistory: boolean;
+  requireObservation: boolean;
 };
 
+type InstrumentConfig = { name: string; scoreField: string; thresholds: any[] };
+
 type Config = {
-  prior: number; // log-odds intercept
+  prior: number;
   riskTolerance: "sensitive" | "balanced" | "specific";
   domainWeights: Record<CriterionKey | AltKey, number>;
   minDataset: MinDatasetRules;
-  defaultInstruments: InstrumentConfig[]; // generic list (scores only)
-  // Domain-level configs for named instruments (qualitative bands)
+  defaultInstruments: InstrumentConfig[];
   srs2Domains: DomainConfig[];
-  wiscDomains: DomainConfig[]; // used for reporting; no ASD mapping by default
-  abasDomains: DomainConfig[]; // primarily → impairment mapping
+  wiscDomains: DomainConfig[];
+  abasDomains: DomainConfig[];
 };
 
-// ----------------------- Utility Functions -----------------------
+type SeverityState = Record<string, { score?: number; severity?: string }>;
+
+// ----------------------- Utils -----------------------
 
 function logistic(x: number) {
   return 1 / (1 + Math.exp(-x));
 }
 
-function classNames(...xs: (string | false | null | undefined)[]) {
+function cx(...xs: Array<string | false | null | undefined>) {
   return xs.filter(Boolean).join(" ");
 }
 
 // ----------------------- Default Configuration -----------------------
 
 const DEFAULT_CONFIG: Config = {
-  prior: 0.0,
+  prior: 0,
   riskTolerance: "balanced",
   domainWeights: {
     A1: 1.2,
@@ -138,10 +126,9 @@ const DEFAULT_CONFIG: Config = {
     { name: "CELF-5", scoreField: "index", thresholds: [] },
     { name: "AQ", scoreField: "raw", thresholds: [] },
   ],
-  // Build domain configs from imported label lists while preserving evidence mappings
+  // Build domain configs with evidence mappings
   srs2Domains: SRS2_DOMAINS.map((d) => {
     const mapBySeverity: Record<string, InstrumentBandMap> = {};
-    // Map domain → DSM criteria contributions
     if (d.key === "srs_awareness") {
       mapBySeverity.Mild = { A1: 0.5 };
       mapBySeverity.Moderate = { A1: 1.0 };
@@ -163,21 +150,14 @@ const DEFAULT_CONFIG: Config = {
       mapBySeverity.Moderate = { B2: 0.8, B3: 0.8 };
       mapBySeverity.Severe = { B2: 1.1, B3: 1.1 };
     }
-    return {
-      key: d.key,
-      label: d.label,
-      severities: [...SRS2_SEVERITIES],
-      mapBySeverity,
-    } as DomainConfig;
+    return { key: d.key, label: d.label, severities: [...SRS2_SEVERITIES], mapBySeverity };
   }),
-  // WISC domains used for report context; no ASD mapping applied by default
   wiscDomains: WISC_DOMAINS.map((d) => ({
     key: d.key,
     label: d.label,
     severities: [...WISC_SEVERITIES],
     mapBySeverity: {},
   })),
-  // ABAS domains → impairment mapping only
   abasDomains: ABAS3_DOMAINS.map((d) => ({
     key: d.key,
     label: d.label,
@@ -191,46 +171,47 @@ const DEFAULT_CONFIG: Config = {
   })),
 };
 
+// ----------------------- Tiny UI helpers -----------------------
+
+function Card({ title, right, children }: { title?: string; right?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="card stack">
+      <div className="row" style={{ justifyContent: "space-between" }}>
+        {title ? <h2 className="section-title">{title}</h2> : <div />}
+        {right}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="control">
+      <label>{label}</label>
+      {children}
+    </div>
+  );
+}
+
 // ---------------------------- Component ----------------------------
 
-type SeverityState = Record<string, { score?: number; severity?: string }>; // keyed by domain key
-
-export default function ASDDecisionSupportMVP() {
-  // THEME
-  const [theme, setTheme] = useState<"night" | "day">("night"); // dark-first
-  const isNight = theme === "night";
-
-  const pageBg = isNight ? "bg-slate-900" : "bg-slate-50";
-  const pageText = isNight ? "text-slate-100" : "text-slate-900";
-  const cardBg = isNight ? "bg-slate-800" : "bg-white";
-  const borderCol = isNight ? "border-slate-700" : "border-slate-200";
-  const mutedText = isNight ? "text-slate-300" : "text-slate-600";
-  const inputBg = isNight ? "bg-slate-900" : "bg-white";
-  const inputText = isNight ? "text-slate-100" : "text-slate-900";
-  const inputBorder = isNight ? "border-slate-700" : "border-slate-300";
-  const accent = isNight ? "bg-indigo-500 hover:bg-indigo-600" : "bg-indigo-600 hover:bg-indigo-700";
-
+export default function App() {
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
 
-  // Generic Instrument Scores (kept for arbitrary entries)
+  // Generic Instruments (scores only)
   const [instruments, setInstruments] = useState(
-    DEFAULT_CONFIG.defaultInstruments.map((i) => ({ name: i.name, value: undefined as number | undefined }))
+    DEFAULT_CONFIG.defaultInstruments.map((i) => ({ name: i.name, value: undefined as number | undefined, band: "" }))
   );
 
   // Domain-level states
-  const [srs2, setSRS2] = useState<SeverityState>(() => Object.fromEntries(
-    config.srs2Domains.map((d) => [d.key, { score: undefined, severity: "" }])
-  ));
-  const [wisc, setWISC] = useState<SeverityState>(() => Object.fromEntries(
-    config.wiscDomains.map((d) => [d.key, { score: undefined, severity: "" }])
-  ));
-  const [abas, setABAS] = useState<SeverityState>(() => Object.fromEntries(
-    config.abasDomains.map((d) => [d.key, { score: undefined, severity: "" }])
-  ));
+  const [srs2, setSRS2] = useState<SeverityState>(() => Object.fromEntries(config.srs2Domains.map((d) => [d.key, { score: undefined, severity: "" }])));
+  const [wisc, setWISC] = useState<SeverityState>(() => Object.fromEntries(config.wiscDomains.map((d) => [d.key, { score: undefined, severity: "" }])));
+  const [abas, setABAS] = useState<SeverityState>(() => Object.fromEntries(config.abasDomains.map((d) => [d.key, { score: undefined, severity: "" }])));
 
   // MIGDAS qualitative
   const [migdas, setMIGDAS] = useState({
-    consistency: "unclear" as (typeof MIGDAS_CONSISTENCY)[number],
+    consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
     notes: [""] as string[],
   });
 
@@ -242,18 +223,9 @@ export default function ASDDecisionSupportMVP() {
     maskingIndicators: false,
   });
 
-  const [observation, setObservation] = useState({
-    A1: 0,
-    A2: 0,
-    A3: 0,
-    B1: 0,
-    B2: 0,
-    B3: 0,
-    B4: 0,
-    notes: "",
-  });
+  const [observation, setObservation] = useState({ A1: 0, A2: 0, A3: 0, B1: 0, B2: 0, B3: 0, B4: 0, notes: "" });
 
-  // Comorbidity/differential flags
+  // Comorbid flags
   const [diff, setDiff] = useState({
     ADHD: false,
     DLD: false,
@@ -266,17 +238,12 @@ export default function ASDDecisionSupportMVP() {
     Other: "",
   });
 
-  // Clinician & admin
-  const [clinician, setClinician] = useState({
-    name: "",
-    date: new Date().toISOString().slice(0, 10),
-    attested: false,
-  });
+  // Clinician/admin
+  const [clinician, setClinician] = useState({ name: "", date: new Date().toISOString().slice(0, 10), attested: false });
 
-  // Report voice
   const [reportVoice, setReportVoice] = useState<"clinical" | "dual">("dual");
 
-  // ---------------- Minimum dataset checks ----------------
+  // ---------------- Minimum dataset ----------------
   const datasetStatus = useMemo(() => {
     const withValues = instruments.filter((i) => i.value !== undefined);
 
@@ -284,17 +251,13 @@ export default function ASDDecisionSupportMVP() {
     const domainABASEntered = Object.values(abas).some((d) => d.severity && d.severity !== "");
     const migdasEntered = migdas.consistency !== "unclear";
 
-    const effectiveInstrumentCount =
-      withValues.length + (domainSRS2Entered ? 1 : 0) + (domainABASEntered ? 1 : 0) + (migdasEntered ? 1 : 0);
+    const effectiveInstrumentCount = withValues.length + (domainSRS2Entered ? 1 : 0) + (domainABASEntered ? 1 : 0) + (migdasEntered ? 1 : 0);
 
     const hasAdaptive = domainABASEntered || instruments.some((i) => ["Vineland-3", "ABAS-3"].includes(i.name) && i.value !== undefined);
-
     const hasASDInstrument = domainSRS2Entered || migdasEntered || instruments.some((i) => ["SRS-2", "ADOS-2", "MIGDAS-2", "GARS"].includes(i.name) && i.value !== undefined);
 
-    const historyOk = history.developmentalConcerns.trim().length > 10 && (history.earlyOnset || true);
-    const observationOk = ["A1", "A2", "A3", "B1", "B2", "B3", "B4"].every(
-      (k) => (observation as any)[k] !== undefined
-    );
+    const historyOk = history.developmentalConcerns.trim().length > 10 && history.earlyOnset;
+    const observationOk = (['A1','A2','A3','B1','B2','B3','B4'] as const).every((k) => (observation as any)[k] !== undefined);
 
     const rules = config.minDataset;
     const passes =
@@ -306,27 +269,14 @@ export default function ASDDecisionSupportMVP() {
 
     return {
       passes,
-      counts: {
-        instrumentsEntered: withValues.length,
-        effectiveInstrumentCount,
-        hasASDInstrument,
-        hasAdaptive,
-        historyOk,
-        observationOk,
-      },
+      counts: { instrumentsEntered: withValues.length, effectiveInstrumentCount, hasASDInstrument, hasAdaptive, historyOk, observationOk },
     };
-  }, [instruments, history, observation, config.minDataset, srs2, migdas, abas]);
+  }, [instruments, srs2, abas, migdas, history, observation, config.minDataset]);
 
   // ---------------- Evidence aggregation ----------------
   const evidence = useMemo(() => {
     const ev: Record<CriterionKey | AltKey, number> = {
-      A1: 0,
-      A2: 0,
-      A3: 0,
-      B1: 0,
-      B2: 0,
-      B3: 0,
-      B4: 0,
+      A1: 0, A2: 0, A3: 0, B1: 0, B2: 0, B3: 0, B4: 0,
       onsetEarly: history.earlyOnset ? 1 : 0,
       impairment: history.crossContextImpairment ? 1 : 0,
       masking: history.maskingIndicators ? 1 : 0,
@@ -339,7 +289,7 @@ export default function ASDDecisionSupportMVP() {
     };
 
     // Clinician observation (0..3)
-    (["A1", "A2", "A3", "B1", "B2", "B3", "B4"] as (keyof typeof ev)[]).forEach((k) => {
+    (['A1','A2','A3','B1','B2','B3','B4'] as const).forEach((k) => {
       const v = Number((observation as any)[k]);
       if (!Number.isNaN(v)) (ev as any)[k] += v;
     });
@@ -350,20 +300,16 @@ export default function ASDDecisionSupportMVP() {
       if (!sev) return;
       const map = d.mapBySeverity[sev];
       if (!map) return;
-      Object.entries(map).forEach(([k, v]) => {
-        (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
-      });
+      Object.entries(map).forEach(([k, v]) => { (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number); });
     });
 
-    // ABAS-3 domain severities → impairment prompt
+    // ABAS-3 domain severities → impairment
     config.abasDomains.forEach((d) => {
       const sev = abas[d.key]?.severity || "";
       if (!sev) return;
       const map = d.mapBySeverity[sev];
       if (!map) return;
-      Object.entries(map).forEach(([k, v]) => {
-        (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
-      });
+      Object.entries(map).forEach(([k, v]) => { (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number); });
     });
 
     // MIGDAS qualitative
@@ -374,7 +320,7 @@ export default function ASDDecisionSupportMVP() {
     }
 
     return ev;
-  }, [observation, history, diff, srs2, config.srs2Domains, abas, config.abasDomains, migdas]);
+  }, [observation, history, diff, srs2, abas, config.srs2Domains, config.abasDomains, migdas]);
 
   // ---------------- Likelihood model ----------------
   const model = useMemo(() => {
@@ -397,9 +343,8 @@ export default function ASDDecisionSupportMVP() {
     return { p, lp, pA, pB, cut, terms };
   }, [config, evidence]);
 
-  // ---------------- Support needs (provisional) ----------------
+  // ---------------- Support estimate ----------------
   const supportEstimate = useMemo(() => {
-    // Use ABAS domain severities; if any domain very low → high support
     const sevs = Object.values(abas).map((d) => d.severity || "");
     if (sevs.some((s) => s === "Extremely Low" || s === "Very Low")) return "High support likely";
     if (sevs.some((s) => s === "Low Average" || s === "Average")) return "Moderate support possible";
@@ -427,7 +372,7 @@ export default function ASDDecisionSupportMVP() {
     return recs;
   }, [datasetStatus, model, diff, supportEstimate]);
 
-  // ---------------- Report ----------------
+  // ---------------- Report (markdown-ish) ----------------
   const reportMarkdown = useMemo(() => {
     const lines: string[] = [];
     lines.push(`# ASD Decision Support — Structured Summary`);
@@ -439,28 +384,21 @@ export default function ASDDecisionSupportMVP() {
     lines.push(`**Provisional support needs:** ${supportEstimate}`);
     lines.push("");
     lines.push(`## Domain Summaries`);
-    // SRS-2
     lines.push(`### SRS-2`);
     config.srs2Domains.forEach((d) => {
       const st = srs2[d.key];
-      if (st?.severity || st?.score !== undefined)
-        lines.push(`- ${d.label}: ${st.score ?? "—"} ${st.severity ? `(${st.severity})` : ""}`);
+      if (st?.severity || st?.score !== undefined) lines.push(`- ${d.label}: ${st.score ?? "—"} ${st.severity ? `(${st.severity})` : ""}`);
     });
-    // WISC
     lines.push(`### WISC`);
     config.wiscDomains.forEach((d) => {
       const st = wisc[d.key];
-      if (st?.severity || st?.score !== undefined)
-        lines.push(`- ${d.label}: ${st.score ?? "—"} ${st.severity ? `(${st.severity})` : ""}`);
+      if (st?.severity || st?.score !== undefined) lines.push(`- ${d.label}: ${st.score ?? "—"} ${st.severity ? `(${st.severity})` : ""}`);
     });
-    // ABAS-3
     lines.push(`### ABAS-3`);
     config.abasDomains.forEach((d) => {
       const st = abas[d.key];
-      if (st?.severity || st?.score !== undefined)
-        lines.push(`- ${d.label}: ${st.score ?? "—"} ${st.severity ? `(${st.severity})` : ""}`);
+      if (st?.severity || st?.score !== undefined) lines.push(`- ${d.label}: ${st.score ?? "—"} ${st.severity ? `(${st.severity})` : ""}`);
     });
-    // MIGDAS
     lines.push(`### MIGDAS`);
     lines.push(`- Consistency: ${migdas.consistency}`);
     migdas.notes.filter((n) => n.trim()).forEach((n, i) => lines.push(`- Note ${i + 1}: ${n.trim()}`));
@@ -497,328 +435,367 @@ export default function ASDDecisionSupportMVP() {
     return lines.join("\n");
   }, [clinician, model, srs2, wisc, abas, migdas, history, observation, recommendation, supportEstimate, reportVoice]);
 
-  // ---------------- Render helpers ----------------
-  const Card: React.FC<{ title?: string; children: React.ReactNode; right?: React.ReactNode }> = ({ title, children, right }) => (
-    <section className={classNames("mb-6 rounded-2xl border p-4", cardBg, borderCol)}>
-      <div className="mb-3 flex items-center justify-between">
-        {title ? <h2 className="text-lg font-semibold">{title}</h2> : <div />}
-        {right}
-      </div>
-      {children}
-    </section>
-  );
-
-  const inputCls = classNames("mt-1 w-full rounded-md border p-2", inputBg, inputText, inputBorder);
-  const selectCls = classNames("mt-1 w-full rounded-md border p-2", inputBg, inputText, inputBorder);
-  const textAreaCls = classNames("rounded-xl border p-2", inputBg, inputText, inputBorder);
-  const chipOk = classNames("rounded px-2 py-0.5 text-xs", isNight ? "bg-emerald-600/30 text-emerald-200" : "bg-emerald-100 text-emerald-700");
-  const chipWarn = classNames("rounded px-2 py-0.5 text-xs", isNight ? "bg-amber-600/30 text-amber-200" : "bg-amber-100 text-amber-700");
-
   // ---------------------------- UI ----------------------------
-return (
-  <div className="app-shell">
-    <div className="topbar">
-      <div>
-        <h1 className="title">ASD Decision Support — MVP</h1>
-        <div className="subtitle">DSM-5-TR aligned • draft build</div>
+  return (
+    <div className="app-shell">
+      {/* Top Bar */}
+      <div className="topbar">
+        <div>
+          <h1 className="title">ASD Decision Support — MVP</h1>
+          <div className="subtitle">DSM-5-TR aligned • draft build</div>
+        </div>
+        <div className="toolbar">
+          <button onClick={() => window.print()}>Export</button>
+        </div>
       </div>
-      <div className="toolbar">
-        <button onClick={() => window.print()}>Export</button>
-      </div>
-    </div>
 
-    <div className="grid">
-      <section className="card stack">
-        <h2 className="section-title">SRS-2</h2>
-        {/* ⬇️ move your existing SRS-2 controls here */}
-      </section>
-
-      <section className="card stack">
-        <h2 className="section-title">ABAS-3</h2>
-        {/* ⬇️ move your existing ABAS-3 controls here */}
-      </section>
-
-      <section className="card stack">
-        <h2 className="section-title">WISC</h2>
-        {/* ⬇️ move your existing WISC controls here */}
-      </section>
-
-      <section className="card stack">
-        <h2 className="section-title">Summary</h2>
-        {/* ⬇️ move your existing summary/likelihood/report UI here */}
-        {/* Example meter: */}
-        {/* <label>Overall likelihood</label>
-        <div className="meter"><span style={{ width: "68%" }} /></div> */}
-      </section>
-    </div>
-  </div>
-);
-        {/* Dev fixtures loader */}
-        <Card title="Dev/Test Fixtures" right={
-          <div className="flex items-center gap-2">
-            <select className={selectCls} id="fixtureSelect">
-              {CANONICAL_CASES.map((c) => (
-                <option key={c.id} value={c.id}>{c.id} — {c.title}</option>
-              ))}
-            </select>
-            <button
-              className={classNames("rounded-xl px-3 py-1 text-sm text-white", accent)}
-              onClick={() => {
-                const select = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
-                if (!select) return;
-                const sel = CANONICAL_CASES.find((c) => c.id === select.value);
-                if (!sel) return;
-                // Apply SRS-2
-                setSRS2((prev) => {
-                  const next = { ...prev };
-                  if (sel.srs2) Object.entries(sel.srs2).forEach(([k, v]) => { next[k] = { ...(next[k]||{}), severity: v as string }; });
-                  return next;
-                });
-                // Apply ABAS-3
-                setABAS((prev) => {
-                  const next = { ...prev };
-                  if (sel.abas3) Object.entries(sel.abas3).forEach(([k, v]) => { next[k] = { ...(next[k]||{}), severity: v as string }; });
-                  return next;
-                });
-                // Apply WISC
-                setWISC((prev) => {
-                  const next = { ...prev };
-                  if (sel.wisc) Object.entries(sel.wisc).forEach(([k, v]) => { next[k] = { ...(next[k]||{}), severity: v as string }; });
-                  return next;
-                });
-                // MIGDAS
-                if (sel.migdas) setMIGDAS({ consistency: sel.migdas.consistency, notes: sel.migdas.notes });
-                // Flags → history/diff
-                setHistory((h) => ({
-                  ...h,
-                  developmentalConcerns: "Auto-filled for fixture; replace with clinical history.",
-                  earlyOnset: !!sel.flags?.earlyOnset,
-                  crossContextImpairment: !!sel.flags?.crossContextImpairment,
-                  maskingIndicators: !!sel.flags?.masking,
-                }));
-                setDiff((d) => ({
-                  ...d,
-                  ADHD: !!sel.flags?.comorbidity?.includes("ADHD"),
-                  DLD: !!sel.flags?.comorbidity?.includes("DLD"),
-                  ID: !!sel.flags?.comorbidity?.includes("ID"),
-                  Anxiety: !!sel.flags?.comorbidity?.includes("Anxiety"),
-                  Depression: !!sel.flags?.comorbidity?.includes("Depression"),
-                  TraumaPTSD: !!sel.flags?.comorbidity?.includes("TraumaPTSD"),
-                  FASD: !!sel.flags?.comorbidity?.includes("FASD"),
-                  Tics: !!sel.flags?.comorbidity?.includes("Tics"),
-                }));
-              }}
-            >Load</button>
-          </div>
-        }>
-          <p className={classNames("text-xs", mutedText)}>Use fixtures to sanity-check thresholds and the minimum-dataset gate. (Fixtures are label-only; no copyrighted content.)</p>
+      {/* GRID */}
+      <div className="grid">
+        {/* Dev fixtures */}
+        <Card
+          title="Dev/Test Fixtures"
+          right={
+            <div className="row">
+              <select id="fixtureSelect">
+                {CANONICAL_CASES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.id} — {c.title}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={() => {
+                  const select = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
+                  if (!select) return;
+                  const sel = CANONICAL_CASES.find((c) => c.id === select.value);
+                  if (!sel) return;
+                  // Apply SRS-2
+                  setSRS2((prev) => {
+                    const next = { ...prev } as SeverityState;
+                    if (sel.srs2)
+                      Object.entries(sel.srs2).forEach(([k, v]) => {
+                        next[k] = { ...(next[k] || {}), severity: v as string };
+                      });
+                    return next;
+                  });
+                  // Apply ABAS-3
+                  setABAS((prev) => {
+                    const next = { ...prev } as SeverityState;
+                    if (sel.abas3)
+                      Object.entries(sel.abas3).forEach(([k, v]) => {
+                        next[k] = { ...(next[k] || {}), severity: v as string };
+                      });
+                    return next;
+                  });
+                  // Apply WISC
+                  setWISC((prev) => {
+                    const next = { ...prev } as SeverityState;
+                    if (sel.wisc)
+                      Object.entries(sel.wisc).forEach(([k, v]) => {
+                        next[k] = { ...(next[k] || {}), severity: v as string };
+                      });
+                    return next;
+                  });
+                  // MIGDAS
+                  if (sel.migdas) setMIGDAS({ consistency: sel.migdas.consistency, notes: sel.migdas.notes });
+                  // Flags → history/diff
+                  setHistory((h) => ({
+                    ...h,
+                    developmentalConcerns: "Auto-filled for fixture; replace with clinical history.",
+                    earlyOnset: !!sel.flags?.earlyOnset,
+                    crossContextImpairment: !!sel.flags?.crossContextImpairment,
+                    maskingIndicators: !!sel.flags?.masking,
+                  }));
+                  setDiff((d) => ({
+                    ...d,
+                    ADHD: !!sel.flags?.comorbidity?.includes("ADHD"),
+                    DLD: !!sel.flags?.comorbidity?.includes("DLD"),
+                    ID: !!sel.flags?.comorbidity?.includes("ID"),
+                    Anxiety: !!sel.flags?.comorbidity?.includes("Anxiety"),
+                    Depression: !!sel.flags?.comorbidity?.includes("Depression"),
+                    TraumaPTSD: !!sel.flags?.comorbidity?.includes("TraumaPTSD"),
+                    FASD: !!sel.flags?.comorbidity?.includes("FASD"),
+                    Tics: !!sel.flags?.comorbidity?.includes("Tics"),
+                  }));
+                }}
+              >
+                Load
+              </button>
+            </div>
+          }
+        >
+          <p className="small">Use fixtures to sanity‑check thresholds and the minimum‑dataset gate. (Label‑only; no proprietary content.)</p>
         </Card>
 
-        {/* Clinician */}
+        {/* Clinician & Governance */}
         <Card title="Clinician & Governance">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <label className={classNames("text-xs uppercase tracking-wide", mutedText)}>Clinician Name</label>
-              <input className={inputCls} value={clinician.name} onChange={(e) => setClinician((s) => ({ ...s, name: e.target.value }))} placeholder="Dr Jane Citizen" />
-            </div>
-            <div>
-              <label className={classNames("text-xs uppercase tracking-wide", mutedText)}>Date</label>
-              <input type="date" className={inputCls} value={clinician.date} onChange={(e) => setClinician((s) => ({ ...s, date: e.target.value }))} />
-            </div>
-            <div className="flex items-end">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={clinician.attested} onChange={(e) => setClinician((s) => ({ ...s, attested: e.target.checked }))} />
-                I attest that clinical judgement prevails.
-              </label>
-            </div>
+          <div className="grid">
+            <Field label="Clinician Name">
+              <input
+                value={clinician.name}
+                onChange={(e) => setClinician((s) => ({ ...s, name: e.target.value }))}
+                placeholder="Dr Jane Citizen"
+              />
+            </Field>
+            <Field label="Date">
+              <input type="date" value={clinician.date} onChange={(e) => setClinician((s) => ({ ...s, date: e.target.value }))} />
+            </Field>
+            <label className="row">
+              <input type="checkbox" checked={clinician.attested} onChange={(e) => setClinician((s) => ({ ...s, attested: e.target.checked }))} />
+              <span>I attest that clinical judgement prevails.</span>
+            </label>
           </div>
-          <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <label className={classNames("text-xs uppercase tracking-wide", mutedText)}>Report Voice</label>
-              <select className={selectCls} value={reportVoice} onChange={(e) => setReportVoice(e.target.value as any)}>
+          <div className="grid">
+            <Field label="Report Voice">
+              <select value={reportVoice} onChange={(e) => setReportVoice(e.target.value as any)}>
                 <option value="clinical">Clinical only</option>
                 <option value="dual">Clinical + Family summary</option>
               </select>
-            </div>
-            <div>
-              <label className={classNames("text-xs uppercase tracking-wide", mutedText)}>Risk Tolerance</label>
-              <select className={selectCls} value={config.riskTolerance} onChange={(e) => setConfig((c) => ({ ...c, riskTolerance: e.target.value as any }))}>
+            </Field>
+            <Field label="Risk Tolerance">
+              <select value={config.riskTolerance} onChange={(e) => setConfig((c) => ({ ...c, riskTolerance: e.target.value as any }))}>
                 <option value="sensitive">Sensitive (lower cutpoint)</option>
                 <option value="balanced">Balanced</option>
                 <option value="specific">Specific (higher cutpoint)</option>
               </select>
-            </div>
-            <div>
-              <label className={classNames("text-xs uppercase tracking-wide", mutedText)}>Prior (log-odds)</label>
-              <input type="number" step={0.1} className={inputCls} value={config.prior} onChange={(e) => setConfig((c) => ({ ...c, prior: Number(e.target.value) }))} />
-            </div>
+            </Field>
+            <Field label="Prior (log-odds)">
+              <input type="number" step={0.1} value={config.prior} onChange={(e) => setConfig((c) => ({ ...c, prior: Number(e.target.value) }))} />
+            </Field>
           </div>
         </Card>
 
-        {/* Domain-level instruments */}
+        {/* SRS-2 */}
         <Card title="SRS-2 — Domain Entries">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid">
             {config.srs2Domains.map((d) => (
-              <div key={d.key} className={classNames("rounded-xl border p-3", cardBg, borderCol)}>
-                <div className="mb-1 text-sm font-semibold">{d.label}</div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className={classNames("text-xs", mutedText)}>Score (optional)</label>
-                    <input type="number" className={inputCls} value={srs2[d.key]?.score ?? ""} onChange={(e) => setSRS2((s) => ({ ...s, [d.key]: { ...s[d.key], score: e.target.value === "" ? undefined : Number(e.target.value) } }))} />
-                  </div>
-                  <div className="col-span-2">
-                    <label className={classNames("text-xs", mutedText)}>Severity</label>
-                    <select className={selectCls} value={srs2[d.key]?.severity ?? ""} onChange={(e) => setSRS2((s) => ({ ...s, [d.key]: { ...s[d.key], severity: e.target.value } }))}>
-                      <option value="">—</option>
-                      {d.severities.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
+              <section key={d.key} className="card">
+                <div className="stack">
+                  <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
+                  <div className="grid" style={{ gridTemplateColumns: "1fr 2fr", gap: 12 }}>
+                    <Field label="Score (optional)">
+                      <input
+                        type="number"
+                        value={srs2[d.key]?.score ?? ""}
+                        onChange={(e) =>
+                          setSRS2((s) => ({
+                            ...s,
+                            [d.key]: { ...s[d.key], score: e.target.value === "" ? undefined : Number(e.target.value) },
+                          }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Severity">
+                      <select
+                        value={srs2[d.key]?.severity ?? ""}
+                        onChange={(e) => setSRS2((s) => ({ ...s, [d.key]: { ...s[d.key], severity: e.target.value } }))}
+                      >
+                        <option value="">—</option>
+                        {d.severities.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
                   </div>
                 </div>
-              </div>
+              </section>
             ))}
           </div>
         </Card>
 
+        {/* WISC */}
         <Card title="WISC — Domain Entries">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid">
             {config.wiscDomains.map((d) => (
-              <div key={d.key} className={classNames("rounded-xl border p-3", cardBg, borderCol)}>
-                <div className="mb-1 text-sm font-semibold">{d.label}</div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className={classNames("text-xs", mutedText)}>Score (optional)</label>
-                    <input type="number" className={inputCls} value={wisc[d.key]?.score ?? ""} onChange={(e) => setWISC((s) => ({ ...s, [d.key]: { ...s[d.key], score: e.target.value === "" ? undefined : Number(e.target.value) } }))} />
-                  </div>
-                  <div className="col-span-2">
-                    <label className={classNames("text-xs", mutedText)}>Range</label>
-                    <select className={selectCls} value={wisc[d.key]?.severity ?? ""} onChange={(e) => setWISC((s) => ({ ...s, [d.key]: { ...s[d.key], severity: e.target.value } }))}>
-                      <option value="">—</option>
-                      {d.severities.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
+              <section key={d.key} className="card">
+                <div className="stack">
+                  <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
+                  <div className="grid" style={{ gridTemplateColumns: "1fr 2fr", gap: 12 }}>
+                    <Field label="Score (optional)">
+                      <input
+                        type="number"
+                        value={wisc[d.key]?.score ?? ""}
+                        onChange={(e) =>
+                          setWISC((s) => ({
+                            ...s,
+                            [d.key]: { ...s[d.key], score: e.target.value === "" ? undefined : Number(e.target.value) },
+                          }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Range">
+                      <select
+                        value={wisc[d.key]?.severity ?? ""}
+                        onChange={(e) => setWISC((s) => ({ ...s, [d.key]: { ...s[d.key], severity: e.target.value } }))}
+                      >
+                        <option value="">—</option>
+                        {d.severities.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
                   </div>
                 </div>
-              </div>
+              </section>
             ))}
           </div>
-          <p className={classNames("mt-2 text-xs", mutedText)}>
-            WISC entries are for context and differential formulation; by default they do not alter ASD likelihood.
-          </p>
+          <p className="small">WISC entries are for context and differential formulation; by default they do not alter ASD likelihood.</p>
         </Card>
 
+        {/* ABAS-3 */}
         <Card title="ABAS-3 — Domain Entries">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid">
             {config.abasDomains.map((d) => (
-              <div key={d.key} className={classNames("rounded-xl border p-3", cardBg, borderCol)}>
-                <div className="mb-1 text-sm font-semibold">{d.label}</div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className={classNames("text-xs", mutedText)}>Score (optional)</label>
-                    <input type="number" className={inputCls} value={abas[d.key]?.score ?? ""} onChange={(e) => setABAS((s) => ({ ...s, [d.key]: { ...s[d.key], score: e.target.value === "" ? undefined : Number(e.target.value) } }))} />
-                  </div>
-                  <div className="col-span-2">
-                    <label className={classNames("text-xs", mutedText)}>Range</label>
-                    <select className={selectCls} value={abas[d.key]?.severity ?? ""} onChange={(e) => setABAS((s) => ({ ...s, [d.key]: { ...s[d.key], severity: e.target.value } }))}>
-                      <option value="">—</option>
-                      {d.severities.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
+              <section key={d.key} className="card">
+                <div className="stack">
+                  <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
+                  <div className="grid" style={{ gridTemplateColumns: "1fr 2fr", gap: 12 }}>
+                    <Field label="Score (optional)">
+                      <input
+                        type="number"
+                        value={abas[d.key]?.score ?? ""}
+                        onChange={(e) =>
+                          setABAS((s) => ({
+                            ...s,
+                            [d.key]: { ...s[d.key], score: e.target.value === "" ? undefined : Number(e.target.value) },
+                          }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Range">
+                      <select
+                        value={abas[d.key]?.severity ?? ""}
+                        onChange={(e) => setABAS((s) => ({ ...s, [d.key]: { ...s[d.key], severity: e.target.value } }))}
+                      >
+                        <option value="">—</option>
+                        {d.severities.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
                   </div>
                 </div>
-              </div>
+              </section>
             ))}
           </div>
-          <p className={classNames("mt-2 text-xs", mutedText)}>
-            ABAS-3 domain ranges influence the provisional support-need prompt via the **impairment** feature.
-          </p>
+          <p className="small">ABAS-3 domain ranges influence the provisional support-need prompt via the <b>impairment</b> feature.</p>
         </Card>
 
-        <Card title="MIGDAS — Qualitative Profile" right={
-          <button className={classNames("rounded-xl px-3 py-1 text-sm", isNight ? "bg-slate-700 hover:bg-slate-600" : "bg-slate-200 hover:bg-slate-300")} onClick={() => setMIGDAS((m) => ({ ...m, notes: [...m.notes, ""] }))}>+ Add note</button>
-        }>
-          <div className="mb-3">
-            <label className={classNames("text-xs", mutedText)}>Overall Consistency</label>
-            <div className="mt-1 grid grid-cols-3 gap-2 text-sm">
-              {(MIGDAS_CONSISTENCY as readonly string[]).map((opt) => (
-                <label key={opt} className={classNames("flex items-center gap-2 rounded border p-2", borderCol)}>
-                  <input type="radio" name="migdas_consistency" checked={migdas.consistency === opt} onChange={() => setMIGDAS((m) => ({ ...m, consistency: opt as any }))} />
-                  {opt === "unclear" ? "Unclear" : opt === "consistent" ? "Consistent with autism" : "Inconsistent with autism"}
-                </label>
+        {/* MIGDAS */}
+        <Card
+          title="MIGDAS — Qualitative Profile"
+          right={<button onClick={() => setMIGDAS((m) => ({ ...m, notes: [...m.notes, ""] }))}>+ Add note</button>}
+        >
+          <div className="stack">
+            <Field label="Overall Consistency">
+              <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+                {(MIGDAS_CONSISTENCY as readonly string[]).map((opt) => (
+                  <label key={opt} className="row">
+                    <input type="radio" name="migdas_consistency" checked={migdas.consistency === opt} onChange={() => setMIGDAS((m) => ({ ...m, consistency: opt as any }))} />
+                    <span>
+                      {opt === "unclear" ? "Unclear" : opt === "consistent" ? "Consistent with autism" : "Inconsistent with autism"}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </Field>
+            <div className="stack">
+              {migdas.notes.map((n, i) => (
+                <input
+                  key={i}
+                  placeholder={`Brief observation note ${i + 1}`}
+                  value={n}
+                  onChange={(e) => setMIGDAS((m) => ({ ...m, notes: m.notes.map((x, j) => (j === i ? e.target.value : x)) }))}
+                />
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-2">
-            {migdas.notes.map((n, i) => (
-              <input key={i} className={inputCls} placeholder={`Brief observation note ${i + 1}`} value={n} onChange={(e) => setMIGDAS((m) => ({ ...m, notes: m.notes.map((x, j) => (j === i ? e.target.value : x)) }))} />
-            ))}
-          </div>
         </Card>
 
-        {/* Generic instruments (scores only) */}
+        {/* Generic instruments */}
         <Card title="Other Instruments (scores only)">
-          <div className="mb-3 flex items-center justify-between">
-            <div className={classNames("text-sm", mutedText)}>Enter scores/bands; mappings are configurable later.</div>
-            <button className={classNames("rounded-xl px-3 py-1 text-sm", isNight ? "bg-slate-700 hover:bg-slate-600" : "bg-slate-200 hover:bg-slate-300")} onClick={() => setInstruments((arr) => [...arr, { name: "Custom", value: undefined }])}>+ Add instrument</button>
+          <div className="row" style={{ justifyContent: "space-between" }}>
+            <div className="small">Enter scores/bands; mappings are configurable later.</div>
+            <button onClick={() => setInstruments((arr) => [...arr, { name: "Custom", value: undefined, band: "" }])}>+ Add instrument</button>
           </div>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid">
             {instruments.map((inst, idx) => (
-              <div key={idx} className={classNames("rounded-xl border p-3", cardBg, borderCol)}>
-                <div className="mb-2 flex items-center justify-between">
-                  <input className={inputCls} value={inst.name} onChange={(e) => setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, name: e.target.value } : x)))} />
-                  <button className="text-xs text-rose-400 hover:underline" onClick={() => setInstruments((arr) => arr.filter((_, i) => i !== idx))}>Remove</button>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className={classNames("text-xs", mutedText)}>Score</label>
-                    <input type="number" className={inputCls} value={inst.value ?? ""} onChange={(e) => {
-                      const val = e.target.value === "" ? undefined : Number(e.target.value);
-                      setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, value: val } : x)));
-                    }} />
+              <section key={idx} className="card">
+                <div className="stack">
+                  <div className="row" style={{ justifyContent: "space-between" }}>
+                    <input value={inst.name} onChange={(e) => setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, name: e.target.value } : x)))} />
+                    <button className="small" onClick={() => setInstruments((arr) => arr.filter((_, i) => i !== idx))}>Remove</button>
                   </div>
-                  <div className="col-span-2">
-                    <label className={classNames("text-xs", mutedText)}>Band (optional)</label>
-                    <input className={inputCls} placeholder="e.g., Mild / Moderate / Severe" onChange={(e) => setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, band: e.target.value } : x)))} />
+                  <div className="grid" style={{ gridTemplateColumns: "1fr 2fr", gap: 12 }}>
+                    <Field label="Score">
+                      <input
+                        type="number"
+                        value={inst.value ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value === "" ? undefined : Number(e.target.value);
+                          setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, value: val } : x)));
+                        }}
+                      />
+                    </Field>
+                    <Field label="Band (optional)">
+                      <input
+                        placeholder="e.g., Mild / Moderate / Severe"
+                        value={inst.band || ""}
+                        onChange={(e) => setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, band: e.target.value } : x)))}
+                      />
+                    </Field>
                   </div>
                 </div>
-              </div>
+              </section>
             ))}
           </div>
         </Card>
 
         {/* History & Observation */}
         <Card title="Developmental History & Clinician Observation">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label className={classNames("text-sm font-semibold", mutedText)}>Developmental History</label>
-              <textarea className={classNames("mt-1 h-32 w-full", textAreaCls)} placeholder="Summarise early development, social communication history, restricted/repetitive patterns." value={history.developmentalConcerns} onChange={(e) => setHistory((s) => ({ ...s, developmentalConcerns: e.target.value }))} />
-              <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={history.earlyOnset} onChange={(e) => setHistory((s) => ({ ...s, earlyOnset: e.target.checked }))} /> Early developmental onset evident</label>
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={history.crossContextImpairment} onChange={(e) => setHistory((s) => ({ ...s, crossContextImpairment: e.target.checked }))} /> Cross-context functional impairment</label>
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={history.maskingIndicators} onChange={(e) => setHistory((s) => ({ ...s, maskingIndicators: e.target.checked }))} /> Masking/camouflaging indicators present</label>
+          <div className="grid">
+            <div className="stack">
+              <label>Developmental History</label>
+              <textarea
+                placeholder="Summarise early development, social communication history, restricted/repetitive patterns."
+                value={history.developmentalConcerns}
+                onChange={(e) => setHistory((s) => ({ ...s, developmentalConcerns: e.target.value }))}
+                style={{ height: 120 }}
+              />
+              <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <label className="row"><input type="checkbox" checked={history.earlyOnset} onChange={(e) => setHistory((s) => ({ ...s, earlyOnset: e.target.checked }))} /> Early developmental onset evident</label>
+                <label className="row"><input type="checkbox" checked={history.crossContextImpairment} onChange={(e) => setHistory((s) => ({ ...s, crossContextImpairment: e.target.checked }))} /> Cross‑context functional impairment</label>
+                <label className="row"><input type="checkbox" checked={history.maskingIndicators} onChange={(e) => setHistory((s) => ({ ...s, maskingIndicators: e.target.checked }))} /> Masking/camouflaging indicators present</label>
               </div>
             </div>
-            <div>
-              <label className={classNames("text-sm font-semibold", mutedText)}>Clinician Observation (0–3)</label>
-              <div className="grid grid-cols-2 gap-3">
+            <div className="stack">
+              <label>Clinician Observation (0–3)</label>
+              <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {(["A1", "A2", "A3", "B1", "B2", "B3", "B4"] as CriterionKey[]).map((k) => (
-                  <div key={k}>
-                    <label className={classNames("text-xs", mutedText)}>{k}</label>
-                    <input type="number" min={0} max={3} className={inputCls} value={(observation as any)[k] ?? 0} onChange={(e) => setObservation((s) => ({ ...s, [k]: Number(e.target.value) }))} />
-                  </div>
+                  <Field key={k} label={k}>
+                    <input type="number" min={0} max={3} value={(observation as any)[k] ?? 0} onChange={(e) => setObservation((s) => ({ ...s, [k]: Number(e.target.value) }))} />
+                  </Field>
                 ))}
               </div>
-              <textarea className={classNames("mt-2 h-20 w-full", textAreaCls)} placeholder="Objective notes (setting, salient behaviours)." value={observation.notes} onChange={(e) => setObservation((s) => ({ ...s, notes: e.target.value }))} />
+              <textarea
+                placeholder="Objective notes (setting, salient behaviours)."
+                value={observation.notes}
+                onChange={(e) => setObservation((s) => ({ ...s, notes: e.target.value }))}
+                style={{ height: 80 }}
+              />
             </div>
           </div>
         </Card>
 
-        {/* Comorbidity flags */}
+        {/* Diff flags */}
         <Card title="Comorbidity / Differential Flags">
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+          <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 8 }}>
             {([
               ["ADHD", "ADHD"],
               ["DLD", "Language Disorder (DLD)"],
@@ -829,136 +806,119 @@ return (
               ["FASD", "FASD"],
               ["Tics", "Tic Disorder"],
             ] as const).map(([key, label]) => (
-              <label key={key} className="flex items-center gap-2 text-sm">
+              <label key={key} className="row">
                 <input type="checkbox" checked={(diff as any)[key]} onChange={(e) => setDiff((s) => ({ ...s, [key]: e.target.checked }))} /> {label}
               </label>
             ))}
           </div>
-          <div className="mt-2">
-            <label className={classNames("text-xs", mutedText)}>Other differential notes</label>
-            <input className={inputCls} value={diff.Other} onChange={(e) => setDiff((s) => ({ ...s, Other: e.target.value }))} />
+          <Field label="Other differential notes">
+            <input value={diff.Other} onChange={(e) => setDiff((s) => ({ ...s, Other: e.target.value }))} />
+          </Field>
+        </Card>
+
+        {/* Likelihood & Support needs */}
+        <Card title="Likelihood & Domains">
+          <div className="row" style={{ alignItems: "flex-end", gap: 24 }}>
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 800 }}>{(model.p * 100).toFixed(1)}%</div>
+              <div className="small">Overall ASD likelihood</div>
+              <div className="small">Cutpoint: {(model.cut * 100).toFixed(0)}% ({config.riskTolerance})</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div className="row" style={{ justifyContent: "space-between" }}>
+                <span className="small">Criterion A</span>
+                <span className="small">{(model.pA * 100).toFixed(0)}%</span>
+              </div>
+              <div className="meter"><span style={{ width: `${Math.round(model.pA * 100)}%` }} /></div>
+              <div className="row" style={{ justifyContent: "space-between", marginTop: 12 }}>
+                <span className="small">Criterion B</span>
+                <span className="small">{(model.pB * 100).toFixed(0)}%</span>
+              </div>
+              <div className="meter"><span style={{ width: `${Math.round(model.pB * 100)}%` }} /></div>
+            </div>
+          </div>
+          <div style={{ marginTop: 12 }}>
+            Decision: {model.p >= model.cut ? <span className="badge ok">Above threshold — proceed</span> : <span className="badge warn">Below threshold — consider more data</span>}
           </div>
         </Card>
 
-        {/* Likelihood & Explainability */}
-        <section className={classNames("mb-6 grid grid-cols-1 gap-4 md:grid-cols-3")}>          
-          <div className={classNames("md:col-span-2 rounded-2xl border p-4", cardBg, borderCol)}>
-            <h3 className="text-lg font-semibold">Likelihood & Domains</h3>
-            <div className="mt-2 flex items-end gap-6">
-              <div>
-                <div className="text-4xl font-bold">{(model.p * 100).toFixed(1)}%</div>
-                <div className={classNames("text-xs", mutedText)}>Overall ASD likelihood</div>
-                <div className={classNames("text-xs", mutedText)}>Cutpoint: {(model.cut * 100).toFixed(0)}% ({config.riskTolerance})</div>
-              </div>
-              <div className="grow">
-                <div className="mb-2 flex items-center justify-between text-xs"><span>Criterion A</span><span>{(model.pA * 100).toFixed(0)}%</span></div>
-                <div className={classNames("h-2 w-full rounded", isNight ? "bg-slate-700" : "bg-slate-200")}>
-                  <div className="h-2 rounded bg-indigo-600" style={{ width: `${Math.round(model.pA * 100)}%` }} />
-                </div>
-                <div className="mt-3 mb-2 flex items-center justify-between text-xs"><span>Criterion B</span><span>{(model.pB * 100).toFixed(0)}%</span></div>
-                <div className={classNames("h-2 w-full rounded", isNight ? "bg-slate-700" : "bg-slate-200")}>
-                  <div className="h-2 rounded bg-indigo-600" style={{ width: `${Math.round(model.pB * 100)}%` }} />
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 text-sm">
-              Decision: {model.p >= model.cut ? (
-                <span className={chipOk}>Above threshold — proceed</span>
-              ) : (
-                <span className={chipWarn}>Below threshold — consider more data</span>
-              )}
-            </div>
-          </div>
+        <Card title="Provisional Support Needs">
+          <div className="card" style={{ textAlign: "center" }}>{supportEstimate}</div>
+          <p className="small">Derived from ABAS domain ranges.</p>
+        </Card>
 
-          <div className={classNames("rounded-2xl border p-4", cardBg, borderCol)}>
-            <h4 className="text-sm font-semibold">Provisional Support Needs</h4>
-            <div className={classNames("mt-1 rounded-xl p-3 text-center", isNight ? "bg-slate-900 text-slate-100" : "bg-slate-50 text-slate-800")}>{supportEstimate}</div>
-            <p className={classNames("mt-2 text-xs", mutedText)}>Derived from ABAS domain ranges. Configure mappings in settings (no proprietary content).</p>
-          </div>
-        </section>
-
+        {/* Recommendations */}
         <Card title="Recommendations">
-          <ul className="list-disc pl-6 text-sm">
+          <ul style={{ paddingLeft: 20 }}>
             {recommendation.map((r, i) => (
-              <li key={i}>{r}</li>
+              <li key={i} style={{ fontSize: 14 }}>{r}</li>
             ))}
           </ul>
         </Card>
 
+        {/* Explainability */}
         <Card title="Explainability — Evidence Contributions">
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <div className="grid">
             {model.terms
               .sort((a, b) => Math.abs(b.product) - Math.abs(a.product))
               .map((t, i) => (
-                <div key={i} className={classNames("rounded-xl border p-3", cardBg, borderCol)}>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-mono">{String(t.key)}</span>
+                <section key={i} className="card">
+                  <div className="row" style={{ justifyContent: "space-between" }}>
+                    <span style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace" }}>{String(t.key)}</span>
                     <span>{t.product.toFixed(2)}</span>
                   </div>
-                  <div className={classNames("mt-2 h-2 w-full rounded", isNight ? "bg-slate-700" : "bg-slate-200")}> 
-                    <div className={classNames("h-2 rounded", t.product >= 0 ? "bg-indigo-600" : "bg-rose-500")} style={{ width: `${Math.min(100, Math.abs(t.product) * 20)}%` }} />
+                  <div className="meter" style={{ marginTop: 8 }}>
+                    <span style={{ width: `${Math.min(100, Math.abs(t.product) * 20)}%`, background: t.product >= 0 ? "linear-gradient(90deg,#34d399,#60a5fa)" : "#f43f5e" }} />
                   </div>
-                  <div className={classNames("mt-1 text-xs", mutedText)}>value {t.value.toFixed(2)} × weight {t.weight.toFixed(2)}</div>
-                </div>
+                  <div className="small" style={{ marginTop: 4 }}>
+                    value {t.value.toFixed(2)} × weight {t.weight.toFixed(2)}
+                  </div>
+                </section>
               ))}
           </div>
         </Card>
 
+        {/* Report */}
         <Card title="Structured Report (preview)">
-          <pre className={classNames("whitespace-pre-wrap rounded-xl p-3 text-sm", isNight ? "bg-slate-900 text-slate-100" : "bg-slate-50 text-slate-800")}>{reportMarkdown}</pre>
+          <pre style={{ whiteSpace: "pre-wrap", padding: 12 }}>{reportMarkdown}</pre>
         </Card>
 
+        {/* Settings & Minimum Dataset */}
         <Card title="Settings & Minimum Dataset">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className={classNames("rounded-xl border p-3", cardBg, borderCol)}>
-              <h4 className="mb-2 font-semibold">Minimum Dataset</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <label className="flex items-center gap-2"><input type="checkbox" checked={config.minDataset.requireASDInstrument} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireASDInstrument: e.target.checked } }))} /> Require ≥1 ASD instrument</label>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={config.minDataset.requireAdaptive} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireAdaptive: e.target.checked } }))} /> Require adaptive measure</label>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={config.minDataset.requireHistory} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireHistory: e.target.checked } }))} /> Require history</label>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={config.minDataset.requireObservation} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireObservation: e.target.checked } }))} /> Require observation</label>
-                <div>
-                  <label className={classNames("text-xs", mutedText)}>Min instruments</label>
-                  <input type="number" min={0} className={inputCls} value={config.minDataset.minInstruments} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, minInstruments: Number(e.target.value) } }))} />
-                </div>
+          <div className="grid">
+            <section className="card">
+              <h3 className="section-title">Minimum Dataset</h3>
+              <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <label className="row"><input type="checkbox" checked={config.minDataset.requireASDInstrument} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireASDInstrument: e.target.checked } }))} /> Require ≥1 ASD instrument</label>
+                <label className="row"><input type="checkbox" checked={config.minDataset.requireAdaptive} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireAdaptive: e.target.checked } }))} /> Require adaptive measure</label>
+                <label className="row"><input type="checkbox" checked={config.minDataset.requireHistory} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireHistory: e.target.checked } }))} /> Require history</label>
+                <label className="row"><input type="checkbox" checked={config.minDataset.requireObservation} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireObservation: e.target.checked } }))} /> Require observation</label>
+                <Field label="Min instruments">
+                  <input type="number" min={0} value={config.minDataset.minInstruments} onChange={(e) => setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, minInstruments: Number(e.target.value) } }))} />
+                </Field>
               </div>
-              <div className={classNames("mt-2 text-xs", mutedText)}>
-                Status: {datasetStatus.passes ? <span className={chipOk}>Meets minimum</span> : <span className={chipWarn}>Does not meet minimum</span>} 
-                <span className="ml-2">(Instruments: {datasetStatus.counts.instrumentsEntered}, Effective: {datasetStatus.counts.effectiveInstrumentCount}, ASD instrument: {String(datasetStatus.counts.hasASDInstrument)}, Adaptive: {String(datasetStatus.counts.hasAdaptive)}, History: {String(datasetStatus.counts.historyOk)}, Obs: {String(datasetStatus.counts.observationOk)})</span>
+              <div className="small" style={{ marginTop: 8 }}>
+                Status: {datasetStatus.passes ? <span className="badge ok">Meets minimum</span> : <span className="badge warn">Does not meet minimum</span>}
+                <span style={{ marginLeft: 8 }}>
+                  (Instruments: {datasetStatus.counts.instrumentsEntered}, Effective: {datasetStatus.counts.effectiveInstrumentCount}, ASD instrument: {String(datasetStatus.counts.hasASDInstrument)}, Adaptive: {String(datasetStatus.counts.hasAdaptive)}, History: {String(datasetStatus.counts.historyOk)}, Obs: {String(datasetStatus.counts.observationOk)})
+                </span>
               </div>
-            </div>
+            </section>
 
-            <div className={classNames("rounded-xl border p-3", cardBg, borderCol)}>
-              <h4 className="mb-2 font-semibold">Audit JSON</h4>
-              <pre className={classNames("h-48 overflow-auto whitespace-pre-wrap rounded p-2 text-xs", isNight ? "bg-slate-900" : "bg-slate-50")}>{JSON.stringify({
-                clinician,
-                srs2,
-                wisc,
-                abas,
-                migdas,
-                instruments,
-                history,
-                observation,
-                diff,
-                evidence,
-                model: { p: model.p, lp: model.lp, cut: model.cut },
-                config,
-                timestamp: new Date().toISOString(),
+            <section className="card">
+              <h3 className="section-title">Audit JSON</h3>
+              <pre style={{ whiteSpace: "pre-wrap", height: 220, overflow: "auto", padding: 8 }}>{JSON.stringify({
+                clinician, srs2, wisc, abas, migdas, instruments, history, observation, diff, evidence, model: { p: model.p, lp: model.lp, cut: model.cut }, config, timestamp: new Date().toISOString(),
               }, null, 2)}</pre>
-            </div>
-          </div>
-          <div className={classNames("mt-4 rounded-xl border p-3 text-xs", borderCol)}>
-            <h4 className="mb-1 font-semibold">Regulatory posture & Jurisdiction</h4>
-            <p className={mutedText}>
-              Clinical Decision Support (CDS) tool. Not a diagnostic device. Intended for use by qualified clinicians under the Australian Privacy Principles (APPs) and the NSW Health Records and Information Privacy Act (HRIP Act). For TGA, design for CDS exemption where applicable; retain versioned rules, audit logs, and clinician attestation in production.
-            </p>
+            </section>
           </div>
         </Card>
-
-        <footer className={classNames("my-10 text-center text-xs", mutedText)}>
-          © {new Date().getFullYear()} ASD Decision Support MVP — Demonstration only. Night/Day accessibility modes ensure high contrast; please report any visibility issues.
-        </footer>
       </div>
+
+      <footer style={{ margin: "40px 0", textAlign: "center" }} className="small">
+        © {new Date().getFullYear()} ASD Decision Support MVP — Demonstration only.
+      </footer>
+
       <style>{`@media print { body { background: white; } .no-print { display: none; } }`}</style>
     </div>
   );
