@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey } from "./config/modelConfig";
+import { VINELAND_BANDS } from "./config/modelConfig";
 import { useAsdEngine } from "./hooks/useAsdEngine";
 import { CANONICAL_CASES, MIGDAS_CONSISTENCY } from "./data/testData";
 import type { Config, SeverityState, CriterionKey } from "./types";
@@ -76,10 +77,6 @@ export default function App() {
     }
   }, [ageBand, autoPrior, setConfig]);
 
-  useEffect(() => {
-  document.body.setAttribute("data-theme", theme);
-}, [theme]);
-
   const ruleHash = useMemo(() => {
   const s = JSON.stringify(DEFAULT_CONFIG);
   let h = 0;
@@ -89,6 +86,10 @@ export default function App() {
 
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const toggleTheme = () => setTheme(t => (t === "dark" ? "light" : "dark"));
+ 
+  useEffect(() => {
+      document.body.setAttribute("data-theme", theme);
+  }, [theme]);
   
   const { datasetStatus, evidence, model, supportEstimate, recommendation } = useAsdEngine(
     config,
@@ -340,6 +341,7 @@ export default function App() {
                 </div>
               </div>
             </Card>
+      )}
 
       {activeTab === 5 && (
   <Card title="Report (preview)">
