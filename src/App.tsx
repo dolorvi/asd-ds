@@ -1,10 +1,14 @@
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import {DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey} from "./config/modelConfig";
 import { useAsdEngine } from "./hooks/useAsdEngine";
 import { CANONICAL_CASES, MIGDAS_CONSISTENCY } from "./data/testData";
 import type { Config, SeverityState, CriterionKey } from "./types";
 import { Card, Field, TabBar, ChipGroup, Header, Footer } from "./components/ui";
-import { getBandColor } from "./ui/severity";
+import { getBandColor } from "./components/severity";
+
+import type { Condition } from "./types";
+
+const [condition, setCondition] = useState<Condition>("ASD");
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -249,11 +253,14 @@ const setInstrumentBand = useCallback(
         <section key={d.key} className="card">
           <div className="stack">
             <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
+            
+            {/* SRS Domain Grid */}
             <ChipGroup
-              options={d.severities}
-              value={srs2[d.key]?.severity || ""}
-              onChange={(val) => setSRS2((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))}
-            />
+  options={d.severities}
+  value={srs2[d.key]?.severity || ""}
+  onChange={(val) => setSRS2((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))}
+  polarity="goodLow"
+/>
           </div>
         </section>
       ))}
@@ -282,10 +289,11 @@ const AbasDomainGrid = (
             </div>
 
             <ChipGroup
-              options={d.severities}
-              value={sel}
-              onChange={(val) => setABAS((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))}
-            />
+  options={d.severities}
+  value={abas[d.key]?.severity || ""}   // or vineland/wisc as appropriate
+  onChange={(val) => setABAS((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))}
+  polarity="goodHigh"
+/>
           </div>
         </section>
       );
@@ -314,14 +322,16 @@ const AbasDomainGrid = (
   return (
     <div className="app-shell">
       <Header
-        title="ASD Decision Support — MVP"
-        subtitle="DSM-5-TR aligned • tabs build"
-        onDevToggle={() => setDevOpen((v) => !v)}
-        onExportSummary={exportSummary}
-        onExportFull={() => window.print()}
-        onThemeToggle={toggleTheme}
-        theme={theme}
-      />
+  title="ASD Decision Support — MVP"
+  subtitle="DSM-5-TR aligned • tabs build"
+  onDevToggle={() => setDevOpen((v) => !v)}
+  onExportSummary={exportSummary}
+  onExportFull={() => window.print()}
+  onThemeToggle={toggleTheme}
+  theme={theme}
+  condition={condition}
+  onConditionChange={setCondition}
+/>
 
       {/* Compact toggle */}
       <div className="row no-print" style={{ justifyContent: "flex-end", gap: 8, margin: "6px 0 4px" }}>

@@ -51,3 +51,5 @@ export type Config = {
 };
 
 export type SeverityState = Record<string, { score?: number; severity?: string }>;
+
+export type Condition = "ASD" | "ADHD" | "ID" | "FASD";

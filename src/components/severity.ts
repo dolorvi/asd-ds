@@ -1,51 +1,40 @@
-// Canonical buckets shared across ABAS & Vineland
-export type CanonicalBand = "EL" | "VL" | "LA" | "AVG" | "HA" | "VH" | "EH";
+// src/ui/severity.ts
+export type Polarity = "goodHigh" | "goodLow" | "neutral";
 
-// Exact phrase → canonical bucket (compare AFTER normalization)
-const PHRASE_TO_CANONICAL: Record<string, CanonicalBand> = {
-  // Low end
-  "extremely low": "EL",
-  "low": "EL",                 // Vineland "Low"
-  "very low": "VL",
-  "moderately low": "VL",      // Vineland
+/** Map any label to a tone token, respecting domain polarity. */
+export function getBandTone(label: string, polarity: Polarity = "goodHigh"): "danger"|"warn"|"neutral"|"good"|"best" {
+  const l = label.trim().toLowerCase();
 
-  // Mid
-  "low average": "LA",
-  "below average": "LA",
-  "average": "AVG",
-  "adequate": "AVG",           // Vineland
-  "typical": "AVG",
-  "age appropriate": "AVG",
-  "within normal limits": "AVG",
+  const has = (xs: string[]) => xs.some(k => l === k || l.includes(k));
 
-  // High end
-  "high average": "HA",
-  "above average": "HA",
-  "very high": "VH",
-  "moderately high": "VH",     // Vineland
-  "extremely high": "EH",
-  "high": "EH",                // Vineland "High"
-};
+  const LOW      = ["extremely low","very low","low","severe","severely elevated","clinically significant"];
+  const LOWISH   = ["low average","borderline","below average","moderate","moderately elevated"];
+  const AVERAGE  = ["average","typical","within normal limits","wnl","normal"];
+  const HIGHISH  = ["high average","above average","mild","mildly elevated"];
+  const HIGH     = ["very high","extremely high","superior","very superior"];
 
-export function normalizeBandTerm(label: string): CanonicalBand | undefined {
-  const key = label
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z ]/g, "")   // strip punctuation
-    .replace(/\s+/g, " ");     // collapse whitespace
-  return PHRASE_TO_CANONICAL[key];
+  const is = (group: string[]) => has(group);
+
+  let tone: "danger"|"warn"|"neutral"|"good"|"best" = "neutral";
+
+  if (is(LOW))      tone = (polarity === "goodHigh") ? "danger" : "best";
+  else if (is(LOWISH)) tone = (polarity === "goodHigh") ? "warn"   : "good";
+  else if (is(AVERAGE)) tone = "neutral";
+  else if (is(HIGHISH)) tone = (polarity === "goodHigh") ? "good"  : "warn";
+  else if (is(HIGH))    tone = (polarity === "goodHigh") ? "best"  : "danger";
+
+  return tone;
 }
 
-// Single source of truth for colors
-export function getBandColor(label: string): string {
-  switch (normalizeBandTerm(label)) {
-    case "EL":  return "#ef4444"; // red-500
-    case "VL":  return "#f97316"; // orange-500
-    case "LA":  return "#f59e0b"; // amber-500
-    case "AVG": return "#64748b"; // slate-500 (neutral)
-    case "HA":  return "#14b8a6"; // teal-500
-    case "VH":  return "#22c55e"; // green-500
-    case "EH":  return "#16a34a"; // green-600
-    default:    return "#475569"; // fallback
-  }
+/** Final background color (alpha tint) for a chip */
+export function getBandColor(label: string, polarity: Polarity = "goodHigh"): string {
+  const tone = getBandTone(label, polarity);
+  const map: Record<ReturnType<typeof getBandTone>, string> = {
+    danger:  "var(--tone-danger)",
+    warn:    "var(--tone-warn)",
+    neutral: "var(--tone-neutral)",
+    good:    "var(--tone-good)",
+    best:    "var(--tone-best)",
+  };
+  return map[tone];
 }
