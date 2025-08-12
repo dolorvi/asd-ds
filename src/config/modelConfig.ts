@@ -1,4 +1,4 @@
-import { SRS2_DOMAINS, WISC_DOMAINS, ABAS3_DOMAINS, SRS2_SEVERITIES, WISC_SEVERITIES, ABAS3_SEVERITIES } from "../data/testData";
+import { SRS2_DOMAINS, WISC_DOMAINS, ABAS3_DOMAINS, VINELAND_DOMAINS, SRS2_SEVERITIES, WISC_SEVERITIES, ABAS3_SEVERITIES } from "../data/testData";
 import type { Config, InstrumentBandMap } from "../types";
 
 // ---- Age-band priors (log-odds) ----
@@ -100,4 +100,14 @@ export const DEFAULT_CONFIG: Config = {
       "Extremely High": { impairment: -0.8 },
     },
   })),
+  vinelandDomains: VINELAND_DOMAINS.map((d) => ({
+    key: d.key,
+    label: d.label,
+    severities: [...VINELAND_SEVERITIES],
+    mapBySeverity: {
+      "Low": { impairment: 1.0 },
+      "Moderately Low": { impairment: 0.5 },
+      "Average": { impairment: -0.2 },
+      "Moderately High": { impairment: -0.5 },
+      "High": { impairment: -0.8 },
 };
