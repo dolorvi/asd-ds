@@ -1,12 +1,13 @@
+// src/hooks/useAsdEngine.ts
 import { useMemo } from "react";
 import type { Config, CriterionKey, AltKey, SeverityState } from "../types";
-import { VINELAND_IMPAIRMENT_MAP } from "../config/modelConfig"; // ⬅️ NEW
+import { VINELAND_IMPAIRMENT_MAP } from "../config/modelConfig"; // make sure this is exported
 
 export function useAsdEngine(
   config: Config,
   srs2: SeverityState,
   abas: SeverityState,
-  wisc: SeverityState,
+  wisc: SeverityState, // kept for parity, not used in model by default
   migdas: { consistency: string; notes: string[] },
   history: {
     developmentalConcerns: string;
@@ -16,24 +17,24 @@ export function useAsdEngine(
   },
   observation: Record<CriterionKey | "notes", any>,
   diff: Record<string, boolean | unknown>,
-  // ⬇︎ allow label-only instruments (e.g., ADI-R band, Vineland band)
+  // allow label-only instruments (e.g., ADI-R band, Vineland composite band)
   instruments: Array<{ name: string; value?: number; band?: string }>
 ) {
-  // ---- datasetStatus ----
+  /** ---------------- Minimum dataset gate ---------------- */
   const datasetStatus = useMemo(() => {
-    // treat an instrument as "entered" if it has a score OR a non-empty band
+    // Instrument present if it has a score OR a non-empty band label
     const withValues = instruments.filter(
       (i) => i.value !== undefined || (i.band && i.band.trim() !== "")
     );
 
-    const srsEntered = Object.values(srs2).some((d) => d.severity);
-    const abasEntered = Object.values(abas).some((d) => d.severity);
+    const srsEntered = Object.values(srs2).some((d) => !!d.severity);
+    const abasEntered = Object.values(abas).some((d) => !!d.severity);
     const migEntered = migdas.consistency !== "unclear";
 
     const effectiveInstrumentCount =
       withValues.length + (srsEntered ? 1 : 0) + (abasEntered ? 1 : 0) + (migEntered ? 1 : 0);
 
-    // Adaptive satisfied by ABAS domain entries or a Vineland band/score
+    // Adaptive satisfied by ABAS domains OR a Vineland score/band
     const vinelandBandEntered = instruments.some(
       (i) => i.name === "Vineland-3" && i.band && i.band.trim() !== ""
     );
@@ -56,8 +57,7 @@ export function useAsdEngine(
           (i.value !== undefined || (i.band && i.band.trim() !== ""))
       );
 
-    const historyOk =
-      history.developmentalConcerns.trim().length > 10 && history.earlyOnset;
+    const historyOk = history.developmentalConcerns.trim().length > 10 && history.earlyOnset;
 
     const obsOk = (["A1", "A2", "A3", "B1", "B2", "B3", "B4"] as const).every(
       (k) => observation[k] !== undefined
@@ -84,7 +84,7 @@ export function useAsdEngine(
     };
   }, [config.minDataset, instruments, srs2, abas, migdas, history, observation]);
 
-  // ---- evidence ----
+  /** ---------------- Evidence aggregation ---------------- */
   const evidence = useMemo(() => {
     const ev: Record<CriterionKey | AltKey, number> = {
       A1: 0,
@@ -102,17 +102,16 @@ export function useAsdEngine(
       altTrauma: (diff as any).TraumaPTSD ? 1 : 0,
       altADHD: (diff as any).ADHD ? 1 : 0,
       altAnxiety: (diff as any).Anxiety || (diff as any).Depression ? 1 : 0,
-      altOther:
-        (diff as any).FASD || (diff as any).Tics || !!(diff as any).Other ? 1 : 0,
+      altOther: (diff as any).FASD || (diff as any).Tics || !!(diff as any).Other ? 1 : 0,
     };
 
-    // Clinician observation (0..3)
+    // Clinician observation (0..3 each)
     (["A1", "A2", "A3", "B1", "B2", "B3", "B4"] as const).forEach((k) => {
       const v = Number(observation[k]);
       if (!Number.isNaN(v)) (ev as any)[k] += v;
     });
 
-    // SRS-2 domain severities → evidence (label-only, via config maps)
+    // SRS-2 domain severities → evidence via config maps (label-only)
     config.srs2Domains.forEach((d) => {
       const sev = srs2[d.key]?.severity || "";
       const map = d.mapBySeverity[sev];
@@ -122,7 +121,7 @@ export function useAsdEngine(
       });
     });
 
-    // ABAS-3 domain severities → impairment (label-only, via config maps)
+    // ABAS-3 domain severities → impairment (label-only)
     config.abasDomains.forEach((d) => {
       const sev = abas[d.key]?.severity || "";
       const map = d.mapBySeverity[sev];
@@ -133,17 +132,15 @@ export function useAsdEngine(
     });
 
     // Vineland-3 composite band → impairment delta (label-only)
-    const v = instruments.find(
+    const vineland = instruments.find(
       (i) => i.name === "Vineland-3" && i.band && i.band.trim()
     );
-    if (v?.band && VINELAND_IMPAIRMENT_MAP[v.band as keyof typeof VINELAND_IMPAIRMENT_MAP] !== undefined) {
-      ev.impairment +=
-        VINELAND_IMPAIRMENT_MAP[
-          v.band as keyof typeof VINELAND_IMPAIRMENT_MAP
-        ];
+    if (vineland?.band) {
+      const delta = (VINELAND_IMPAIRMENT_MAP as any)[vineland.band];
+      if (typeof delta === "number") ev.impairment += delta;
     }
 
-    // MIGDAS qualitative
+    // MIGDAS qualitative → balanced push/pull across social/rrb
     if (migdas.consistency === "consistent") {
       ev.A1 += 0.6;
       ev.A2 += 0.6;
@@ -161,14 +158,16 @@ export function useAsdEngine(
     return ev;
   }, [config.srs2Domains, config.abasDomains, srs2, abas, migdas, observation, history, diff, instruments]);
 
-  // ---- model ----
+  /** ---------------- Likelihood model ---------------- */
   const model = useMemo(() => {
     const w = config.domainWeights;
+
     const terms = (Object.keys(w) as (keyof typeof w)[]).map((k) => {
       const value = (evidence as any)[k] ?? 0;
       const weight = w[k];
       return { key: k, value, weight, product: value * weight };
     });
+
     const lp = config.prior + terms.reduce((a, b) => a + b.product, 0);
     const p = 1 / (1 + Math.exp(-lp));
 
@@ -178,20 +177,18 @@ export function useAsdEngine(
     const pB = Math.min(1, Math.max(0, B / (4 * 3)));
 
     const cut =
-      config.riskTolerance === "sensitive"
-        ? 0.35
-        : config.riskTolerance === "specific"
-        ? 0.7
-        : 0.5;
+      config.riskTolerance === "sensitive" ? 0.35 :
+      config.riskTolerance === "specific"  ? 0.70 :
+      0.50;
 
     return { p, lp, pA, pB, cut, terms };
   }, [config, evidence]);
 
-  // ---- support & recs ----
+  /** ---------------- Support & recommendations ---------------- */
   const supportEstimate = useMemo(() => {
     const sevs = Object.values(abas).map((d) => d.severity || "");
     if (sevs.some((s) => s === "Extremely Low" || s === "Very Low")) return "High support likely";
-    if (sevs.some((s) => s === "Low Average" || s === "Average")) return "Moderate support possible"; // ⬅️ include Average
+    if (sevs.some((s) => s === "Low Average" || s === "Average")) return "Moderate support possible";
     if (sevs.some((s) => s)) return "Lower support likely";
     return "Insufficient data";
   }, [abas]);
@@ -208,8 +205,9 @@ export function useAsdEngine(
       recs.push(
         "Proceed with full diagnostic formulation aligned to DSM-5-TR; integrate ADOS-2 (if appropriate), collateral reports, and medical/hearing screens."
       );
-      if (supportEstimate.includes("High"))
+      if (supportEstimate.includes("High")) {
         recs.push("Initiate support planning; coordinate NDIS-relevant documentation where applicable.");
+      }
     } else {
       recs.push(
         "Risk below decision threshold. If concern persists, add informant measures/observations across settings; review in 3–6 months."
