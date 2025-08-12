@@ -795,6 +795,7 @@ const AbasDomainGrid = (
             </>
           )}
         </div>
+      )}
 
         {/* Right column: sticky summary */}
         <aside id="summary-section" className="summary-only" style={{ width: 340, position: "sticky", top: 64 }}>
