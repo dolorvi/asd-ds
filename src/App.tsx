@@ -391,6 +391,27 @@ export default function App() {
           </Card>
 
           <Card title="Clinician & Governance">
+            <Field label="Age band (sets baseline)">
+              <select
+                value={ageBand}
+                onChange={(e) => setAgeBand(e.target.value as AgeBandKey)}
+                disabled={!autoPrior}
+                >
+                {Object.entries(PRIOR_BY_AGE).map(([key, v]) => (
+                  <option key={key} value={key}>{v.label}</option>
+                ))}
+              </select>
+            </Field>
+
+            <label className="row" title="When ON, the prior is set from Age band. Turn OFF to input a custom prior.">
+              <input type="checkbox" checked={autoPrior} onChange={(e) => setAutoPrior(e.target.checked)} />
+              Auto-set prior from Age band
+            </label>
+
+            <div className="small" style={{ opacity: 0.9 }}>
+              Baseline prevalence: {(PRIOR_BY_AGE[ageBand].prevalence * 100).toFixed(1)}% • Log-odds: {PRIOR_BY_AGE[ageBand].logit.toFixed(3)}
+            </div>
+
             <Field label="Clinician"><input value={clinician.name} onChange={(e) => setClinician((s) => ({ ...s, name: e.target.value }))} placeholder="Dr Jane Citizen" /></Field>
             <Field label="Date"><input type="date" value={clinician.date} onChange={(e) => setClinician((s) => ({ ...s, date: e.target.value }))} /></Field>
             <label className="row"><input type="checkbox" checked={clinician.attested} onChange={(e) => setClinician((s) => ({ ...s, attested: e.target.checked }))} /> I attest that clinical judgement prevails.</label>
