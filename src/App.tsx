@@ -29,6 +29,16 @@ export default function App() {
   const [clinician, setClinician] = useState({ name: "", date: new Date().toISOString().slice(0, 10), attested: false });
   const [reportVoice, setReportVoice] = useState<"clinical" | "dual">("dual");
 
+  const [ageBand, setAgeBand] = useState<AgeBandKey>(DEFAULT_AGE_BAND);
+  const [autoPrior, setAutoPrior] = useState(true);
+
+  // When auto mode is on, age-band changes update the model prior (log-odds)
+  useEffect(() => {
+    if (autoPrior) {
+      setConfig(c => ({ ...c, prior: PRIOR_BY_AGE[ageBand].logit }));
+    }
+  }, [ageBand, autoPrior, setConfig]);
+
   const ruleHash = useMemo(() => {
   const s = JSON.stringify(DEFAULT_CONFIG);
   let h = 0;
@@ -386,7 +396,17 @@ export default function App() {
             <label className="row"><input type="checkbox" checked={clinician.attested} onChange={(e) => setClinician((s) => ({ ...s, attested: e.target.checked }))} /> I attest that clinical judgement prevails.</label>
             <Field label="Report Voice"><select value={reportVoice} onChange={(e) => setReportVoice(e.target.value as any)}><option value="clinical">Clinical only</option><option value="dual">Clinical + Family summary</option></select></Field>
             <Field label="Risk Tolerance"><select value={config.riskTolerance} onChange={(e) => setConfig((c) => ({ ...c, riskTolerance: e.target.value as any }))}><option value="sensitive">Sensitive</option><option value="balanced">Balanced</option><option value="specific">Specific</option></select></Field>
-            <Field label="Prior (log-odds)"><input type="number" step={0.1} value={config.prior} onChange={(e) => setConfig((c) => ({ ...c, prior: Number(e.target.value) }))} /></Field>
+            <Field label="Prior (log-odds)"> 
+              <input
+                type="number"
+                step={0.1}
+                value={config.prior}
+                onChange={(e) => {
+                  setAutoPrior(false);
+                  setConfig((c) => ({ ...c, prior: Number(e.target.value) }));
+                }}
+                />
+            </Field>
           </Card>
         </aside>
       </div>
