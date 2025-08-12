@@ -4,6 +4,7 @@ import { useAsdEngine } from "./hooks/useAsdEngine";
 import { CANONICAL_CASES, MIGDAS_CONSISTENCY } from "./data/testData";
 import type { Config, SeverityState, CriterionKey } from "./types";
 import { Card, Field, TabBar, ChipGroup, Header, Footer } from "./components/ui";
+import { getBandColor } from "./ui/severity";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -259,22 +260,38 @@ const setInstrumentBand = useCallback(
     </div>
   );
 
-  const AbasDomainGrid = (
-    <div className="grid">
-      {config.abasDomains.map((d) => (
+const AbasDomainGrid = (
+  <div className="grid">
+    {config.abasDomains.map((d) => {
+      const sel = abas[d.key]?.severity || "";
+      const color = sel ? getBandColor(sel) : undefined;
+      return (
         <section key={d.key} className="card">
           <div className="stack">
-            <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
+            {/* CHANGED: title now shows a colored pill for the selected band */}
+            <div className="row" style={{ alignItems: "center", justifyContent: "space-between" }}>
+              <div className="title" style={{ fontSize: 14 }}>{d.label}</div>
+              {sel && (
+                <span
+                  className="chip"
+                  style={{ background: color, color: "#0b1220", padding: "4px 8px", borderRadius: 999 }}
+                >
+                  {sel}
+                </span>
+              )}
+            </div>
+
             <ChipGroup
               options={d.severities}
-              value={abas[d.key]?.severity || ""}
+              value={sel}
               onChange={(val) => setABAS((s) => ({ ...s, [d.key]: { ...s[d.key], severity: val } }))}
             />
           </div>
         </section>
-      ))}
-    </div>
-  );
+      );
+    })}
+  </div>
+);
 
   const WiscDomainGrid = (
     <div className="grid">
