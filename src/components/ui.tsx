@@ -1,6 +1,7 @@
 // src/components/ui.tsx
 import React from "react";
 import type { Condition } from "../types"; // <-- make sure src/types.ts exports this type
+import "./ui.css";
 
 // -------------------- Header --------------------
 

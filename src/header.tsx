@@ -1,46 +1,52 @@
 import React from "react";
 import type { Condition } from "./types";
 
-type HeaderProps = {
+export type HeaderProps = {
   title: string;
   subtitle?: string;
-  theme: "light" | "dark";
-  onThemeToggle: () => void;
-  onDevToggle: () => void;
-  onExportSummary: () => void;
-  onExportFull: () => void;
+  onDevToggle?: () => void;
+  onExportSummary?: () => void;
+  onExportFull?: () => void;
+  onThemeToggle?: () => void;
+  theme?: "dark" | "light";
 
-  // NEW
+  // NEW:
   condition: Condition;
   onConditionChange: (c: Condition) => void;
 };
 
 const CONDITIONS: Condition[] = ["ASD", "ADHD", "ID", "FASD"];
 
-export function Header(props: HeaderProps) {
+export function Header({
+  title,
+  subtitle,
+  onDevToggle,
+  onExportSummary,
+  onExportFull,
+  onThemeToggle,
+  theme = "dark",
+  condition,
+  onConditionChange,
+}: HeaderProps) {
   return (
-    <header className="app-header">
-      <div className="row" style={{ alignItems: "center", gap: 12 }}>
-        <div className="stack">
-          <h1 className="app-title">{props.title}</h1>
-          {props.subtitle && <div className="small">{props.subtitle}</div>}
-        </div>
+    <header className="topbar">
+      <div className="row" style={{ alignItems: "center", gap: 8 }}>
+        <h1 className="app-title">{title}</h1>
+        {subtitle && <span className="muted small">{subtitle}</span>}
+        <div style={{ flex: 1 }} />
 
-        {/* Condition toggle */}
-        <div className="seg" style={{ marginLeft: 8 }}>
+        {/* NEW segmented condition control */}
+        <div className="seg">
           {CONDITIONS.map((c) => (
             <button
               key={c}
-              className={"chip" + (props.condition === c ? " chip-active" : "")}
-              onClick={() => props.onConditionChange(c)}
+              className={"chip" + (condition === c ? " chip-active" : "")}
+              onClick={() => onConditionChange(c)}
               title={
-                c === "ASD"
-                  ? "Autism"
-                  : c === "ADHD"
-                  ? "Attention-Deficit/Hyperactivity Disorder"
-                  : c === "ID"
-                  ? "Intellectual Disability"
-                  : "Fetal Alcohol Spectrum Disorder"
+                c === "ASD" ? "Autism" :
+                c === "ADHD" ? "Attention-Deficit/Hyperactivity Disorder" :
+                c === "ID" ? "Intellectual Disability" :
+                "Fetal Alcohol Spectrum Disorder"
               }
             >
               {c}
@@ -48,16 +54,10 @@ export function Header(props: HeaderProps) {
           ))}
         </div>
 
-        <div className="spacer" />
-
-        <div className="row" style={{ gap: 8 }}>
-          <button className="small" onClick={props.onThemeToggle}>
-            {props.theme === "dark" ? "Day" : "Night"}
-          </button>
-          <button className="small" onClick={props.onDevToggle}>Dev</button>
-          <button className="small" onClick={props.onExportSummary}>Export summary</button>
-          <button className="small" onClick={props.onExportFull}>Export (full)</button>
-        </div>
+        <button className="small" onClick={onDevToggle}>Dev</button>
+        <button className="small" onClick={onExportSummary}>Export summary</button>
+        <button className="small" onClick={onExportFull}>Export (full)</button>
+        <button className="small" onClick={onThemeToggle}>{theme === "dark" ? "Day" : "Night"}</button>
       </div>
     </header>
   );
