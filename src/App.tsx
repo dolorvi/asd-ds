@@ -76,13 +76,9 @@ export default function App() {
     if (autoPrior) setConfig((c) => ({ ...c, prior: PRIOR_BY_AGE[ageBand].logit }));
   }, [ageBand, autoPrior]);
 
-  // ---------- density + theme ----------
+  // ---------- density ----------
   const [compact, setCompact] = useState(true);
   useEffect(() => { document.body.classList.toggle("compact", compact); }, [compact]);
-
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
-  useEffect(() => { document.body.setAttribute("data-theme", theme); }, [theme]);
 
   // ---------- engine ----------
   const { datasetStatus, evidence, model, supportEstimate, recommendation } =
@@ -128,8 +124,6 @@ export default function App() {
         onDevToggle={() => setDevOpen(v => !v)}
         onExportSummary={exportSummary}
         onExportFull={() => window.print()}
-        onThemeToggle={toggleTheme}
-        theme={theme}
         condition={condition}
         onConditionChange={setCondition}
       />
