@@ -1,0 +1,25 @@
+:root {
+  /* layout */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --gap-1: 6px; --gap-2: 10px; --gap-3: 14px; --gap-4: 18px;
+
+  /* color (dark) */
+  --bg: hsl(220 18% 7%);
+  --panel: hsl(220 18% 10%);
+  --elev: hsl(220 18% 12%);
+  --border: hsl(220 14% 18%);
+  --muted: hsl(220 10% 60%);
+  --text: hsl(220 15% 92%);
+  --accent: hsl(217 92% 60%);
+  --accent-2: hsl(217 92% 66%);
+
+  /* shadows */
+  --shadow-1: 0 1px 2px hsl(220 40% 2% / .6);
+  --shadow-2: 0 6px 18px hsl(220 40% 2% / .35);
+
+  /* motion */
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --t-fast: 140ms; --t-med: 220ms;
+}

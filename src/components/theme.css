@@ -42,3 +42,39 @@
 .app-header .left { min-width: 0; }
 .app-header .seg { display:flex; gap:6px; align-items:center; }
 .app-header .right { display:flex; gap:8px; align-items:center; }
+
+.card{
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-1);
+  }
+  .card--elev{background: var(--elev); box-shadow: var(--shadow-2)}
+  
+  .tabbar{display:flex; gap:8px}
+  .tab{
+    border:1px solid var(--border); background:var(--panel);
+    border-radius:999px; padding:6px 12px; font-weight:500; color:var(--muted)
+  }
+  .tab--active{color:var(--text); background:hsl(217 92% 60% / .14); border-color: hsl(217 92% 60% / .3)}
+  .tab:hover{transform:translateY(-1px)}
+  
+  .chip{
+    border:1px solid var(--border);
+    background: hsl(220 18% 12%);
+    border-radius: 999px; padding:6px 10px; color:var(--text); opacity:.85;
+  }
+  .chip--active{opacity:1; border-color:hsl(217 92% 60% / .5); box-shadow: inset 0 0 0 999px hsl(217 92% 60% / .12)}
+  .chip:hover{opacity:1; transform:translateY(-1px)}
+  
+  .summary{
+    background: var(--elev);
+    border:1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-2);
+  }
+  .badge{
+    display:inline-block; padding:6px 10px; border-radius:999px; font-weight:600;
+    background:hsl(6 70% 40% / .16); border:1px solid hsl(6 70% 40% / .3);
+  }
+  .badge--ok{background:hsl(140 70% 35% / .18); border-color:hsl(140 70% 35% / .36)}  
