@@ -8,12 +8,12 @@ import { getBandColor } from "./components/severity";
 
 import type { Condition } from "./types";
 
-const [condition, setCondition] = useState<Condition>("ASD");
-
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
 
 export default function App() {
+  const [condition, setCondition] = useState<Condition>("ASD");
+
   // ---------- core state ----------
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
   const [activeTab, setActiveTab] = useState(0);
