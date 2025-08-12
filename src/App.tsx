@@ -362,442 +362,443 @@ const AbasDomainGrid = (
         </div>
       )}
 
-      <TabBar tabs={[...TABS]} active={activeTab} onSelect={setActiveTab} />
+<TabBar tabs={[...TABS]} active={activeTab} onSelect={setActiveTab} />
 
-      <div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
-        {/* Left column: tabs */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {/* ASD Measures */}
-          {activeTab === 0 && (
-            <>
-              <Card
-                title="SRS-2 — Domain Entries"
-                right={
-                  <button className="small" onClick={() => setCollapsed((s) => ({ ...s, srs2: !s.srs2 }))}>
-                    {collapsed.srs2 ? "Show" : "Hide"}
-                  </button>
-                }
-              >
-                {!collapsed.srs2 && SrsDomainGrid}
-              </Card>
+<div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
+  {/* Left column: tabs */}
+  <div style={{ flex: 1, minWidth: 0 }}>
+    {/* ASD Measures */}
+    {activeTab === 0 && (
+      <>
+        <Card
+          title="SRS-2 — Domain Entries"
+          right={
+            <button className="small" onClick={() => setCollapsed((s) => ({ ...s, srs2: !s.srs2 }))}>
+              {collapsed.srs2 ? "Show" : "Hide"}
+            </button>
+          }
+        >
+          {!collapsed.srs2 && SrsDomainGrid}
+        </Card>
 
-              <Card title="MIGDAS — Qualitative Profile">
-                <Field label="Overall Consistency">
-                  <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-                    {(MIGDAS_CONSISTENCY as readonly string[]).map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => setMIGDAS((m) => ({ ...m, consistency: opt as any }))}
-                        className={"chip" + (migdas.consistency === opt ? " chip-active" : "")}
-                        style={{
-                          padding: "6px 10px",
-                          borderRadius: 999,
-                          border: "1px solid rgba(255,255,255,0.15)",
-                          background: migdas.consistency === opt ? "#3b82f6" : "transparent",
-                          color: migdas.consistency === opt ? "#0b1220" : "inherit",
-                          fontSize: 12,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {opt === "unclear"
-                          ? "Unclear"
-                          : opt === "consistent"
-                          ? "Consistent with autism"
-                          : "Inconsistent with autism"}
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-                <div className="stack">
-                  {migdas.notes.map((n, i) => (
-                    <input
-                      key={i}
-                      placeholder={`Brief observation note ${i + 1}`}
-                      value={n}
-                      onChange={(e) =>
-                        setMIGDAS((m) => ({ ...m, notes: m.notes.map((x, j) => (j === i ? e.target.value : x)) }))
-                      }
-                    />
-                  ))}
-                  <button onClick={() => setMIGDAS((m) => ({ ...m, notes: [...m.notes, ""] }))}>+ Add note</button>
-                </div>
-              </Card>
-            </>
-          )}
-
-          {/* Adaptive */}
-          {activeTab === 1 && (
-            <>
-              <Card
-                title="ABAS-3 — Domain Entries"
-                right={
-                  <button className="small" onClick={() => setCollapsed((s) => ({ ...s, abas: !s.abas }))}>
-                    {collapsed.abas ? "Show" : "Hide"}
-                  </button>
-                }
-              >
-                {!collapsed.abas && AbasDomainGrid}
-                <p className="small">
-                  ABAS-3 domain bands influence the <b>impairment</b> feature and support estimate.
-                </p>
-              </Card>
-
-<Card title="Vineland-3 — Composite Band">
-  <ChipGroup
-    options={config.vinelandDomains[0]?.severities ?? []}
-    value={getInstrumentBand("Vineland-3")}
-    onChange={(val) => setInstrumentBand("Vineland-3", val)}
-  />
-
-  {/* ADDED: show the selected band with the canonical color */}
-  {getInstrumentBand("Vineland-3") && (
-    <div className="row" style={{ gap: 8, marginTop: 8, alignItems: "center" }}>
-      <span className="small">Selected:</span>
-      <span
-        className="chip"
-        style={{
-          background: getBandColor(getInstrumentBand("Vineland-3")),
-          color: "#0b1220",
-          padding: "4px 8px",
-          borderRadius: 999,
-        }}
-      >
-        {getInstrumentBand("Vineland-3")}
-      </span>
-    </div>
-  )}
-
-  <div className="small">Band contributes to impairment (same direction as ABAS).</div>
-</Card>
-
-          {/* History */}
-          {activeTab === 2 && (
-            <Card title="Developmental History & Clinician Observation">
-              <div className="grid">
-                <div className="stack">
-                  <label>Developmental History</label>
-                  <textarea
-                    placeholder="Summarise early development, social communication history, restricted/repetitive patterns."
-                    value={history.developmentalConcerns}
-                    onChange={(e) => setHistory((s) => ({ ...s, developmentalConcerns: e.target.value }))}
-                    style={{ height: 120 }}
-                  />
-                  <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    <label className="row">
-                      <input
-                        type="checkbox"
-                        checked={history.earlyOnset}
-                        onChange={(e) => setHistory((s) => ({ ...s, earlyOnset: e.target.checked }))}
-                      />{" "}
-                      Early developmental onset evident
-                    </label>
-                    <label className="row">
-                      <input
-                        type="checkbox"
-                        checked={history.crossContextImpairment}
-                        onChange={(e) => setHistory((s) => ({ ...s, crossContextImpairment: e.target.checked }))}
-                      />{" "}
-                      Cross-context functional impairment
-                    </label>
-                    <label className="row">
-                      <input
-                        type="checkbox"
-                        checked={history.maskingIndicators}
-                        onChange={(e) => setHistory((s) => ({ ...s, maskingIndicators: e.target.checked }))}
-                      />{" "}
-                      Masking/camouflaging indicators present
-                    </label>
-                  </div>
-                </div>
-                <div className="stack">
-                  <label>Clinician Observation (0–3)</label>
-                  <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                    {(["A1", "A2", "A3", "B1", "B2", "B3", "B4"] as CriterionKey[]).map((k) => (
-                      <Field key={k} label={k}>
-                        <input
-                          type="number"
-                          min={0}
-                          max={3}
-                          value={(observation as any)[k] ?? 0}
-                          onChange={(e) => setObservation((s) => ({ ...s, [k]: Number(e.target.value) }))}
-                        />
-                      </Field>
-                    ))}
-                  </div>
-                  <textarea
-                    placeholder="Objective notes (setting, salient behaviours)."
-                    value={(observation as any).notes}
-                    onChange={(e) => setObservation((s) => ({ ...s, notes: e.target.value }))}
-                    style={{ height: 80 }}
-                  />
-                </div>
-              </div>
-            </Card>
-          )}
-
-          {/* Report */}
-          {activeTab === 5 && (
-            <Card title="Report (preview)">
-              <pre id="report-section" style={{ whiteSpace: "pre-wrap", padding: 12 }}>
-                {reportText}
-              </pre>
-              <div className="row" style={{ gap: 8 }}>
-                <button onClick={() => navigator.clipboard.writeText(reportText)}>Copy</button>
+        <Card title="MIGDAS — Qualitative Profile">
+          <Field label="Overall Consistency">
+            <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+              {(MIGDAS_CONSISTENCY as readonly string[]).map((opt) => (
                 <button
-                  onClick={() => {
-                    document.body.classList.add("print-summary");
-                    const el = document.getElementById("report-section");
-                    if (el) el.classList.add("print-target");
-                    setTimeout(() => {
-                      window.print();
-                      setTimeout(() => {
-                        document.body.classList.remove("print-summary");
-                        el && el.classList.remove("print-target");
-                      }, 0);
-                    }, 0);
+                  key={opt}
+                  onClick={() => setMIGDAS((m) => ({ ...m, consistency: opt as any }))}
+                  className={"chip" + (migdas.consistency === opt ? " chip-active" : "")}
+                  style={{
+                    padding: "6px 10px",
+                    borderRadius: 999,
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    background: migdas.consistency === opt ? "#3b82f6" : "transparent",
+                    color: migdas.consistency === opt ? "#0b1220" : "inherit",
+                    fontSize: 12,
+                    fontWeight: 600,
                   }}
                 >
-                  Print report
+                  {opt === "unclear"
+                    ? "Unclear"
+                    : opt === "consistent"
+                    ? "Consistent with autism"
+                    : "Inconsistent with autism"}
                 </button>
-              </div>
-            </Card>
-          )}
-
-          {/* Comorbidity */}
-          {activeTab === 3 && (
-            <Card title="Comorbidity / Differential Flags">
-              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 8 }}>
-                {(
-                  [
-                    ["ADHD", "ADHD"],
-                    ["DLD", "Language Disorder (DLD)"],
-                    ["ID", "Intellectual Disability"],
-                    ["Anxiety", "Anxiety"],
-                    ["Depression", "Depression"],
-                    ["TraumaPTSD", "Trauma/PTSD"],
-                    ["FASD", "FASD"],
-                    ["Tics", "Tic Disorder"],
-                  ] as const
-                ).map(([key, label]) => (
-                  <label key={key} className="row">
-                    <input
-                      type="checkbox"
-                      checked={(diff as any)[key]}
-                      onChange={(e) => setDiff((s) => ({ ...s, [key]: e.target.checked }))}
-                    />{" "}
-                    {label}
-                  </label>
-                ))}
-              </div>
-              <Field label="Other differential notes">
-                <input value={diff.Other} onChange={(e) => setDiff((s) => ({ ...s, Other: e.target.value }))} />
-              </Field>
-            </Card>
-          )}
-
-          {/* Advanced */}
-          {activeTab === 4 && (
-            <>
-              <Card
-                title="WISC — Domain Entries"
-                right={
-                  <button className="small" onClick={() => setCollapsed((s) => ({ ...s, wisc: !s.wisc }))}>
-                    {collapsed.wisc ? "Show" : "Hide"}
-                  </button>
+              ))}
+            </div>
+          </Field>
+          <div className="stack">
+            {migdas.notes.map((n, i) => (
+              <input
+                key={i}
+                placeholder={`Brief observation note ${i + 1}`}
+                value={n}
+                onChange={(e) =>
+                  setMIGDAS((m) => ({ ...m, notes: m.notes.map((x, j) => (j === i ? e.target.value : x)) }))
                 }
+              />
+            ))}
+            <button onClick={() => setMIGDAS((m) => ({ ...m, notes: [...m.notes, ""] }))}>+ Add note</button>
+          </div>
+        </Card>
+      </>
+    )}
+
+    {/* Adaptive */}
+    {activeTab === 1 && (
+      <>
+        <Card
+          title="ABAS-3 — Domain Entries"
+          right={
+            <button className="small" onClick={() => setCollapsed((s) => ({ ...s, abas: !s.abas }))}>
+              {collapsed.abas ? "Show" : "Hide"}
+            </button>
+          }
+        >
+          {!collapsed.abas && AbasDomainGrid}
+          <p className="small">
+            ABAS-3 domain bands influence the <b>impairment</b> feature and support estimate.
+          </p>
+        </Card>
+
+        <Card title="Vineland-3 — Composite Band">
+          <ChipGroup
+            options={config.vinelandDomains[0]?.severities ?? []}
+            value={getInstrumentBand("Vineland-3")}
+            onChange={(val) => setInstrumentBand("Vineland-3", val)}
+          />
+
+          {/* Show the selected band with the canonical color */}
+          {getInstrumentBand("Vineland-3") && (
+            <div className="row" style={{ gap: 8, marginTop: 8, alignItems: "center" }}>
+              <span className="small">Selected:</span>
+              <span
+                className="chip"
+                style={{
+                  background: getBandColor(getInstrumentBand("Vineland-3")),
+                  color: "#0b1220",
+                  padding: "4px 8px",
+                  borderRadius: 999,
+                }}
               >
-                {!collapsed.wisc && WiscDomainGrid}
-                <p className="small">
-                  WISC entries are for context and differential formulation; by default they do not alter ASD likelihood.
-                </p>
-              </Card>
-
-              <Card title="Other Instruments (scores only)">
-                <div className="row" style={{ justifyContent: "space-between" }}>
-                  <div className="small">Enter scores/bands; mappings are configurable later.</div>
-                  <button onClick={() => setInstruments((arr) => [...arr, { name: "Custom", value: undefined, band: "" }])}>
-                    + Add instrument
-                  </button>
-                </div>
-                <div className="grid">
-                  {instruments.map((inst, idx) => (
-                    <section key={idx} className="card">
-                      <div className="stack">
-                        <div className="row" style={{ justifyContent: "space-between" }}>
-                          <input
-                            value={inst.name}
-                            onChange={(e) =>
-                              setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, name: e.target.value } : x)))
-                            }
-                          />
-                          <button className="small" onClick={() => setInstruments((arr) => arr.filter((_, i) => i !== idx))}>
-                            Remove
-                          </button>
-                        </div>
-                        <div className="grid" style={{ gridTemplateColumns: "1fr 2fr", gap: 12 }}>
-                          <Field label="Score">
-                            <input
-                              type="number"
-                              value={inst.value ?? ""}
-                              onChange={(e) => {
-                                const val = e.target.value === "" ? undefined : Number(e.target.value);
-                                setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, value: val } : x)));
-                              }}
-                            />
-                          </Field>
-                          <Field label="Band (optional)">
-                            <input
-                              placeholder="e.g., Mild / Moderate / Severe"
-                              value={(inst as any).band || ""}
-                              onChange={(e) =>
-                                setInstruments((arr) =>
-                                  arr.map((x, i) => (i === idx ? { ...x, band: (e.target as HTMLInputElement).value } : x))
-                                )
-                              }
-                            />
-                          </Field>
-                        </div>
-                      </div>
-                    </section>
-                  ))}
-                </div>
-              </Card>
-
-              <Card title="Explainability — Evidence Contributions">
-                <div className="grid">
-                  {model.terms
-                    .sort((a, b) => Math.abs(b.product) - Math.abs(a.product))
-                    .slice(0, 5)
-                    .map((t, i) => (
-                      <section key={i} className="card">
-                        <div className="row" style={{ justifyContent: "space-between" }}>
-                          <span
-                            style={{
-                              fontFamily:
-                                "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-                            }}
-                          >
-                            {String(t.key)}
-                          </span>
-                          <span>{t.product.toFixed(2)}</span>
-                        </div>
-                        <div className="meter" style={{ marginTop: 8 }}>
-                          <span
-                            style={{
-                              width: `${Math.min(100, Math.abs(t.product) * 20)}%`,
-                              background: t.product >= 0 ? "linear-gradient(90deg,#34d399,#60a5fa)" : "#f43f5e",
-                            }}
-                          />
-                        </div>
-                        <div className="small" style={{ marginTop: 4 }}>
-                          value {t.value.toFixed(2)} × weight {t.weight.toFixed(2)}
-                        </div>
-                      </section>
-                    ))}
-                </div>
-              </Card>
-
-              <Card title="Settings & Minimum Dataset">
-                <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
-                  <section className="card">
-                    <h3 className="section-title">Minimum Dataset</h3>
-                    <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                      <label className="row">
-                        <input
-                          type="checkbox"
-                          checked={config.minDataset.requireASDInstrument}
-                          onChange={(e) =>
-                            setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireASDInstrument: e.target.checked } }))
-                          }
-                        />{" "}
-                        Require ≥1 ASD instrument
-                      </label>
-                      <label className="row">
-                        <input
-                          type="checkbox"
-                          checked={config.minDataset.requireAdaptive}
-                          onChange={(e) =>
-                            setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireAdaptive: e.target.checked } }))
-                          }
-                        />{" "}
-                        Require adaptive measure
-                      </label>
-                      <label className="row">
-                        <input
-                          type="checkbox"
-                          checked={config.minDataset.requireHistory}
-                          onChange={(e) =>
-                            setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireHistory: e.target.checked } }))
-                          }
-                        />{" "}
-                        Require history
-                      </label>
-                      <label className="row">
-                        <input
-                          type="checkbox"
-                          checked={config.minDataset.requireObservation}
-                          onChange={(e) =>
-                            setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireObservation: e.target.checked } }))
-                          }
-                        />{" "}
-                        Require observation
-                      </label>
-                      <Field label="Min instruments">
-                        <input
-                          type="number"
-                          min={0}
-                          value={config.minDataset.minInstruments}
-                          onChange={(e) =>
-                            setConfig((c) => ({
-                              ...c,
-                              minDataset: { ...c.minDataset, minInstruments: Number(e.target.value) },
-                            }))
-                          }
-                        />
-                      </Field>
-                    </div>
-                    <div className="small" style={{ marginTop: 8 }}>
-                      Status:{" "}
-                      {datasetStatus.passes ? (
-                        <span className="badge ok">Meets minimum</span>
-                      ) : (
-                        <span className="badge warn">Does not meet minimum</span>
-                      )}
-                    </div>
-                  </section>
-
-                  <section className="card">
-                    <h3 className="section-title">Audit JSON</h3>
-                    <pre
-                      style={{ whiteSpace: "pre-wrap", height: 220, overflow: "auto", padding: 8 }}
-                    >{JSON.stringify(
-                      {
-                        clinician,
-                        srs2,
-                        wisc,
-                        abas,
-                        migdas,
-                        instruments,
-                        history,
-                        observation,
-                        diff,
-                        evidence,
-                        model: { p: model.p, lp: model.lp, cut: model.cut },
-                        config,
-                        timestamp: new Date().toISOString(),
-                      },
-                      null,
-                      2
-                    )}</pre>
-                  </section>
-                </div>
-              </Card>
-            </>
+                {getInstrumentBand("Vineland-3")}
+              </span>
+            </div>
           )}
-        </div>
-      )}
 
-        {/* Right column: sticky summary */}
+          <div className="small">Band contributes to impairment (same direction as ABAS).</div>
+        </Card>
+      </>
+    )}
+
+    {/* History */}
+    {activeTab === 2 && (
+      <Card title="Developmental History & Clinician Observation">
+        <div className="grid">
+          <div className="stack">
+            <label>Developmental History</label>
+            <textarea
+              placeholder="Summarise early development, social communication history, restricted/repetitive patterns."
+              value={history.developmentalConcerns}
+              onChange={(e) => setHistory((s) => ({ ...s, developmentalConcerns: e.target.value }))}
+              style={{ height: 120 }}
+            />
+            <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <label className="row">
+                <input
+                  type="checkbox"
+                  checked={history.earlyOnset}
+                  onChange={(e) => setHistory((s) => ({ ...s, earlyOnset: e.target.checked }))}
+                />{" "}
+                Early developmental onset evident
+              </label>
+              <label className="row">
+                <input
+                  type="checkbox"
+                  checked={history.crossContextImpairment}
+                  onChange={(e) => setHistory((s) => ({ ...s, crossContextImpairment: e.target.checked }))}
+                />{" "}
+                Cross-context functional impairment
+              </label>
+              <label className="row">
+                <input
+                  type="checkbox"
+                  checked={history.maskingIndicators}
+                  onChange={(e) => setHistory((s) => ({ ...s, maskingIndicators: e.target.checked }))}
+                />{" "}
+                Masking/camouflaging indicators present
+              </label>
+            </div>
+          </div>
+          <div className="stack">
+            <label>Clinician Observation (0–3)</label>
+            <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {(["A1", "A2", "A3", "B1", "B2", "B3", "B4"] as CriterionKey[]).map((k) => (
+                <Field key={k} label={k}>
+                  <input
+                    type="number"
+                    min={0}
+                    max={3}
+                    value={(observation as any)[k] ?? 0}
+                    onChange={(e) => setObservation((s) => ({ ...s, [k]: Number(e.target.value) }))}
+                  />
+                </Field>
+              ))}
+            </div>
+            <textarea
+              placeholder="Objective notes (setting, salient behaviours)."
+              value={(observation as any).notes}
+              onChange={(e) => setObservation((s) => ({ ...s, notes: e.target.value }))}
+              style={{ height: 80 }}
+            />
+          </div>
+        </div>
+      </Card>
+    )}
+
+    {/* Comorbidity */}
+    {activeTab === 3 && (
+      <Card title="Comorbidity / Differential Flags">
+        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 8 }}>
+          {(
+            [
+              ["ADHD", "ADHD"],
+              ["DLD", "Language Disorder (DLD)"],
+              ["ID", "Intellectual Disability"],
+              ["Anxiety", "Anxiety"],
+              ["Depression", "Depression"],
+              ["TraumaPTSD", "Trauma/PTSD"],
+              ["FASD", "FASD"],
+              ["Tics", "Tic Disorder"],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key} className="row">
+              <input
+                type="checkbox"
+                checked={(diff as any)[key]}
+                onChange={(e) => setDiff((s) => ({ ...s, [key]: e.target.checked }))}
+              />{" "}
+              {label}
+            </label>
+          ))}
+        </div>
+        <Field label="Other differential notes">
+          <input value={diff.Other} onChange={(e) => setDiff((s) => ({ ...s, Other: e.target.value }))} />
+        </Field>
+      </Card>
+    )}
+
+    {/* Advanced */}
+    {activeTab === 4 && (
+      <>
+        <Card
+          title="WISC — Domain Entries"
+          right={
+            <button className="small" onClick={() => setCollapsed((s) => ({ ...s, wisc: !s.wisc }))}>
+              {collapsed.wisc ? "Show" : "Hide"}
+            </button>
+          }
+        >
+          {!collapsed.wisc && WiscDomainGrid}
+          <p className="small">
+            WISC entries are for context and differential formulation; by default they do not alter ASD likelihood.
+          </p>
+        </Card>
+
+        <Card title="Other Instruments (scores only)">
+          <div className="row" style={{ justifyContent: "space-between" }}>
+            <div className="small">Enter scores/bands; mappings are configurable later.</div>
+            <button onClick={() => setInstruments((arr) => [...arr, { name: "Custom", value: undefined, band: "" }])}>
+              + Add instrument
+            </button>
+          </div>
+          <div className="grid">
+            {instruments.map((inst, idx) => (
+              <section key={idx} className="card">
+                <div className="stack">
+                  <div className="row" style={{ justifyContent: "space-between" }}>
+                    <input
+                      value={inst.name}
+                      onChange={(e) =>
+                        setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, name: e.target.value } : x)))
+                      }
+                    />
+                    <button className="small" onClick={() => setInstruments((arr) => arr.filter((_, i) => i !== idx))}>
+                      Remove
+                    </button>
+                  </div>
+                  <div className="grid" style={{ gridTemplateColumns: "1fr 2fr", gap: 12 }}>
+                    <Field label="Score">
+                      <input
+                        type="number"
+                        value={inst.value ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value === "" ? undefined : Number(e.target.value);
+                          setInstruments((arr) => arr.map((x, i) => (i === idx ? { ...x, value: val } : x)));
+                        }}
+                      />
+                    </Field>
+                    <Field label="Band (optional)">
+                      <input
+                        placeholder="e.g., Mild / Moderate / Severe"
+                        value={(inst as any).band || ""}
+                        onChange={(e) =>
+                          setInstruments((arr) =>
+                            arr.map((x, i) => (i === idx ? { ...x, band: (e.target as HTMLInputElement).value } : x))
+                          )
+                        }
+                      />
+                    </Field>
+                  </div>
+                </div>
+              </section>
+            ))}
+          </div>
+        </Card>
+
+        <Card title="Explainability — Evidence Contributions">
+          <div className="grid">
+            {model.terms
+              .sort((a, b) => Math.abs(b.product) - Math.abs(a.product))
+              .slice(0, 5)
+              .map((t, i) => (
+                <section key={i} className="card">
+                  <div className="row" style={{ justifyContent: "space-between" }}>
+                    <span
+                      style={{
+                        fontFamily:
+                          "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+                      }}
+                    >
+                      {String(t.key)}
+                    </span>
+                    <span>{t.product.toFixed(2)}</span>
+                  </div>
+                  <div className="meter" style={{ marginTop: 8 }}>
+                    <span
+                      style={{
+                        width: `${Math.min(100, Math.abs(t.product) * 20)}%`,
+                        background: t.product >= 0 ? "linear-gradient(90deg,#34d399,#60a5fa)" : "#f43f5e",
+                      }}
+                    />
+                  </div>
+                  <div className="small" style={{ marginTop: 4 }}>
+                    value {t.value.toFixed(2)} × weight {t.weight.toFixed(2)}
+                  </div>
+                </section>
+              ))}
+          </div>
+        </Card>
+
+        <Card title="Settings & Minimum Dataset">
+          <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <section className="card">
+              <h3 className="section-title">Minimum Dataset</h3>
+              <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <label className="row">
+                  <input
+                    type="checkbox"
+                    checked={config.minDataset.requireASDInstrument}
+                    onChange={(e) =>
+                      setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireASDInstrument: e.target.checked } }))
+                    }
+                  />{" "}
+                  Require ≥1 ASD instrument
+                </label>
+                <label className="row">
+                  <input
+                    type="checkbox"
+                    checked={config.minDataset.requireAdaptive}
+                    onChange={(e) =>
+                      setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireAdaptive: e.target.checked } }))
+                    }
+                  />{" "}
+                  Require adaptive measure
+                </label>
+                <label className="row">
+                  <input
+                    type="checkbox"
+                    checked={config.minDataset.requireHistory}
+                    onChange={(e) =>
+                      setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireHistory: e.target.checked } }))
+                    }
+                  />{" "}
+                  Require history
+                </label>
+                <label className="row">
+                  <input
+                    type="checkbox"
+                    checked={config.minDataset.requireObservation}
+                    onChange={(e) =>
+                      setConfig((c) => ({ ...c, minDataset: { ...c.minDataset, requireObservation: e.target.checked } }))
+                    }
+                  />{" "}
+                  Require observation
+                </label>
+                <Field label="Min instruments">
+                  <input
+                    type="number"
+                    min={0}
+                    value={config.minDataset.minInstruments}
+                    onChange={(e) =>
+                      setConfig((c) => ({
+                        ...c,
+                        minDataset: { ...c.minDataset, minInstruments: Number(e.target.value) },
+                      }))
+                    }
+                  />
+                </Field>
+              </div>
+              <div className="small" style={{ marginTop: 8 }}>
+                Status:{" "}
+                {datasetStatus.passes ? (
+                  <span className="badge ok">Meets minimum</span>
+                ) : (
+                  <span className="badge warn">Does not meet minimum</span>
+                )}
+              </div>
+            </section>
+
+            <section className="card">
+              <h3 className="section-title">Audit JSON</h3>
+              <pre style={{ whiteSpace: "pre-wrap", height: 220, overflow: "auto", padding: 8 }}>
+                {JSON.stringify(
+                  {
+                    clinician,
+                    srs2,
+                    wisc,
+                    abas,
+                    migdas,
+                    instruments,
+                    history,
+                    observation,
+                    diff,
+                    evidence,
+                    model: { p: model.p, lp: model.lp, cut: model.cut },
+                    config,
+                    timestamp: new Date().toISOString(),
+                  },
+                  null,
+                  2
+                )}
+              </pre>
+            </section>
+          </div>
+        </Card>
+      </>
+    )}
+
+    {/* Report */}
+    {activeTab === 5 && (
+      <Card title="Report (preview)">
+        <pre id="report-section" style={{ whiteSpace: "pre-wrap", padding: 12 }}>
+          {reportText}
+        </pre>
+        <div className="row" style={{ gap: 8 }}>
+          <button onClick={() => navigator.clipboard.writeText(reportText)}>Copy</button>
+          <button
+            onClick={() => {
+              document.body.classList.add("print-summary");
+              const el = document.getElementById("report-section");
+              if (el) el.classList.add("print-target");
+              setTimeout(() => {
+                window.print();
+                setTimeout(() => {
+                  document.body.classList.remove("print-summary");
+                  el && el.classList.remove("print-target");
+                }, 0);
+              }, 0);
+            }}
+          >
+            Print report
+          </button>
+        </div>
+      </Card>
+    )}
+  </div>
+
+  {/* Right column: sticky summary */}
         <aside id="summary-section" className="summary-only" style={{ width: 340, position: "sticky", top: 64 }}>
           <Card title="Summary">
             {/* Screen-only numeric view */}
