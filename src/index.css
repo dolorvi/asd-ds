@@ -152,8 +152,8 @@ button:disabled{opacity:.6; cursor:not-allowed}
 }
 
 .chip--active{
-  opacity:1;
-  border-color:hsl(217 92% 60%/.5);
+  opacity: 1;
+  border-color: hsl(217 92% 60% / .5);
 }
 
 .chip:hover{opacity:1; transform:translateY(-1px)}

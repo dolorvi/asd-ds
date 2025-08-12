@@ -2,7 +2,6 @@ import React from "react";
 import type { Condition } from "../types";
 
 /* -------------------- Header -------------------- */
-
 export type HeaderProps = {
   title: string;
   subtitle?: string;
@@ -42,15 +41,7 @@ export function Header({
                   key={c}
                   className={`chip ${condition === c ? "chip--active" : ""}`}
                   onClick={() => onConditionChange(c)}
-                  title={
-                    c === "ASD"
-                      ? "Autism"
-                      : c === "ADHD"
-                      ? "Attention-Deficit/Hyperactivity Disorder"
-                      : c === "ID"
-                      ? "Intellectual Disability"
-                      : "Fetal Alcohol Spectrum Disorder"
-                  }
+                  title={c}
                 >
                   {c}
                 </button>
@@ -60,26 +51,10 @@ export function Header({
         </div>
 
         <div className="row row--wrap">
-          {onThemeToggle && (
-            <button className="btn" onClick={onThemeToggle} title="Toggle theme">
-              {theme === "dark" ? "Day" : "Night"}
-            </button>
-          )}
-          {onDevToggle && (
-            <button className="btn" onClick={onDevToggle} title="Developer fixtures">
-              Dev
-            </button>
-          )}
-          {onExportSummary && (
-            <button className="btn" onClick={onExportSummary}>
-              Export summary
-            </button>
-          )}
-          {onExportFull && (
-            <button className="btn btn--accent" onClick={onExportFull}>
-              Export (full)
-            </button>
-          )}
+          {onThemeToggle && <button className="btn" onClick={onThemeToggle}>{theme === "dark" ? "Day" : "Night"}</button>}
+          {onDevToggle && <button className="btn" onClick={onDevToggle}>Dev</button>}
+          {onExportSummary && <button className="btn" onClick={onExportSummary}>Export summary</button>}
+          {onExportFull && <button className="btn btn--accent" onClick={onExportFull}>Export (full)</button>}
         </div>
       </div>
     </div>
@@ -87,21 +62,14 @@ export function Header({
 }
 
 /* -------------------- Card -------------------- */
-
-export function Card({
-  title,
-  right,
-  children,
-}: {
-  title?: string;
-  right?: React.ReactNode;
-  children: React.ReactNode;
+export function Card({ title, right, children }:{
+  title?: string; right?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
     <section className="card">
       {(title || right) && (
         <div className="card__bar">
-          {title ? <h2 className="section-title">{title}</h2> : <span />}
+          {title ? <h2 className="section-title">{title}</h2> : <span/>}
           {right}
         </div>
       )}
@@ -111,46 +79,34 @@ export function Card({
 }
 
 /* -------------------- Field -------------------- */
-
-export function Field({ label, children }: { label: string; children: React.ReactNode }) {
+export function Field({ label, children }:{ label: string; children: React.ReactNode }) {
   return (
     <div className="control">
-      <label>{label}</label>
+      <label className="small">{label}</label>
       {children}
     </div>
   );
 }
 
 /* -------------------- TabBar -------------------- */
-
-export function TabBar({ tabs, active, onSelect }: { tabs: string[]; active: number; onSelect: (i: number) => void }) {
+export function TabBar({ tabs, active, onSelect }:{
+  tabs: string[]; active: number; onSelect: (i:number)=>void
+}) {
   return (
     <div className="tabbar">
-      {tabs.map((t, i) => (
-        <button
-          key={t}
-          onClick={() => onSelect(i)}
-          className={`tab ${i === active ? "tab--active" : ""}`}
-        >
-          {t}
-        </button>
+      {tabs.map((t,i)=>(
+        <button key={t} className={`tab ${i===active?"tab--active":""}`} onClick={()=>onSelect(i)}>{t}</button>
       ))}
     </div>
   );
 }
 
-/* -------------------- ChipGroup (now with color hook) -------------------- */
-
+/* -------------------- ChipGroup (color-aware) -------------------- */
 export function ChipGroup({
-  options,
-  value,
-  onChange,
-  getColor, // optional: returns a color for a given label
-}: {
-  options: string[];
-  value: string | undefined;
-  onChange: (v: string) => void;
-  getColor?: (label: string) => string;
+  options, value, onChange, getColor,
+}:{
+  options: string[]; value: string | undefined; onChange: (v:string)=>void;
+  getColor?: (label:string)=>string;
 }) {
   return (
     <div className="row row--wrap">
@@ -173,21 +129,12 @@ export function ChipGroup({
 }
 
 /* -------------------- Footer -------------------- */
-
-export function Footer({
-  version,
-  ruleHash,
-  jurisdiction = "AU • Privacy Act (APPs) + relevant State Health Records Acts",
-}: {
-  version: string;
-  ruleHash: string;
-  jurisdiction?: string;
-}) {
+export function Footer({ version, ruleHash }:{version:string; ruleHash:string}) {
   return (
     <footer className="small" style={{ margin: "40px 0", textAlign: "center", opacity: 0.9 }}>
       <div>© {new Date().getFullYear()} ASD Decision Support MVP — Demonstration only.</div>
       <div style={{ marginTop: 6 }}>
-        Decision support only; clinician judgement prevails • Build {version} • Rule set {ruleHash} • {jurisdiction}
+        Decision support only; clinician judgement prevails • Build {version} • Rule set {ruleHash}
       </div>
     </footer>
   );
