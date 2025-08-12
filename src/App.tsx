@@ -15,9 +15,6 @@ export default function App() {
   const TABS = ["ASD Measures", "Adaptive", "History", "Comorbidity", "Advanced", "Report"];
   const [devOpen, setDevOpen] = useState(false);
 
-const [instruments, setInstruments] = useState(
-  DEFAULT_CONFIG.defaultInstruments.map(i => ({ name: i.name, value: undefined as number | undefined, band: "" }))
-);
   const [srs2, setSRS2] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
@@ -91,6 +88,14 @@ const [instruments, setInstruments] = useState(
     for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
     return ("00000000" + (h >>> 0).toString(16)).slice(-8);
   }, []);
+
+  const [instruments, setInstruments] = useState(
+  DEFAULT_CONFIG.defaultInstruments.map(i => ({
+    name: i.name,
+    value: undefined as number | undefined,
+    band: "",
+  }))
+);
 
   // ---------- engine ----------
   const { datasetStatus, evidence, model, supportEstimate, recommendation } = useAsdEngine(
