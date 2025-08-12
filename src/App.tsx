@@ -16,13 +16,9 @@ export default function App() {
   const TABS = ["ASD Measures", "Adaptive", "History", "Comorbidity", "Advanced", "Report"];
   const [devOpen, setDevOpen] = useState(false);
 
-  const [instruments, setInstruments] = useState(
-    DEFAULT_CONFIG.defaultInstruments.map((i) => ({
-      name: i.name,
-      value: undefined as number | undefined,
-      band: "",
-    }))
-  );
+const [instruments, setInstruments] = useState(
+  DEFAULT_CONFIG.defaultInstruments.map(i => ({ name: i.name, value: undefined as number | undefined, band: "" }))
+);
   const [srs2, setSRS2] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
@@ -111,16 +107,16 @@ export default function App() {
   );
 
   // ---------- helpers for label-only instruments (Vineland) ----------
-  const setInstrumentBand = useCallback(
-    (name: string, band: string) => {
-      setInstruments((arr) => arr.map((x) => (x.name === name ? { ...x, band } : x)));
-    },
-    [setInstruments]
-  );
-  const getInstrumentBand = useCallback(
-    (name: string) => instruments.find((x) => x.name === name)?.band || "",
-    [instruments]
-  );
+const getInstrumentBand = useCallback(
+  (name: string) => instruments.find(x => x.name === name)?.band || "",
+  [instruments]
+);
+
+const setInstrumentBand = useCallback(
+  (name: string, band: string) =>
+    setInstruments(arr => arr.map(x => (x.name === name ? { ...x, band } : x))),
+  [] // setState function is stable; empty deps are fine
+);
 
   // ---------- report text (prose, no %) ----------
   const reportText = useMemo(() => {
