@@ -8,6 +8,11 @@ import { Card, Field, TabBar, ChipGroup, Header, Footer } from "./components/ui"
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
 
+const setInstrumentBand = (name: string, band: string) =>
+  setInstruments(arr => arr.map(x => x.name === name ? { ...x, band } : x));
+const getInstrumentBand = (name: string) =>
+  instruments.find(x => x.name === name)?.band || "";
+
 export default function App() {
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
   const [activeTab, setActiveTab] = useState(0);
@@ -250,11 +255,35 @@ export default function App() {
           )}
 
           {activeTab === 1 && (
-            <Card title="ABAS-3 — Domain Entries" right={<button className="small" onClick={() => setCollapsed((s) => ({ ...s, abas: !s.abas }))}>{collapsed.abas ? "Show" : "Hide"}</button>}>
-              {!collapsed.abas && AbasDomainGrid}
-              <p className="small">ABAS-3 domain bands influence the <b>impairment</b> feature and support estimate.</p>
-            </Card>
-          )}
+  <>
+    <Card
+      title="ABAS-3 — Domain Entries"
+      right={
+        <button
+          className="small"
+          onClick={() => setCollapsed((s) => ({ ...s, abas: !s.abas }))}
+        >
+          {collapsed.abas ? "Show" : "Hide"}
+        </button>
+      }
+    >
+      {!collapsed.abas && AbasDomainGrid}
+      <p className="small">
+        ABAS-3 domain bands influence the <b>impairment</b> feature and support estimate.
+      </p>
+    </Card>
+
+    <Card title="Vineland-3 — Composite Band">
+      <ChipGroup
+        options={[...VINELAND_BANDS]}
+        value={getInstrumentBand("Vineland-3")}
+        onChange={(val) => setInstrumentBand("Vineland-3", val)}
+      />
+      <div className="small">Band contributes to impairment (same direction as ABAS).</div>
+    </Card>
+  </>
+)}
+
 
           {activeTab === 2 && (
             <Card title="Developmental History & Clinician Observation">
