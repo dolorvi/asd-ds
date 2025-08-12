@@ -1,4 +1,3 @@
-// src/ui/severity.ts
 export type Polarity = "goodHigh" | "goodLow" | "neutral";
 
 /** Map any label to a tone token, respecting domain polarity. */

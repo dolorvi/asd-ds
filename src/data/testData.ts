@@ -23,6 +23,7 @@ export interface DomainLabelConfig {
 
 // ----------------------------- SRS-2 -----------------------------
 export const SRS2_SEVERITIES = [
+  "Average",
   "Mild",
   "Moderate",
   "Severe",

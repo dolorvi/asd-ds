@@ -7,8 +7,6 @@ export type HeaderProps = {
   onDevToggle?: () => void;
   onExportSummary?: () => void;
   onExportFull?: () => void;
-  onThemeToggle?: () => void;
-  theme?: "dark" | "light";
 
   // NEW:
   condition: Condition;
@@ -23,8 +21,6 @@ export function Header({
   onDevToggle,
   onExportSummary,
   onExportFull,
-  onThemeToggle,
-  theme = "dark",
   condition,
   onConditionChange,
 }: HeaderProps) {
@@ -35,7 +31,6 @@ export function Header({
         {subtitle && <span className="muted small">{subtitle}</span>}
         <div style={{ flex: 1 }} />
 
-        {/* NEW segmented condition control */}
         <div className="seg">
           {CONDITIONS.map((c) => (
             <button
@@ -57,7 +52,6 @@ export function Header({
         <button className="small" onClick={onDevToggle}>Dev</button>
         <button className="small" onClick={onExportSummary}>Export summary</button>
         <button className="small" onClick={onExportFull}>Export (full)</button>
-        <button className="small" onClick={onThemeToggle}>{theme === "dark" ? "Day" : "Night"}</button>
       </div>
     </header>
   );
