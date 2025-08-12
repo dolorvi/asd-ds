@@ -1,12 +1,6 @@
 // src/App.tsx
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import {
-  DEFAULT_CONFIG,
-  PRIOR_BY_AGE,
-  DEFAULT_AGE_BAND,
-  type AgeBandKey,
-  VINELAND_BANDS,
-} from "./config/modelConfig";
+import {DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey} from "./config/modelConfig";
 import { useAsdEngine } from "./hooks/useAsdEngine";
 import { CANONICAL_CASES, MIGDAS_CONSISTENCY } from "./data/testData";
 import type { Config, SeverityState, CriterionKey } from "./types";
@@ -433,10 +427,10 @@ export default function App() {
 
               <Card title="Vineland-3 — Composite Band">
                 <ChipGroup
-                  options={[...VINELAND_BANDS]}
+                  options={config.vinelandDomains[0]?.severities ?? []}  // ✅ from config
                   value={getInstrumentBand("Vineland-3")}
                   onChange={(val) => setInstrumentBand("Vineland-3", val)}
-                />
+                  />
                 <div className="small">Band contributes to impairment (same direction as ABAS).</div>
               </Card>
             </>
