@@ -28,7 +28,8 @@ export default function App() {
   const [srs2, setSRS2] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
-
+  const [vineland, setVineland] = useState<Record<string, string>>({});
+ 
   const [migdas, setMIGDAS] = useState({
     consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
     notes: [""],
@@ -196,12 +197,24 @@ export default function App() {
               {/* TODO: MIGDAS panel (presentational) */}
             </>
           )}
-
+          
           {activeTab === 1 && (
-            <><>
-              <AbasPanel domains={config.abasDomains} abas={abas} setABAS={setABAS} />
-              {/* TODO: Vineland composite panel using get/setInstrumentBand */}
-            </><VinelandPanel domains={config.vinelandDomains} vineland={vineland} setVineland={setVineland} /></>
+            <>
+            <AbasPanel
+            title="ABAS-3 Composite"
+            domains={config.abasDomains}
+            options={ABAS_SEVERITIES}
+            valueMap={abas}
+            setValueMap={setABAS}
+            />
+            <VinelandPanel
+            title="Vineland-3 Composite"
+            domains={config.vinelandDomains ?? VINELAND_DOMAINS}
+            options={VINELAND_SEVERITIES}
+            valueMap={vineland}
+            setValueMap={setVineland}
+            />
+            </>
           )}
 
           {activeTab === 2 && (
