@@ -1,5 +1,4 @@
-import React from "react";
-import { Card, Button, Stack } from "@/ui/primitives";
+import { Card, Button, Stack } from "../components/primitives";
 
 export function SummaryPanel({
   model, config, supportEstimate, recommendation, exportSummary
