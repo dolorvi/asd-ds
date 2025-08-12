@@ -7,13 +7,18 @@ export type HeaderProps = {
   onDevToggle?: () => void;
   onExportSummary?: () => void;
   onExportFull?: () => void;
-
-  // NEW:
   condition: Condition;
   onConditionChange: (c: Condition) => void;
 };
 
 const CONDITIONS: Condition[] = ["ASD", "ADHD", "ID", "FASD"];
+
+const CONDITION_TITLES: Record<Condition, string> = {
+  ASD: "Autism Spectrum Disorder",
+  ADHD: "Attention-Deficit/Hyperactivity Disorder",
+  ID: "Intellectual Disability",
+  FASD: "Fetal Alcohol Spectrum Disorder",
+};
 
 export function Header({
   title,
@@ -27,31 +32,45 @@ export function Header({
   return (
     <header className="topbar">
       <div className="row" style={{ alignItems: "center", gap: 8 }}>
-        <h1 className="app-title">{title}</h1>
-        {subtitle && <span className="muted small">{subtitle}</span>}
+        <h1 className="title">{title}</h1>
+        {subtitle && <span className="subtitle small">{subtitle}</span>}
+
         <div style={{ flex: 1 }} />
 
-        <div className="seg">
-          {CONDITIONS.map((c) => (
-            <button
-              key={c}
-              className={"chip" + (condition === c ? " chip-active" : "")}
-              onClick={() => onConditionChange(c)}
-              title={
-                c === "ASD" ? "Autism" :
-                c === "ADHD" ? "Attention-Deficit/Hyperactivity Disorder" :
-                c === "ID" ? "Intellectual Disability" :
-                "Fetal Alcohol Spectrum Disorder"
-              }
-            >
-              {c}
-            </button>
-          ))}
+        <div className="row" role="group" aria-label="Condition">
+          {CONDITIONS.map((c) => {
+            const active = condition === c;
+            return (
+              <button
+                key={c}
+                type="button"
+                className={`chip${active ? " chip--active" : ""}`}
+                aria-pressed={active}
+                title={CONDITION_TITLES[c]}
+                onClick={() => onConditionChange(c)}
+              >
+                {c}
+              </button>
+            );
+          })}
         </div>
 
-        <button className="small" onClick={onDevToggle}>Dev</button>
-        <button className="small" onClick={onExportSummary}>Export summary</button>
-        <button className="small" onClick={onExportFull}>Export (full)</button>
+        <div className="row" style={{ gap: 8 }}>
+          <button type="button" className="btn" onClick={onDevToggle} disabled={!onDevToggle}>
+            Dev
+          </button>
+          <button
+            type="button"
+            className="btn"
+            onClick={onExportSummary}
+            disabled={!onExportSummary}
+          >
+            Export summary
+          </button>
+          <button type="button" className="btn" onClick={onExportFull} disabled={!onExportFull}>
+            Export (full)
+          </button>
+        </div>
       </div>
     </header>
   );

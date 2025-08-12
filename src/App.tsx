@@ -10,6 +10,7 @@ import { Container, Tabs, Card, Row } from "./components/primitives";
 import { SrsPanel } from "./panels/SrsPanel";
 import { AbasPanel } from "./panels/AbasPanel";
 import { SummaryPanel } from "./panels/SummaryPanel";
+import { VinelandPanel } from "./panels/VinelandPanel";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -197,10 +198,10 @@ export default function App() {
           )}
 
           {activeTab === 1 && (
-            <>
+            <><>
               <AbasPanel domains={config.abasDomains} abas={abas} setABAS={setABAS} />
               {/* TODO: Vineland composite panel using get/setInstrumentBand */}
-            </>
+            </><VinelandPanel domains={config.vinelandDomains} vineland={vineland} setVineland={setVineland} /></>
           )}
 
           {activeTab === 2 && (

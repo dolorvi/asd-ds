@@ -86,3 +86,4 @@ button:disabled{opacity:.6;cursor:not-allowed}
   body.print-summary #summary-section, body.print-summary #summary-section *{visibility:visible!important}
   body.print-summary #summary-section{position:absolute;left:0;top:0;width:100%}
 }
+}

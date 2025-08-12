@@ -21,7 +21,7 @@ export interface DomainLabelConfig {
   severities: readonly RangeLabel[]; // allowed labels only (no numbers)
 }
 
-// ----------------------------- SRS-2 -----------------------------
+// ----------------------------- Autism Questionnaires -----------------------------
 export const SRS2_SEVERITIES = [
   "Average",
   "Mild",
@@ -56,13 +56,28 @@ export const WISC_DOMAINS: DomainLabelConfig[] = [
   { key: "wisc_fsiq", label: "Full Scale IQ",        severities: WISC_SEVERITIES },
 ];
 
-// ----------------------------- ABAS-3 (Conceptual/Social/Practical) -----------------------------
+// ----------------------------- Adaptive Behaviour (Conceptual/Social/Practical) -----------------------------
 export const ABAS3_SEVERITIES = WISC_SEVERITIES; // same label set by convention
 
 export const ABAS3_DOMAINS: DomainLabelConfig[] = [
   { key: "abas_conceptual", label: "Conceptual", severities: ABAS3_SEVERITIES },
   { key: "abas_social",     label: "Social",     severities: ABAS3_SEVERITIES },
   { key: "abas_practical",  label: "Practical",  severities: ABAS3_SEVERITIES },
+];
+
+export const VINELAND_SEVERITIES = [
+  "Low",
+  "Moderately Low",
+  "Average",
+  "Moderately High",
+  "High",
+] as const;
+
+export const VINELAND_DOMAINS: DomainLabelConfig[] = [
+  { key: "vineland_communication", label: "Communication", severities: VINELAND_SEVERITIES },
+  { key: "vineland_socialization",     label: "Socialization",     severities: VINELAND_SEVERITIES },
+  { key: "vineland_dls",  label: "Daily Living Skills",  severities: VINELAND_SEVERITIES },
+  { key: "vineland_motor",  label: "Motor Skills",  severities: VINELAND_SEVERITIES },
 ];
 
 // ----------------------------- MIGDAS (Qualitative) -----------------------------
