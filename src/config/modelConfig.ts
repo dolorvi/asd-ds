@@ -42,6 +42,8 @@ export const DEFAULT_CONFIG: Config = {
   defaultInstruments: [
     { name: "ADOS-2", scoreField: "standard", thresholds: [] },
     { name: "MIGDAS-2", scoreField: "standard", thresholds: [] },
+    { name: "ADI-R", scoreField: "band", thresholds: [] },
+    { name: "ASRS",  scoreField: "score", thresholds: [] },
     { name: "GARS", scoreField: "standard", thresholds: [] },
     { name: "SRS-2", scoreField: "t", thresholds: [] },
     { name: "Vineland-3", scoreField: "composite", thresholds: [] },
