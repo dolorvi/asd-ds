@@ -1,4 +1,3 @@
-// src/App.tsx
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import {DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey} from "./config/modelConfig";
 import { useAsdEngine } from "./hooks/useAsdEngine";
@@ -423,7 +422,7 @@ const setInstrumentBand = useCallback(
 
               <Card title="Vineland-3 — Composite Band">
                 <ChipGroup
-                  options={config.vinelandDomains[0]?.severities ?? []}  // ✅ from config
+                  options={config.vinelandDomains[0]?.severities ?? []}
                   value={getInstrumentBand("Vineland-3")}
                   onChange={(val) => setInstrumentBand("Vineland-3", val)}
                   />
