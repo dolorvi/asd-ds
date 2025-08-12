@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { DEFAULT_CONFIG } from "./config/modelConfig";
-import { Card, Field, TabBar, ChipGroup } from "./components/ui";
 import { useAsdEngine } from "./hooks/useAsdEngine";
 import { CANONICAL_CASES, MIGDAS_CONSISTENCY } from "./data/testData";
 import type { Config, SeverityState, CriterionKey } from "./types";
