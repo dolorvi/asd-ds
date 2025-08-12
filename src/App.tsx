@@ -4,6 +4,7 @@ import { Card, Field, TabBar, ChipGroup } from "./components/ui";
 import { useAsdEngine } from "./hooks/useAsdEngine";
 import { CANONICAL_CASES, MIGDAS_CONSISTENCY } from "./data/testData";
 import type { Config, SeverityState, CriterionKey } from "./types";
+import { Card, Field, TabBar, ChipGroup, Header, Footer } from "./components/ui";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -29,6 +30,16 @@ export default function App() {
   const [clinician, setClinician] = useState({ name: "", date: new Date().toISOString().slice(0, 10), attested: false });
   const [reportVoice, setReportVoice] = useState<"clinical" | "dual">("dual");
 
+  const ruleHash = useMemo(() => {
+  const s = JSON.stringify(DEFAULT_CONFIG);
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return ("00000000" + (h >>> 0).toString(16)).slice(-8);
+  }, []);
+
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const toggleTheme = () => setTheme(t => (t === "dark" ? "light" : "dark"));
+  
   const { datasetStatus, evidence, model, supportEstimate, recommendation } = useAsdEngine(
     config,
     srs2,
@@ -149,16 +160,15 @@ export default function App() {
   // -------------- Render --------------
   return (
     <div className="app-shell">
-      <div className="topbar" style={{ position: "sticky", top: 0, zIndex: 10 }}>
-        <div>
-          <h1 className="title">ASD Decision Support — MVP</h1>
-          <div className="subtitle">DSM-5-TR aligned • tabs build</div>
-        </div>
-        <div className="toolbar">
-          <button onClick={() => setDevOpen((v) => !v)} title="Developer fixtures">Dev</button>
-          <button onClick={() => window.print()}>Export (full)</button>
-        </div>
-      </div>
+      <Header
+        title="ASD Decision Support — MVP"
+        subtitle="DSM-5-TR aligned • tabs build"
+        onDevToggle={() => setDevOpen(v => !v)}
+        onExportSummary={exportSummary}
+        onExportFull={() => window.print()}
+        onThemeToggle={toggleTheme}
+        theme={theme}
+        />
 
       <div className="card" style={{ margin: "12px 0", padding: 12, borderLeft: datasetStatus.passes ? "4px solid #10b981" : "4px solid #f59e0b" }}>
         <span className="small"><b>Minimum dataset:</b> {ribbon}</span>
@@ -382,7 +392,7 @@ export default function App() {
         </aside>
       </div>
 
-      <footer style={{ margin: "40px 0", textAlign: "center" }} className="small">© {new Date().getFullYear()} ASD Decision Support MVP — Demonstration only.</footer>
+      <Footer version="v0.6" ruleHash={ruleHash} />
 
       {/* print-only CSS for summary export */}
       <style>{`
