@@ -76,6 +76,10 @@ export default function App() {
     }
   }, [ageBand, autoPrior, setConfig]);
 
+  useEffect(() => {
+  document.body.setAttribute("data-theme", theme);
+}, [theme]);
+
   const ruleHash = useMemo(() => {
   const s = JSON.stringify(DEFAULT_CONFIG);
   let h = 0;
