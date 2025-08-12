@@ -1,6 +1,21 @@
 import { SRS2_DOMAINS, WISC_DOMAINS, ABAS3_DOMAINS, SRS2_SEVERITIES, WISC_SEVERITIES, ABAS3_SEVERITIES } from "../data/testData";
 import type { Config, InstrumentBandMap } from "../types";
 
+// ---- Age-band priors (log-odds) ----
+// Keys kept simple; labels shown in the UI. Prevalence → logit precomputed.
+export type AgeBandKey = "au_5_14" | "au_15_24" | "au_25_39" | "au_overall" | "generic_2";
+
+export const PRIOR_BY_AGE: Record<AgeBandKey, { label: string; prevalence: number; logit: number }> = {
+  au_5_14:   { label: "AU • 5–14y (4.3%)",  prevalence: 0.043, logit: -3.103 },
+  au_15_24:  { label: "AU • 15–24y (3.0%)", prevalence: 0.030, logit: -3.476 },
+  au_25_39:  { label: "AU • 25–39y (0.6%)", prevalence: 0.006, logit: -5.110 },
+  au_overall:{ label: "AU • Overall (1.1%)", prevalence: 0.011, logit: -4.499 },
+  generic_2: { label: "Generic (2.0%)",     prevalence: 0.020, logit: -3.892 },
+};
+
+// Default for Australian school-age clinic workflows
+export const DEFAULT_AGE_BAND: AgeBandKey = "au_5_14";
+
 export const DEFAULT_CONFIG: Config = {
   prior: 0,
   riskTolerance: "balanced",
