@@ -32,6 +32,11 @@ export default function App() {
   const [ageBand, setAgeBand] = useState<AgeBandKey>(DEFAULT_AGE_BAND);
   const [autoPrior, setAutoPrior] = useState(true);
 
+  const [compact, setCompact] = useState(true);
+  useEffect(() => {
+    document.body.classList.toggle("compact", compact);
+  }, [compact]);
+
   // When auto mode is on, age-band changes update the model prior (log-odds)
   useEffect(() => {
     if (autoPrior) {
@@ -178,6 +183,17 @@ export default function App() {
         onThemeToggle={toggleTheme}
         theme={theme}
         />
+ 
+      <div className="row no-print" style={{ justifyContent: "flex-end", gap: 8, margin: "6px 0 4px" }}>
+      <label className="row small">
+        <input
+          type="checkbox"
+          checked={compact}
+          onChange={e => setCompact(e.target.checked)}
+        />
+        Compact mode
+      </label>
+      </div>
 
       <div className="card" style={{ margin: "12px 0", padding: 12, borderLeft: datasetStatus.passes ? "4px solid #10b981" : "4px solid #f59e0b" }}>
         <span className="small"><b>Minimum dataset:</b> {ribbon}</span>
