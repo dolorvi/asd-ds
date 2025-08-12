@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { DEFAULT_CONFIG } from "./config/modelConfig";
+import React, { useMemo, useState, useEffect } from "react";
+import { DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey } from "./config/modelConfig";
 import { useAsdEngine } from "./hooks/useAsdEngine";
 import { CANONICAL_CASES, MIGDAS_CONSISTENCY } from "./data/testData";
 import type { Config, SeverityState, CriterionKey } from "./types";
