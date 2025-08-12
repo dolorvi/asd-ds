@@ -1,4 +1,3 @@
-// src/components/ui.tsx
 import React from "react";
 import type { Condition } from "../types";
 
@@ -31,13 +30,13 @@ export function Header({
 }: HeaderProps) {
   return (
     <div className="topbar">
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-        <div className="stack">
+      <div className="row row--between row--center row--wrap">
+        <div className="stack stack--sm">
           <h1 className="title">{title}</h1>
           {subtitle ? <div className="subtitle">{subtitle}</div> : null}
 
           {onConditionChange && (
-            <div className="row" style={{ gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+            <div className="row row--wrap">
               {CONDITIONS.map((c) => (
                 <button
                   key={c}
@@ -60,7 +59,7 @@ export function Header({
           )}
         </div>
 
-        <div className="row" style={{ gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <div className="row row--wrap">
           {onThemeToggle && (
             <button className="btn" onClick={onThemeToggle} title="Toggle theme">
               {theme === "dark" ? "Day" : "Night"}
@@ -99,11 +98,13 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section className="card stack">
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-        {title ? <h2 className="section-title">{title}</h2> : <div />}
-        {right}
-      </div>
+    <section className="card">
+      {(title || right) && (
+        <div className="card__bar">
+          {title ? <h2 className="section-title">{title}</h2> : <span />}
+          {right}
+        </div>
+      )}
       {children}
     </section>
   );
@@ -122,15 +123,7 @@ export function Field({ label, children }: { label: string; children: React.Reac
 
 /* -------------------- TabBar -------------------- */
 
-export function TabBar({
-  tabs,
-  active,
-  onSelect,
-}: {
-  tabs: string[];
-  active: number;
-  onSelect: (i: number) => void;
-}) {
+export function TabBar({ tabs, active, onSelect }: { tabs: string[]; active: number; onSelect: (i: number) => void }) {
   return (
     <div className="tabbar">
       {tabs.map((t, i) => (
@@ -146,28 +139,35 @@ export function TabBar({
   );
 }
 
-/* -------------------- ChipGroup -------------------- */
+/* -------------------- ChipGroup (now with color hook) -------------------- */
 
 export function ChipGroup({
   options,
   value,
   onChange,
+  getColor, // optional: returns a color for a given label
 }: {
   options: string[];
   value: string | undefined;
   onChange: (v: string) => void;
+  getColor?: (label: string) => string;
 }) {
   return (
-    <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-      {options.map((opt) => (
-        <button
-          key={opt}
-          onClick={() => onChange(opt)}
-          className={`chip ${value === opt ? "chip--active" : ""}`}
-        >
-          {opt}
-        </button>
-      ))}
+    <div className="row row--wrap">
+      {options.map((opt) => {
+        const active = value === opt;
+        const bg = active && getColor ? getColor(opt) : undefined;
+        return (
+          <button
+            key={opt}
+            onClick={() => onChange(opt)}
+            className={`chip ${active ? "chip--active" : ""}`}
+            style={bg ? { background: bg, color: "var(--text)" } : undefined}
+          >
+            {opt}
+          </button>
+        );
+      })}
     </div>
   );
 }

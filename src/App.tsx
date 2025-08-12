@@ -210,25 +210,25 @@ export default function App() {
           )}
 
           {activeTab === 2 && (
-            <Card title="History / Observation" children={undefined}>
+            <Card title="History / Observation">
               {/* TODO: move history + observation into a HistoryPanel */}
             </Card>
           )}
 
           {activeTab === 3 && (
-            <Card title="Comorbidity / Differential" children={undefined}>
+            <Card title="Comorbidity / Differential">
               {/* TODO: move diff flags into a DiffPanel */}
             </Card>
           )}
 
           {activeTab === 4 && (
-            <Card title="Advanced" children={undefined}>
+            <Card title="Advanced">
               {/* TODO: WISC panel + Instruments panel */}
             </Card>
           )}
 
           {activeTab === 5 && (
-            <Card title="Report (preview)" children={undefined}>
+            <Card title="Report (preview)">
               {/* TODO: ReportPanel that uses memo’d reportText */}
             </Card>
           )}
