@@ -1,5 +1,46 @@
 import React from "react";
 
+export function Header({
+  title,
+  subtitle,
+  onDevToggle,
+  onExportFull,
+  onExportSummary,
+  onThemeToggle,
+  theme = "dark",
+}: {
+  title: string;
+  subtitle?: string;
+  onDevToggle?: () => void;
+  onExportFull?: () => void;
+  onExportSummary?: () => void;
+  onThemeToggle?: () => void;
+  theme?: "dark" | "light";
+}) {
+  return (
+    <div className="topbar" style={{ position: "sticky", top: 0, zIndex: 10 }}>
+      <div>
+        <h1 className="title">{title}</h1>
+        {subtitle ? <div className="subtitle">{subtitle}</div> : null}
+      </div>
+      <div className="toolbar" style={{ gap: 8 }}>
+        {onThemeToggle && (
+          <button onClick={onThemeToggle} title="Toggle theme">
+            {theme === "dark" ? "Day" : "Night"}
+          </button>
+        )}
+        {onDevToggle && (
+          <button onClick={onDevToggle} title="Developer fixtures">
+            Dev
+          </button>
+        )}
+        {onExportSummary && <button onClick={onExportSummary}>Export summary</button>}
+        {onExportFull && <button onClick={onExportFull}>Export (full)</button>}
+      </div>
+    </div>
+  );
+}
+
 export function Card({ title, right, children }: { title?: string; right?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section className="card stack">
@@ -74,5 +115,26 @@ export function ChipGroup({
         </button>
       ))}
     </div>
+  );
+}
+
+export function Footer({
+  version,
+  ruleHash,
+  jurisdiction = "AU • Privacy Act (APPs) + relevant State Health Records Acts",
+}: {
+  version: string;
+  ruleHash: string;
+  jurisdiction?: string;
+}) {
+  return (
+    <footer className="small" style={{ margin: "40px 0", textAlign: "center", opacity: 0.9 }}>
+      <div>
+        © {new Date().getFullYear()} ASD Decision Support MVP — Demonstration only.
+      </div>
+      <div style={{ marginTop: 6 }}>
+        Decision support only; clinician judgement prevails • Build {version} • Rule set {ruleHash} • {jurisdiction}
+      </div>
+    </footer>
   );
 }
