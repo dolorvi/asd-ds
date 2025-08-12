@@ -442,16 +442,33 @@ const AbasDomainGrid = (
                 </p>
               </Card>
 
-              <Card title="Vineland-3 — Composite Band">
-                <ChipGroup
-                  options={config.vinelandDomains[0]?.severities ?? []}
-                  value={getInstrumentBand("Vineland-3")}
-                  onChange={(val) => setInstrumentBand("Vineland-3", val)}
-                  />
-                <div className="small">Band contributes to impairment (same direction as ABAS).</div>
-              </Card>
-            </>
-          )}
+<Card title="Vineland-3 — Composite Band">
+  <ChipGroup
+    options={config.vinelandDomains[0]?.severities ?? []}
+    value={getInstrumentBand("Vineland-3")}
+    onChange={(val) => setInstrumentBand("Vineland-3", val)}
+  />
+
+  {/* ADDED: show the selected band with the canonical color */}
+  {getInstrumentBand("Vineland-3") && (
+    <div className="row" style={{ gap: 8, marginTop: 8, alignItems: "center" }}>
+      <span className="small">Selected:</span>
+      <span
+        className="chip"
+        style={{
+          background: getBandColor(getInstrumentBand("Vineland-3")),
+          color: "#0b1220",
+          padding: "4px 8px",
+          borderRadius: 999,
+        }}
+      >
+        {getInstrumentBand("Vineland-3")}
+      </span>
+    </div>
+  )}
+
+  <div className="small">Band contributes to impairment (same direction as ABAS).</div>
+</Card>
 
           {/* History */}
           {activeTab === 2 && (
