@@ -16,8 +16,35 @@ const getInstrumentBand = (name: string) =>
 export default function App() {
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
   const [activeTab, setActiveTab] = useState(0);
-  const TABS = ["ASD Measures", "Adaptive", "History", "Comorbidity", "Advanced"];
+  const TABS = ["ASD Measures", "Adaptive", "History", "Comorbidity", "Advanced", "Report"];
   const [devOpen, setDevOpen] = useState(false);
+
+  const reportText = useMemo(() => {
+  const lines: string[] = [];
+  const lik = model.p >= 0.70 ? "High likelihood" : model.p >= model.cut ? "Moderate likelihood" : "Low likelihood";
+  const cons = migdas.consistency === "inconsistent" ? "Inconsistent with autism"
+              : (model.p >= model.cut ? "Consistent with autism" : "Not currently consistent with autism");
+
+  lines.push("ASD Decision Support — Summary Report");
+  lines.push("");
+  lines.push(`Overall: ${lik} • ${cons}`);
+  lines.push(`Provisional support needs: ${supportEstimate}`);
+  lines.push("");
+
+  lines.push("SRS-2 (labels):");
+  config.srs2Domains.forEach(d => { const s = srs2[d.key]?.severity; if (s) lines.push(`- ${d.label}: ${s}`); });
+
+  const vin = getInstrumentBand("Vineland-3"); if (vin) { lines.push(""); lines.push(`Vineland-3 composite: ${vin}`); }
+  lines.push(""); lines.push("MIGDAS: " + (migdas.consistency === "unclear" ? "Unclear" :
+                             migdas.consistency === "consistent" ? "Consistent with autism" : "Inconsistent with autism"));
+  const notes = migdas.notes.filter(n => n.trim()); notes.forEach((n,i)=>lines.push(`- Note ${i+1}: ${n.trim()}`));
+
+  lines.push(""); lines.push("Recommendations:");
+  recommendation.slice(0,6).forEach(r => lines.push("- " + r));
+
+  lines.push(""); lines.push("Governance: Decision support only; clinician judgement prevails.");
+  return lines.join("\n");
+}, [model, migdas, supportEstimate, config.srs2Domains, srs2, recommendation]);
 
   const [instruments, setInstruments] = useState(
     DEFAULT_CONFIG.defaultInstruments.map((i) => ({ name: i.name, value: undefined as number | undefined, band: "" }))
@@ -284,7 +311,6 @@ export default function App() {
   </>
 )}
 
-
           {activeTab === 2 && (
             <Card title="Developmental History & Clinician Observation">
               <div className="grid">
@@ -310,7 +336,24 @@ export default function App() {
                 </div>
               </div>
             </Card>
-          )}
+
+      {activeTab === 5 && (
+  <Card title="Report (preview)">
+    <pre id="report-section" style={{ whiteSpace: "pre-wrap", padding: 12 }}>{reportText}</pre>
+    <div className="row" style={{ gap: 8 }}>
+      <button onClick={() => navigator.clipboard.writeText(reportText)}>Copy</button>
+      <button onClick={() => {
+        document.body.classList.add("print-summary");
+        const el = document.getElementById("report-section");
+        if (el) el.classList.add("print-target");
+        setTimeout(() => { window.print(); setTimeout(() => {
+          document.body.classList.remove("print-summary");
+          el && el.classList.remove("print-target");
+        }, 0); }, 0);
+      }}>Print report</button>
+    </div>
+  </Card>
+)}
 
           {activeTab === 3 && (
             <Card title="Comorbidity / Differential Flags">
