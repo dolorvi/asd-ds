@@ -11,6 +11,7 @@ import { SrsPanel } from "./panels/SrsPanel";
 import { AbasPanel } from "./panels/AbasPanel";
 import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
+import { ReportPanel } from "./panels/ReportPanel";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -26,8 +27,10 @@ export default function App() {
   const [devOpen, setDevOpen] = useState(false);
 
   const [srs2, setSRS2] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
+  const [srs2Teacher, setSRS2Teacher] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
+  const [abasTeacher, setABASTeacher] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
  
   const [migdas, setMIGDAS] = useState({
     consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
@@ -77,13 +80,22 @@ export default function App() {
     if (autoPrior) setConfig((c) => ({ ...c, prior: PRIOR_BY_AGE[ageBand].logit }));
   }, [ageBand, autoPrior]);
 
+  const isSchoolAge = ageBand === "au_5_14" || ageBand === "au_15_24";
+
+  useEffect(() => {
+    if (!isSchoolAge) {
+      setSRS2Teacher(() => initSeverityState(config.srs2Domains));
+      setABASTeacher(() => initSeverityState(config.abasDomains));
+    }
+  }, [isSchoolAge, config.srs2Domains, config.abasDomains]);
+
   // ---------- density ----------
   const [compact, setCompact] = useState(true);
   useEffect(() => { document.body.classList.toggle("compact", compact); }, [compact]);
 
   // ---------- engine ----------
   const { datasetStatus, evidence, model, supportEstimate, recommendation } =
-    useAsdEngine(config, srs2, abas, wisc, migdas, history, observation as any, diff as any, instruments);
+    useAsdEngine(config, srs2, srs2Teacher, abas, abasTeacher, wisc, migdas, history, observation as any, diff as any, instruments);
 
   // ---------- ribbon ----------
   const ribbon = useMemo(() => {
@@ -192,30 +204,42 @@ export default function App() {
         <section className="stack">
           {activeTab === 0 && (
             <>
-              <SrsPanel domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
+              <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
+              {isSchoolAge && (
+                <SrsPanel title="SRS-2 Teacher" domains={config.srs2Domains} srs2={srs2Teacher} setSRS2={setSRS2Teacher} />
+              )}
               {/* TODO: MIGDAS panel (presentational) */}
             </>
           )}
           
           {activeTab === 1 && (
             <>
-            <AbasPanel
-            title="ABAS-3 Composite"
-            domains={config.abasDomains}
-            options={ABAS_SEVERITIES}
-            valueMap={abas}
-            setValueMap={setABAS}
-            />
-            <VinelandPanel
-            title="Vineland-3 Composite"
-            domains={config.vinelandDomains ?? VINELAND_DOMAINS}
-            options={VINELAND_SEVERITIES}
-            valueMap={{ vineland_composite: getInstrumentBand("Vineland-3") }}
-            setValueMap={(fn) => {
-              const next = fn({ vineland_composite: getInstrumentBand("Vineland-3") });
-              setInstrumentBand("Vineland-3", next.vineland_composite || "");
-            }}
-            />
+              <AbasPanel
+                title="ABAS-3 Parent"
+                domains={config.abasDomains}
+                options={ABAS_SEVERITIES}
+                valueMap={abas}
+                setValueMap={setABAS}
+              />
+              {isSchoolAge && (
+                <AbasPanel
+                  title="ABAS-3 Teacher"
+                  domains={config.abasDomains}
+                  options={ABAS_SEVERITIES}
+                  valueMap={abasTeacher}
+                  setValueMap={setABASTeacher}
+                />
+              )}
+              <VinelandPanel
+                title="Vineland-3 Composite"
+                domains={config.vinelandDomains ?? VINELAND_DOMAINS}
+                options={VINELAND_SEVERITIES}
+                valueMap={{ vineland_composite: getInstrumentBand("Vineland-3") }}
+                setValueMap={(fn) => {
+                  const next = fn({ vineland_composite: getInstrumentBand("Vineland-3") });
+                  setInstrumentBand("Vineland-3", next.vineland_composite || "");
+                }}
+              />
             </>
           )}
 
@@ -238,9 +262,17 @@ export default function App() {
           )}
 
           {activeTab === 5 && (
-            <Card title="Report (preview)">
-              {/* TODO: ReportPanel that uses memo’d reportText */}
-            </Card>
+            <ReportPanel
+              model={model}
+              supportEstimate={supportEstimate}
+              srs2={srs2}
+              srs2Teacher={srs2Teacher}
+              abas={abas}
+              abasTeacher={abasTeacher}
+              migdas={migdas}
+              instruments={instruments}
+              config={config}
+            />
           )}
         </section>
 
