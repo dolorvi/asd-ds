@@ -23,7 +23,17 @@ export default function App() {
 
   // ---------- core state ----------
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
-  const TABS = ["ASD Measures", "Adaptive", "History", "Comorbidity", "Advanced", "Report"];
+  const TABS = [
+    "ASD Measures",
+    "Adaptive",
+    "Intellectual",
+    "Executive Function",
+    "Sensory",
+    "Language",
+    "History",
+    "Comorbidity",
+    "Report",
+  ];
   const [activeTab, setActiveTab] = useState(0);
   const [devOpen, setDevOpen] = useState(false);
 
@@ -217,6 +227,11 @@ export default function App() {
         <section className="stack">
           {activeTab === 0 && (
             <>
+              <AssessmentPanel
+                assessments={assessments}
+                setAssessments={setAssessments}
+                domains={["Autism questionnaires", "Autism observations", "Autism interviews"]}
+              />
               <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
               {isSchoolAge && (
                 <SrsPanel title="SRS-2 Teacher" domains={config.srs2Domains} srs2={srs2Teacher} setSRS2={setSRS2Teacher} />
@@ -224,9 +239,14 @@ export default function App() {
               {/* TODO: MIGDAS panel (presentational) */}
             </>
           )}
-          
+
           {activeTab === 1 && (
             <>
+              <AssessmentPanel
+                assessments={assessments}
+                setAssessments={setAssessments}
+                domains={["Adaptive questionnaires"]}
+              />
               <AbasPanel
                 title="ABAS-3 Parent"
                 domains={config.abasDomains}
@@ -257,24 +277,50 @@ export default function App() {
           )}
 
           {activeTab === 2 && (
+            <AssessmentPanel
+              assessments={assessments}
+              setAssessments={setAssessments}
+              domains={["Intellectual assessment"]}
+            />
+          )}
+
+          {activeTab === 3 && (
+            <AssessmentPanel
+              assessments={assessments}
+              setAssessments={setAssessments}
+              domains={["Executive function questionnaires"]}
+            />
+          )}
+
+          {activeTab === 4 && (
+            <AssessmentPanel
+              assessments={assessments}
+              setAssessments={setAssessments}
+              domains={["Sensory Assessment"]}
+            />
+          )}
+
+          {activeTab === 5 && (
+            <AssessmentPanel
+              assessments={assessments}
+              setAssessments={setAssessments}
+              domains={["Language assessment"]}
+            />
+          )}
+
+          {activeTab === 6 && (
             <Card title="History / Observation">
               {/* TODO: move history + observation into a HistoryPanel */}
             </Card>
           )}
 
-          {activeTab === 3 && (
+          {activeTab === 7 && (
             <Card title="Comorbidity / Differential">
               {/* TODO: move diff flags into a DiffPanel */}
             </Card>
           )}
 
-          {activeTab === 4 && (
-            <>
-              <AssessmentPanel assessments={assessments} setAssessments={setAssessments} />
-            </>
-          )}
-
-          {activeTab === 5 && (
+          {activeTab === 8 && (
             <ReportPanel
               model={model}
               supportEstimate={supportEstimate}

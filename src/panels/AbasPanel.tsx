@@ -19,7 +19,7 @@ export function AbasPanel({
 }) {
   return (
     <Card title={title}>
-      <div className="grid">
+      <div className="grid grid--sm">
         {domains.map(d=>{
           const sel = valueMap[d.key]?.severity || "";
           return (
