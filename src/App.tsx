@@ -270,92 +270,94 @@ export default function App() {
 
       {condition === "ASD" ? (
         <>
-          <Card>
-            <label className="row row--center" style={{ gap: 8 }}>
-              Age
-              <input
-                type="number"
-                value={age}
-                min={0}
-                onChange={(e) => setAge(Number(e.target.value))}
-                style={{ width: 60 }}
-              />
-            </label>
-          </Card>
-
-          <Card>
-            <span className="small">
-              <b>Minimum dataset:</b> {ribbon}
-            </span>
-            <div className="progress-bar">
-              <div className="progress-bar__fill" style={{ width: `${progress * 100}%` }} />
-            </div>
-          </Card>
-
-          {devOpen && (
+          <div className="stack stack--lg">
             <Card>
-              <div className="row">
-                <select id="fixtureSelect">
-                  {CANONICAL_CASES.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.id} — {c.title}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={() => {
-                    const selEl = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
-                    const sel = selEl ? CANONICAL_CASES.find((c) => c.id === selEl.value) : undefined;
-                    if (!sel) return;
+              <label className="row row--center" style={{ gap: 8 }}>
+                Age
+                <input
+                  type="number"
+                  value={age}
+                  min={0}
+                  onChange={(e) => setAge(Number(e.target.value))}
+                  style={{ width: 60 }}
+                />
+              </label>
+            </Card>
 
-                    setSRS2((prev) => {
-                      const next = { ...prev } as SeverityState;
-                      if (sel.srs2)
-                        Object.entries(sel.srs2).forEach(
-                          ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
-                        );
-                      return next;
-                    });
-
-                    setABAS((prev) => {
-                      const next = { ...prev } as SeverityState;
-                      if (sel.abas3)
-                        Object.entries(sel.abas3).forEach(
-                          ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
-                        );
-                      return next;
-                    });
-
-                    setWISC((prev) => {
-                      const next = { ...prev } as SeverityState;
-                      if (sel.wisc)
-                        Object.entries(sel.wisc).forEach(
-                          ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
-                        );
-                      return next;
-                    });
-
-                    if (sel.migdas) setMIGDAS({ consistency: sel.migdas.consistency, notes: sel.migdas.notes });
-
-                    setHistory((h) => ({
-                      ...h,
-                      developmentalConcerns: "Auto-filled for fixture; replace with clinical history.",
-                      earlyOnset: !!sel.flags?.earlyOnset,
-                      crossContextImpairment: !!sel.flags?.crossContextImpairment,
-                      maskingIndicators: !!sel.flags?.masking,
-                    }));
-                  }}
-                >
-                  Load
-                </button>
-                <div className="small">Dev fixtures for sanity-checks. (Label-only)</div>
+            <Card>
+              <span className="small">
+                <b>Minimum dataset:</b> {ribbon}
+              </span>
+              <div className="progress-bar">
+                <div className="progress-bar__fill" style={{ width: `${progress * 100}%` }} />
               </div>
             </Card>
-          )}
 
-          <MinDatasetProgress count={metInstrumentCount} total={config.minDataset.minInstruments} />
+            {devOpen && (
+              <Card>
+                <div className="row">
+                  <select id="fixtureSelect">
+                    {CANONICAL_CASES.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.id} — {c.title}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => {
+                      const selEl = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
+                      const sel = selEl ? CANONICAL_CASES.find((c) => c.id === selEl.value) : undefined;
+                      if (!sel) return;
 
-          <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
+                      setSRS2((prev) => {
+                        const next = { ...prev } as SeverityState;
+                        if (sel.srs2)
+                          Object.entries(sel.srs2).forEach(
+                            ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                          );
+                        return next;
+                      });
+
+                      setABAS((prev) => {
+                        const next = { ...prev } as SeverityState;
+                        if (sel.abas3)
+                          Object.entries(sel.abas3).forEach(
+                            ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                          );
+                        return next;
+                      });
+
+                      setWISC((prev) => {
+                        const next = { ...prev } as SeverityState;
+                        if (sel.wisc)
+                          Object.entries(sel.wisc).forEach(
+                            ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                          );
+                        return next;
+                      });
+
+                      if (sel.migdas) setMIGDAS({ consistency: sel.migdas.consistency, notes: sel.migdas.notes });
+
+                      setHistory((h) => ({
+                        ...h,
+                        developmentalConcerns: "Auto-filled for fixture; replace with clinical history.",
+                        earlyOnset: !!sel.flags?.earlyOnset,
+                        crossContextImpairment: !!sel.flags?.crossContextImpairment,
+                        maskingIndicators: !!sel.flags?.masking,
+                      }));
+                    }}
+                  >
+                    Load
+                  </button>
+                  <div className="small">Dev fixtures for sanity-checks. (Label-only)</div>
+                </div>
+              </Card>
+            )}
+
+            <MinDatasetProgress count={metInstrumentCount} total={config.minDataset.minInstruments} />
+
+            <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
+          </div>
 
           <div className="layout">
             {/* LEFT: panels per tab */}
