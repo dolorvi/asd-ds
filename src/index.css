@@ -3,14 +3,14 @@
   --radius-xs:6px; --radius-sm:10px; --radius-md:14px;
   --gap-1:6px; --gap-2:10px; --gap-3:14px; --gap-4:18px;
 
-  --bg:hsl(210 20% 98%);
+  --bg:hsl(205 70% 97%);
   --panel:hsl(0 0% 100%);
-  --elev:hsl(210 20% 96%);
-  --border:hsl(214 20% 90%);
+  --elev:hsl(205 70% 95%);
+  --border:hsl(205 40% 85%);
   --muted:hsl(215 16% 45%);
   --text:hsl(215 28% 17%);
-  --accent:hsl(217 92% 60%);
-  --accent-2:hsl(217 92% 66%);
+  --accent:hsl(205 74% 65%);
+  --accent-2:hsl(30 100% 75%);
   --tone-danger:#fecaca;
   --tone-warn:#fde68a;
   --tone-neutral:#e5e7eb;
@@ -90,6 +90,16 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .badge--ok{background:var(--tone-good);border:1px solid color-mix(in hsl, var(--tone-good) 60%, black 40%)}
 .badge--warn{background:var(--tone-warn);border:1px solid color-mix(in hsl, var(--tone-warn) 60%, black 40%)}
 .badge--danger{background:var(--tone-danger);border:1px solid color-mix(in hsl, var(--tone-danger) 60%, black 40%)}
+
+/* progress bar */
+.progress-bar{width:100%;height:8px;background:var(--tone-neutral);border-radius:4px;overflow:hidden}
+.progress-bar__fill{height:100%;background:var(--accent-2)}
+
+/* AI chat */
+.chat-log{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;margin-bottom:8px}
+.chat-msg{padding:4px 8px;border-radius:10px;max-width:80%}
+.chat-msg--user{align-self:flex-end;background:var(--accent);color:#fff}
+.chat-msg--bot{align-self:flex-start;background:var(--accent-2);color:var(--text)}
 
 /* ===== Print (summary) ===== */
 @media print{
