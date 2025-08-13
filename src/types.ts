@@ -27,7 +27,15 @@ export type MinDatasetRules = {
   requireObservation: boolean;
 };
 
-export type InstrumentConfig = { name: string; scoreField: string; thresholds: any[] };
+export type InstrumentConfig = {
+  name: string;
+  scoreField: string;
+  thresholds: any[];
+  /** Optional label for the band field */
+  bandLabel?: string;
+  /** Optional set of allowed band values; renders a dropdown when provided */
+  bandOptions?: string[];
+};
 
 /** Runtime entry for free-form instruments (supports score OR label-only band, e.g., Vineland composite band) */
 export type InstrumentEntry = {
