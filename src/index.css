@@ -85,7 +85,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .btn--accent{background:var(--accent);border-color:transparent;color:#fff}
 .btn--accent:hover{filter:brightness(1.05)}
 
-.tabbar{display:flex;gap:12px;flex-wrap:wrap}
+.tabbar{display:flex;gap:16px;flex-wrap:wrap}
 .tab{border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:6px 12px;font-weight:500;color:var(--muted);transition:background-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .tab--active{color:var(--text);background:color-mix(in hsl, var(--accent) 14%, transparent);border-color:color-mix(in hsl, var(--accent) 30%, transparent)}
 
