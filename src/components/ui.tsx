@@ -136,6 +136,10 @@ export function Footer({ version, ruleHash }:{version:string; ruleHash:string}) 
       <div style={{ marginTop: 6 }}>
         Decision support only; clinician judgement prevails • Build {version} • Rule set {ruleHash}
       </div>
+      <div style={{ marginTop: 6 }}>
+        <a href="https://www.autismcrc.com.au" target="_blank" rel="noopener noreferrer">Autism CRC</a> •
+        <a href="https://www.autismguidelines.org.au" target="_blank" rel="noopener noreferrer">Autism Guidelines</a>
+      </div>
     </footer>
   );
 }
