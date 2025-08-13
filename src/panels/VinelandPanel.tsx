@@ -5,17 +5,17 @@ import { ChipGroup } from "../components/ui";
 import { getBandColor } from "../components/severity";
 
 export function VinelandPanel({
-  domains, Vineland, setVineland
+  domains, vineland, setVineland
 }:{
   domains:{key:string;label:string;severities:string[]}[];
-  Vineland:SeverityState;
+  vineland:SeverityState;
   setVineland:(fn:(s:SeverityState)=>SeverityState)=>void;
 }) {
   return (
     <Card title="Vineland — Domain Entries">
       <div className="grid">
         {domains.map(d=>{
-          const sel = Vineland[d.key]?.severity || "";
+          const sel = vineland[d.key]?.severity || "";
           return (
             <section key={d.key} className="card">
               <div className="stack stack--sm">
