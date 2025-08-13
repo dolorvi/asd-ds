@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import type { SeverityState, Config } from "../types";
+import type { SeverityState, Config, AssessmentSelection } from "../types";
 import { Card } from "../components/primitives";
 
 export function ReportPanel({
@@ -11,6 +11,8 @@ export function ReportPanel({
   abasTeacher,
   migdas,
   instruments,
+  assessments,
+  history,
   config,
 }:{
   model: { p:number; cut:number };
@@ -21,18 +23,20 @@ export function ReportPanel({
   abasTeacher: SeverityState;
   migdas: { consistency: string };
   instruments: Array<{ name:string; value?:number; band?:string }>;
+  assessments: AssessmentSelection[];
+  history: { earlyOnset: boolean };
   config: Config;
 }){
   const report = useMemo(() => {
     const has = (obj: SeverityState) => Object.values(obj).some(d => !!d.severity);
-    const tests: string[] = [];
+    const testSet = new Set<string>();
     const srsParent = has(srs2);
     const srsTeach = has(srs2Teacher);
     if (srsParent || srsTeach) {
       const parts: string[] = [];
       if (srsParent) parts.push("parent");
       if (srsTeach) parts.push("teacher");
-      tests.push(`SRS-2${parts.length ? ` (${parts.join(" & ")})` : ""}`);
+      testSet.add(`SRS-2${parts.length ? ` (${parts.join(" & ")})` : ""}`);
     }
     const abasParent = has(abas);
     const abasTeach = has(abasTeacher);
@@ -40,15 +44,16 @@ export function ReportPanel({
       const parts: string[] = [];
       if (abasParent) parts.push("parent");
       if (abasTeach) parts.push("teacher");
-      tests.push(`ABAS-3${parts.length ? ` (${parts.join(" & ")})` : ""}`);
+      testSet.add(`ABAS-3${parts.length ? ` (${parts.join(" & ")})` : ""}`);
     }
-    if (migdas.consistency !== "unclear") tests.push("MIGDAS-2");
+    if (migdas.consistency !== "unclear") testSet.add("MIGDAS-2");
     instruments.forEach(i => {
       if (i.name === "Vineland-3" && (abasParent || abasTeach)) return;
       if (i.name === "ASRS" && (srsParent || srsTeach)) return;
-      if (i.value !== undefined || (i.band && i.band.trim() !== "")) tests.push(i.name);
+      if (i.value !== undefined || (i.band && i.band.trim() !== "")) testSet.add(i.name);
     });
-    const testList = tests.join(", ");
+    assessments.forEach(a => { if (a.selected) testSet.add(a.selected); });
+    const testList = Array.from(testSet).join(", ");
     const presence = model.p >= model.cut
       ? "indicate the presence of Autism symptoms"
       : "do not indicate Autism symptoms";
@@ -65,10 +70,16 @@ export function ReportPanel({
     });
     const impacted = Array.from(impactedKeys).join(", ");
     const impactText = impacted ? ` with impacted functioning in ${impacted}` : "";
+    const difficultyText = impacted
+      ? ` Individuals with difficulties in ${impacted} may experience challenges in daily activities.`
+      : "";
+    const early = history.earlyOnset
+      ? "The history indicates symptoms were present in early childhood. "
+      : "";
     return testList
-      ? `Multiple tests completed including the ${testList} ${presence}. ${support}${impactText}.`
+      ? `${early}Multiple tests completed including the ${testList} ${presence}. ${support}${impactText}.${difficultyText}`
       : "Insufficient data for report.";
-  }, [model, supportEstimate, srs2, srs2Teacher, abas, abasTeacher, migdas, instruments, config.abasDomains]);
+  }, [model, supportEstimate, srs2, srs2Teacher, abas, abasTeacher, migdas, instruments, assessments, history, config.abasDomains]);
 
   return (
     <Card title="Report (preview)">

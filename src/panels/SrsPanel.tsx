@@ -26,7 +26,15 @@ export function SrsPanel({
                 options={d.severities}
                 value={srs2[d.key]?.severity || ""}
                 onChange={(sev)=>setSRS2(s=>({ ...s, [d.key]: { ...s[d.key], severity: sev }}))}
-                getColor={(label)=>getBandColor(label, "goodLow")}
+                getColor={(label)=>{
+                  switch(label){
+                    case "Average": return getBandColor("Average","goodHigh");
+                    case "Mild": return getBandColor("Low Average","goodHigh");
+                    case "Moderate": return getBandColor("Moderately Elevated","goodHigh");
+                    case "Severe": return getBandColor("Severe","goodHigh");
+                    default: return getBandColor(label,"goodHigh");
+                  }
+                }}
               />
             </div>
           </section>

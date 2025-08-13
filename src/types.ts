@@ -34,6 +34,7 @@ export type InstrumentEntry = {
   name: string;
   value?: number;
   band?: string;
+  primary?: boolean;
 };
 
 export type Config = {
@@ -53,3 +54,10 @@ export type Config = {
 export type SeverityState = Record<string, { score?: number; severity?: string }>;
 
 export type Condition = "ASD" | "ADHD" | "ID" | "FASD";
+
+export type AssessmentSelection = {
+  domain: string;
+  options: string[];
+  selected?: string;
+  primary?: boolean;
+};

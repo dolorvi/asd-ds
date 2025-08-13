@@ -3,7 +3,7 @@ import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey } from "./config/modelConfig";
 import { useAsdEngine } from "./hooks/useAsdEngine";
 import { CANONICAL_CASES, MIGDAS_CONSISTENCY, ABAS3_SEVERITIES as ABAS_SEVERITIES, VINELAND_SEVERITIES, VINELAND_DOMAINS } from "./data/testData";
-import type { Config, SeverityState, CriterionKey, Condition } from "./types";
+import type { Config, SeverityState, CriterionKey, Condition, AssessmentSelection } from "./types";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card, Row } from "./components/primitives";
@@ -12,6 +12,7 @@ import { AbasPanel } from "./panels/AbasPanel";
 import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
 import { ReportPanel } from "./panels/ReportPanel";
+import { AssessmentPanel } from "./panels/AssessmentPanel";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -63,6 +64,18 @@ export default function App() {
   const [instruments, setInstruments] = useState(
     DEFAULT_CONFIG.defaultInstruments.map(i => ({ name: i.name, value: undefined as number | undefined, band: "" }))
   );
+
+  // ---------- assessment selections ----------
+  const [assessments, setAssessments] = useState<AssessmentSelection[]>([
+    { domain: "Autism questionnaires", options: ["ASRS","SRS-2","GARS","CARS","AQ"] },
+    { domain: "Autism observations", options: ["MIGDAS","ADOS"] },
+    { domain: "Autism interviews", options: ["ADI-R"] },
+    { domain: "Adaptive questionnaires", options: ["ABAS3","Vineland"] },
+    { domain: "Executive function questionnaires", options: ["BRIEF2","BDEFS"] },
+    { domain: "Intellectual assessment", options: ["WISC","WPPSI","WAIS"] },
+    { domain: "Language assessment", options: ["CELF5"] },
+    { domain: "Sensory Assessment", options: ["Sensory profile 2"] },
+  ]);
 
   const getInstrumentBand = useCallback(
     (name: string) => instruments.find(x => x.name === name)?.band || "",
@@ -256,9 +269,9 @@ export default function App() {
           )}
 
           {activeTab === 4 && (
-            <Card title="Advanced">
-              {/* TODO: WISC panel + Instruments panel */}
-            </Card>
+            <>
+              <AssessmentPanel assessments={assessments} setAssessments={setAssessments} />
+            </>
           )}
 
           {activeTab === 5 && (
@@ -271,6 +284,8 @@ export default function App() {
               abasTeacher={abasTeacher}
               migdas={migdas}
               instruments={instruments}
+              assessments={assessments}
+              history={history}
               config={config}
             />
           )}
