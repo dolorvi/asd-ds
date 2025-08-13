@@ -16,19 +16,17 @@ export function SrsPanel({
   return (
     <Card title={title}>
       <div className="grid grid--sm">
-        {domains.map((d) => (
-          <section key={d.key} className="card">
-            <details>
-              <summary className="section-title">
-                {d.label}
-                {srs2[d.key]?.severity ? ` – ${srs2[d.key]?.severity}` : ""}
-              </summary>
+        {domains.map((d) => {
+          const sel = srs2[d.key]?.severity || "";
+          return (
+            <section key={d.key} className="card">
               <div className="stack stack--sm">
+                <div className="section-title">{d.label}</div>
                 <label>
                   <select
-                    value={srs2[d.key]?.severity || ""}
-                    className={srs2[d.key]?.severity ? "" : "invalid"}
-                    title={srs2[d.key]?.severity ? "" : "Select severity"}
+                    value={sel}
+                    className={sel ? "" : "invalid"}
+                    title={sel ? "" : "Select severity"}
                     onChange={(e) =>
                       setSRS2((s) => ({
                         ...s,
@@ -45,9 +43,9 @@ export function SrsPanel({
                   </select>
                 </label>
               </div>
-            </details>
-          </section>
-        ))}
+            </section>
+          );
+        })}
       </div>
     </Card>
   );
