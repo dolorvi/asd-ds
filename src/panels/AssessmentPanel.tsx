@@ -5,44 +5,59 @@ import type { AssessmentSelection } from "../types";
 export function AssessmentPanel({
   assessments,
   setAssessments,
-  domains,
+  domain,
 }: {
   assessments: AssessmentSelection[];
   setAssessments: (fn: (arr: AssessmentSelection[]) => AssessmentSelection[]) => void;
-  domains?: string[];
+  domain: string;
 }) {
-  const togglePrimary = (i: number) => {
-    setAssessments((arr) => {
-      const next = arr.map((a, idx) => (idx === i ? { ...a, primary: !a.primary } : a));
-      // if just turned primary on and a tool is selected, notify
-      if (!arr[i].primary && next[i].primary && next[i].selected) {
-        window.alert(
-          `You have selected ${next[i].selected} as the main assessment for ${next[i].domain.toLowerCase()}`
-        );
-      }
-      // sort primaries first
-      return [...next].sort((a, b) => Number(b.primary) - Number(a.primary));
-    });
+  const items = assessments
+    .map((a, index) => ({ ...a, index }))
+    .filter((a) => a.domain === domain);
+
+  const addAssessment = () => {
+    const template = items[0];
+    if (!template) return;
+    setAssessments((arr) => [
+      ...arr,
+      { domain, options: template.options, selected: "", primary: false },
+    ]);
   };
 
-  const changeSelection = (i: number, value: string) => {
+  const removeAssessment = (idx: number) => {
+    setAssessments((arr) => arr.filter((_, i) => i !== idx));
+  };
+
+  const changeSelection = (idx: number, value: string) => {
     setAssessments((arr) => {
       const next = arr.slice();
-      next[i] = { ...next[i], selected: value };
+      next[idx] = { ...next[idx], selected: value };
       return next;
     });
   };
 
-  const visible = domains ? assessments.filter((a) => domains.includes(a.domain)) : assessments;
+  const togglePrimary = (idx: number) => {
+    setAssessments((arr) => {
+      const next = arr.map((a, i) => (i === idx ? { ...a, primary: !a.primary } : a));
+      if (!arr[idx].primary && next[idx].primary && next[idx].selected) {
+        window.alert(
+          `You have selected ${next[idx].selected} as the main assessment for ${domain.toLowerCase()}`,
+        );
+      }
+      return [...next].sort((a, b) => Number(b.primary) - Number(a.primary));
+    });
+  };
 
   return (
-    <Card title="Assessment Tools">
+    <Card title={domain}>
       <div className="stack">
-        {visible.map((a, i) => (
-          <Row key={a.domain} justify="between" align="center">
+        {items.map((a) => (
+          <Row key={a.index} justify="between" align="center">
             <label style={{ flex: 1 }}>
-              <div className="section-title">{a.domain}</div>
-              <select value={a.selected || ""} onChange={(e) => changeSelection(i, e.target.value)}>
+              <select
+                value={a.selected || ""}
+                onChange={(e) => changeSelection(a.index, e.target.value)}
+              >
                 <option value="">Select</option>
                 {a.options.map((o) => (
                   <option key={o} value={o}>
@@ -52,11 +67,23 @@ export function AssessmentPanel({
               </select>
             </label>
             <label className="row row--center" style={{ gap: 4 }}>
-              <input type="checkbox" checked={a.primary || false} onChange={() => togglePrimary(i)} />
+              <input
+                type="checkbox"
+                checked={a.primary || false}
+                onChange={() => togglePrimary(a.index)}
+              />
               Main
             </label>
+            {items.length > 1 && (
+              <button type="button" className="btn" onClick={() => removeAssessment(a.index)}>
+                Remove
+              </button>
+            )}
           </Row>
         ))}
+        <button type="button" className="btn" onClick={addAssessment}>
+          Add Assessment
+        </button>
       </div>
     </Card>
   );

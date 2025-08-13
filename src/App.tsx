@@ -19,6 +19,7 @@ import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
 import { ReportPanel } from "./panels/ReportPanel";
 import { AssessmentPanel } from "./panels/AssessmentPanel";
+import { AiChat } from "./components/AiChat";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -99,14 +100,14 @@ export default function App() {
 
   // ---------- assessment selections ----------
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
-    { domain: "Autism questionnaires", options: ["ASRS", "SRS-2", "GARS", "CARS", "AQ"] },
-    { domain: "Autism observations", options: ["MIGDAS", "ADOS"] },
-    { domain: "Autism interviews", options: ["ADI-R"] },
-    { domain: "Adaptive questionnaires", options: ["ABAS3", "Vineland"] },
-    { domain: "Executive function questionnaires", options: ["BRIEF2", "BDEFS"] },
-    { domain: "Intellectual assessment", options: ["WISC", "WPPSI", "WAIS"] },
-    { domain: "Language assessment", options: ["CELF5"] },
-    { domain: "Sensory Assessment", options: ["Sensory profile 2"] },
+    { domain: "Autism questionnaires", options: ["ASRS", "SRS-2", "GARS", "CARS", "AQ"], selected: "SRS-2", primary: true },
+    { domain: "Autism observations", options: ["MIGDAS", "ADOS"], selected: "MIGDAS", primary: true },
+    { domain: "Autism interviews", options: ["ADI-R"], selected: "ADI-R", primary: true },
+    { domain: "Adaptive questionnaires", options: ["ABAS3", "Vineland"], selected: "ABAS3", primary: true },
+    { domain: "Executive function questionnaires", options: ["BRIEF2", "BDEFS"], selected: "BRIEF2", primary: true },
+    { domain: "Intellectual assessment", options: ["WISC", "WPPSI", "WAIS"], selected: "WISC", primary: true },
+    { domain: "Language assessment", options: ["CELF5"], selected: "CELF5", primary: true },
+    { domain: "Sensory Assessment", options: ["Sensory profile 2"], selected: "Sensory profile 2", primary: true },
   ]);
 
   const getInstrumentBand = useCallback(
@@ -118,14 +119,26 @@ export default function App() {
     [],
   );
 
+  const hasSrs = assessments.some((a) => a.selected === "SRS-2");
+  const hasAbas = assessments.some((a) => a.selected === "ABAS3");
+  const hasVineland = assessments.some((a) => a.selected?.startsWith("Vineland"));
+
   // ---------- prior via age band ----------
+  const [age, setAge] = useState(10);
   const [ageBand, setAgeBand] = useState<AgeBandKey>(DEFAULT_AGE_BAND);
   const [autoPrior, setAutoPrior] = useState(true);
   useEffect(() => {
     if (autoPrior) setConfig((c) => ({ ...c, prior: PRIOR_BY_AGE[ageBand].logit }));
   }, [ageBand, autoPrior]);
 
-  const isSchoolAge = ageBand === "au_5_14" || ageBand === "au_15_24";
+  useEffect(() => {
+    if (age < 15) setAgeBand("au_5_14");
+    else if (age < 25) setAgeBand("au_15_24");
+    else if (age < 40) setAgeBand("au_25_39");
+    else setAgeBand("au_overall");
+  }, [age]);
+
+  const isSchoolAge = age < 18;
 
   useEffect(() => {
     if (!isSchoolAge) {
@@ -154,6 +167,19 @@ export default function App() {
     diff as any,
     instruments,
   );
+
+  const progress = useMemo(() => {
+    const r = config.minDataset;
+    const c = datasetStatus.counts;
+    let count = 0;
+    if (c.hasASDInstrument) count += 1;
+    if (c.hasAdaptive) count += 1;
+    if (c.historyOk) count += 1;
+    if (c.observationOk) count += 1;
+    count += Math.min(c.effectiveInstrumentCount, r.minInstruments);
+    const total = 4 + r.minInstruments;
+    return total ? count / total : 0;
+  }, [datasetStatus, config.minDataset]);
 
   // ---------- ribbon ----------
   const ribbon = useMemo(() => {
@@ -202,6 +228,19 @@ export default function App() {
 
       {condition === "ASD" ? (
         <>
+          <Card>
+            <label className="row row--center" style={{ gap: 8 }}>
+              Age
+              <input
+                type="number"
+                value={age}
+                min={0}
+                onChange={(e) => setAge(Number(e.target.value))}
+                style={{ width: 60 }}
+              />
+            </label>
+          </Card>
+
           <Row justify="end">
             <label className="row small">
               <input type="checkbox" checked={compact} onChange={(e) => setCompact(e.target.checked)} />
@@ -213,6 +252,9 @@ export default function App() {
             <span className="small">
               <b>Minimum dataset:</b> {ribbon}
             </span>
+            <div className="progress-bar">
+              <div className="progress-bar__fill" style={{ width: `${progress * 100}%` }} />
+            </div>
           </Card>
 
           {devOpen && (
@@ -283,19 +325,21 @@ export default function App() {
             <section className="stack">
               {activeTab === 0 && (
                 <>
-                  <AssessmentPanel
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                    domains={["Autism questionnaires", "Autism observations", "Autism interviews"]}
-                  />
-                  <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
-                  {isSchoolAge && (
-                    <SrsPanel
-                      title="SRS-2 Teacher"
-                      domains={config.srs2Domains}
-                      srs2={srs2Teacher}
-                      setSRS2={setSRS2Teacher}
-                    />
+                  <AssessmentPanel domain="Autism questionnaires" assessments={assessments} setAssessments={setAssessments} />
+                  <AssessmentPanel domain="Autism observations" assessments={assessments} setAssessments={setAssessments} />
+                  <AssessmentPanel domain="Autism interviews" assessments={assessments} setAssessments={setAssessments} />
+                  {hasSrs && (
+                    <>
+                      <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
+                      {isSchoolAge && (
+                        <SrsPanel
+                          title="SRS-2 Teacher"
+                          domains={config.srs2Domains}
+                          srs2={srs2Teacher}
+                          setSRS2={setSRS2Teacher}
+                        />
+                      )}
+                    </>
                   )}
                   {/* TODO: MIGDAS panel (presentational) */}
                 </>
@@ -303,74 +347,60 @@ export default function App() {
 
               {activeTab === 1 && (
                 <>
-                  <AssessmentPanel
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                    domains={["Adaptive questionnaires"]}
-                  />
-                  <AbasPanel
-                    title="ABAS-3 Parent"
-                    domains={config.abasDomains}
-                    options={ABAS_SEVERITIES}
-                    valueMap={abas}
-                    setValueMap={setABAS}
-                  />
-                  {isSchoolAge && (
-                    <AbasPanel
-                      title="ABAS-3 Teacher"
-                      domains={config.abasDomains}
-                      options={ABAS_SEVERITIES}
-                      valueMap={abasTeacher}
-                      setValueMap={setABASTeacher}
+                  <AssessmentPanel domain="Adaptive questionnaires" assessments={assessments} setAssessments={setAssessments} />
+                  {hasAbas && (
+                    <>
+                      <AbasPanel
+                        title="ABAS-3 Parent"
+                        domains={config.abasDomains}
+                        options={ABAS_SEVERITIES}
+                        valueMap={abas}
+                        setValueMap={setABAS}
+                      />
+                      {isSchoolAge && (
+                        <AbasPanel
+                          title="ABAS-3 Teacher"
+                          domains={config.abasDomains}
+                          options={ABAS_SEVERITIES}
+                          valueMap={abasTeacher}
+                          setValueMap={setABASTeacher}
+                        />
+                      )}
+                    </>
+                  )}
+                  {hasVineland && (
+                    <VinelandPanel
+                      title="Vineland-3 Composite"
+                      domains={config.vinelandDomains ?? VINELAND_DOMAINS}
+                      options={VINELAND_SEVERITIES}
+                      valueMap={{
+                        vineland_composite: getInstrumentBand("Vineland-3"),
+                      }}
+                      setValueMap={(fn) => {
+                        const next = fn({
+                          vineland_composite: getInstrumentBand("Vineland-3"),
+                        });
+                        setInstrumentBand("Vineland-3", next.vineland_composite || "");
+                      }}
                     />
                   )}
-                  <VinelandPanel
-                    title="Vineland-3 Composite"
-                    domains={config.vinelandDomains ?? VINELAND_DOMAINS}
-                    options={VINELAND_SEVERITIES}
-                    valueMap={{
-                      vineland_composite: getInstrumentBand("Vineland-3"),
-                    }}
-                    setValueMap={(fn) => {
-                      const next = fn({
-                        vineland_composite: getInstrumentBand("Vineland-3"),
-                      });
-                      setInstrumentBand("Vineland-3", next.vineland_composite || "");
-                    }}
-                  />
                 </>
               )}
 
               {activeTab === 2 && (
-                <AssessmentPanel
-                  assessments={assessments}
-                  setAssessments={setAssessments}
-                  domains={["Intellectual assessment"]}
-                />
+                <AssessmentPanel domain="Intellectual assessment" assessments={assessments} setAssessments={setAssessments} />
               )}
 
               {activeTab === 3 && (
-                <AssessmentPanel
-                  assessments={assessments}
-                  setAssessments={setAssessments}
-                  domains={["Executive function questionnaires"]}
-                />
+                <AssessmentPanel domain="Executive function questionnaires" assessments={assessments} setAssessments={setAssessments} />
               )}
 
               {activeTab === 4 && (
-                <AssessmentPanel
-                  assessments={assessments}
-                  setAssessments={setAssessments}
-                  domains={["Sensory Assessment"]}
-                />
+                <AssessmentPanel domain="Sensory Assessment" assessments={assessments} setAssessments={setAssessments} />
               )}
 
               {activeTab === 5 && (
-                <AssessmentPanel
-                  assessments={assessments}
-                  setAssessments={setAssessments}
-                  domains={["Language assessment"]}
-                />
+                <AssessmentPanel domain="Language assessment" assessments={assessments} setAssessments={setAssessments} />
               )}
 
               {activeTab === 6 && <Card title="History / Observation">{/* TODO: HistoryPanel */}</Card>}
@@ -395,13 +425,16 @@ export default function App() {
             </section>
 
             {/* RIGHT: summary */}
-            <SummaryPanel
-              model={model}
-              config={config}
-              supportEstimate={supportEstimate}
-              recommendation={recommendation}
-              exportSummary={exportSummary}
-            />
+            <section className="stack">
+              <SummaryPanel
+                model={model}
+                config={config}
+                supportEstimate={supportEstimate}
+                recommendation={recommendation}
+                exportSummary={exportSummary}
+              />
+              <AiChat />
+            </section>
           </div>
         </>
       ) : (
