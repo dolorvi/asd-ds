@@ -1,21 +1,26 @@
 import React from "react";
-import type { SeverityState } from "../types";
 import { Card } from "../components/primitives";
 import { ChipGroup } from "../components/ui";
 import { getBandColor } from "../components/severity";
 
 export function VinelandPanel({
-  domains, Vineland, setVineland
+  title,
+  domains,
+  options,
+  valueMap,
+  setValueMap,
 }:{
-  domains:{key:string;label:string;severities:string[]}[];
-  Vineland:SeverityState;
-  setVineland:(fn:(s:SeverityState)=>SeverityState)=>void;
+  title: string;
+  domains: { key: string; label: string }[];
+  options: string[];
+  valueMap: Record<string, string>;
+  setValueMap: (fn: (s: Record<string, string>) => Record<string, string>) => void;
 }) {
   return (
-    <Card title="Vineland — Domain Entries">
+    <Card title={title}>
       <div className="grid">
         {domains.map(d=>{
-          const sel = Vineland[d.key]?.severity || "";
+          const sel = valueMap[d.key] || "";
           return (
             <section key={d.key} className="card">
               <div className="stack stack--sm">
@@ -24,9 +29,9 @@ export function VinelandPanel({
                   {sel && <span className="chip" style={{ background:getBandColor(sel, "goodHigh"), color:"#0b1220" }}>{sel}</span>}
                 </div>
                 <ChipGroup
-                  options={d.severities}
+                  options={options}
                   value={sel}
-                  onChange={(sev)=>setVineland(s=>({ ...s, [d.key]: { ...s[d.key], severity: sev }}))}
+                  onChange={(sev)=>setValueMap(s=>({ ...s, [d.key]: sev }))}
                   getColor={(label)=>getBandColor(label, "goodHigh")}
                 />
               </div>
