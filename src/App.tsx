@@ -28,7 +28,6 @@ export default function App() {
   const [srs2, setSRS2] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
-  const [vineland, setVineland] = useState<Record<string, string>>({});
  
   const [migdas, setMIGDAS] = useState({
     consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
@@ -211,8 +210,11 @@ export default function App() {
             title="Vineland-3 Composite"
             domains={config.vinelandDomains ?? VINELAND_DOMAINS}
             options={VINELAND_SEVERITIES}
-            valueMap={vineland}
-            setValueMap={setVineland}
+            valueMap={{ vineland_composite: getInstrumentBand("Vineland-3") }}
+            setValueMap={(fn) => {
+              const next = fn({ vineland_composite: getInstrumentBand("Vineland-3") });
+              setInstrumentBand("Vineland-3", next.vineland_composite || "");
+            }}
             />
             </>
           )}
