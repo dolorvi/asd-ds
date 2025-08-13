@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Row, Stack } from "../components/primitives";
+import { Card } from "../components/primitives";
 import type { AssessmentSelection } from "../types";
 
 export function AssessmentPanel({ assessments, setAssessments }:{
@@ -20,24 +20,35 @@ export function AssessmentPanel({ assessments, setAssessments }:{
     });
   };
   return (
-    <Card title="Assessment Tools">
-      <Stack gap="sm">
-        {assessments.map((a,i)=>(
-          <Row key={a.domain} justify="between" align="center">
-            <label style={{flex:1}}>
-              <div className="section-title">{a.domain}</div>
-              <select value={a.selected || ""} onChange={e=>changeSelection(i,e.target.value)}>
-                <option value="">Select</option>
-                {a.options.map(o => <option key={o} value={o}>{o}</option>)}
-              </select>
-            </label>
-            <label className="row row--center" style={{gap:4}}>
-              <input type="checkbox" checked={a.primary || false} onChange={()=>togglePrimary(i)} />
+    <>
+      {assessments.map((a, i) => (
+        <Card
+          key={a.domain}
+          title={a.domain}
+          right={
+            <label className="row row--center" style={{ gap: 4 }}>
+              <input
+                type="checkbox"
+                checked={a.primary || false}
+                onChange={() => togglePrimary(i)}
+              />
               Main
             </label>
-          </Row>
-        ))}
-      </Stack>
-    </Card>
+          }
+        >
+          <select
+            value={a.selected || ""}
+            onChange={(e) => changeSelection(i, e.target.value)}
+          >
+            <option value="">Select</option>
+            {a.options.map((o) => (
+              <option key={o} value={o}>
+                {o}
+              </option>
+            ))}
+          </select>
+        </Card>
+      ))}
+    </>
   );
 }
