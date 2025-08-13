@@ -14,6 +14,7 @@ import type { Config, SeverityState, Condition, AssessmentSelection } from "./ty
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
+import { MinDatasetProgress } from "./components/MinDatasetProgress";
 import { SrsPanel } from "./panels/SrsPanel";
 import { AsrsPanel } from "./panels/AsrsPanel";
 import { AbasPanel } from "./panels/AbasPanel";
@@ -102,6 +103,13 @@ export default function App() {
   // ---------- instruments ----------
   const [instruments, setInstruments] = useState(
     DEFAULT_CONFIG.defaultInstruments.map((i) => ({ name: i.name, value: undefined as number | undefined, band: "" })),
+  );
+  const metInstrumentCount = useMemo(
+    () =>
+      instruments.filter(
+        (i) => i.value !== undefined || (i.band && i.band.trim() !== "")
+      ).length,
+    [instruments],
   );
 
   // ---------- assessment selections ----------
@@ -345,6 +353,8 @@ export default function App() {
             </Card>
           )}
 
+          <MinDatasetProgress count={metInstrumentCount} total={config.minDataset.minInstruments} />
+
           <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
 
           <div className="layout">
@@ -524,22 +534,22 @@ export default function App() {
 
             {/* RIGHT: summary */}
             <section className="stack stack--md">
-              <SummaryPanel
-                model={model}
-                config={config}
-                supportEstimate={supportEstimate}
-                recommendation={recommendation}
-                exportSummary={exportSummary}
-              />
-              <AiChat />
-            </section>
-          </div>
-        </>
-      ) : (
-        <Card title={`${condition} assessments`}>Assessments for {condition} will be added soon.</Card>
-      )}
+                <SummaryPanel
+                  model={model}
+                  config={config}
+                  supportEstimate={supportEstimate}
+                  recommendation={recommendation}
+                  exportSummary={exportSummary}
+                />
+              </section>
+            </div>
+          </>
+        ) : (
+          <Card title={`${condition} assessments`}>Assessments for {condition} will be added soon.</Card>
+        )}
 
-      <Footer version="v0.6" ruleHash={ruleHash} />
-    </Container>
-  );
-}
+        <Footer version="v0.6" ruleHash={ruleHash} />
+        <AiChat />
+      </Container>
+    );
+  }

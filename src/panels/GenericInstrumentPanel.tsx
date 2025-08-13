@@ -16,8 +16,8 @@ export function GenericInstrumentPanel({
   const items = instruments.filter((i) => selected.includes(i.name));
   if (!items.length) return null;
 
-  const getFieldLabel = (name: string) =>
-    configs.find((c) => c.name === name)?.scoreField || "score";
+  const getConfig = (name: string) => configs.find((c) => c.name === name);
+  const getFieldLabel = (name: string) => getConfig(name)?.scoreField || "score";
 
   const setValue = (name: string, value: number | undefined) => {
     setInstruments((arr) =>
@@ -41,6 +41,8 @@ export function GenericInstrumentPanel({
               <input
                 type="number"
                 value={i.value ?? ""}
+                className={i.value === undefined ? "invalid" : ""}
+                title={i.value === undefined ? "Required" : ""}
                 onChange={(e) =>
                   setValue(
                     i.name,
@@ -49,14 +51,41 @@ export function GenericInstrumentPanel({
                 }
               />
             </label>
-            <label style={{ flex: 1 }}>
-              Band:
-              <input
-                type="text"
-                value={i.band ?? ""}
-                onChange={(e) => setBand(i.name, e.target.value)}
-              />
-            </label>
+            {(() => {
+              const cfg = getConfig(i.name);
+              if (!cfg) return null;
+              const showBand = cfg.bandLabel || cfg.bandOptions || cfg.scoreField === "band";
+              if (!showBand) return null;
+              const label = cfg.bandLabel || "Band";
+              return (
+                <label style={{ flex: 1 }}>
+                  {label}:
+                  {cfg.bandOptions ? (
+                    <select
+                      value={i.band ?? ""}
+                      className={i.band ? "" : "invalid"}
+                      title={i.band ? "" : "Select option"}
+                      onChange={(e) => setBand(i.name, e.target.value)}
+                    >
+                      <option value="">Select</option>
+                      {cfg.bandOptions.map((o) => (
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="number"
+                      value={i.band ?? ""}
+                      className={i.band ? "" : "invalid"}
+                      title={i.band ? "" : "Required"}
+                      onChange={(e) => setBand(i.name, e.target.value)}
+                    />
+                  )}
+                </label>
+              );
+            })()}
           </Row>
         </Card>
       ))}

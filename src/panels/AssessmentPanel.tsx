@@ -56,6 +56,8 @@ export function AssessmentPanel({
             <label style={{ flex: 1 }}>
               <select
                 value={a.selected || ""}
+                className={a.selected ? "" : "invalid"}
+                title={a.selected ? "" : "Select assessment"}
                 onChange={(e) => changeSelection(a.index, e.target.value)}
               >
                 <option value="">Select</option>
@@ -81,9 +83,11 @@ export function AssessmentPanel({
             )}
           </Row>
         ))}
-        <button type="button" className="btn" onClick={addAssessment}>
-          Add Assessment
-        </button>
+        <Row>
+          <button type="button" className="btn" onClick={addAssessment}>
+            Add Assessment
+          </button>
+        </Row>
       </div>
     </Card>
   );

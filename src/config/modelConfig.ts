@@ -59,12 +59,24 @@ export const DEFAULT_CONFIG: Config = {
   defaultInstruments: [
     { name: "ADOS-2", scoreField: "standard", thresholds: [] },
     { name: "MIGDAS-2", scoreField: "standard", thresholds: [] },
-    { name: "ADI-R", scoreField: "band", thresholds: [] },
+    {
+      name: "ADI-R",
+      scoreField: "band",
+      thresholds: [],
+      bandLabel: "Social Interaction Band (ADI-R)",
+      bandOptions: ["1", "2", "3", "4"],
+    },
     { name: "ASRS",  scoreField: "score", thresholds: [] },
     { name: "GARS", scoreField: "standard", thresholds: [] },
     { name: "CARS", scoreField: "standard", thresholds: [] },
     { name: "SRS-2", scoreField: "t", thresholds: [] },
-    { name: "Vineland-3", scoreField: "composite", thresholds: [] }, // <-- MUST exist
+    {
+      name: "Vineland-3",
+      scoreField: "composite",
+      thresholds: [],
+      bandLabel: "Composite Band (Vineland-3)",
+      bandOptions: [...VINELAND_SEVERITIES],
+    }, // <-- MUST exist
     { name: "ABAS-3", scoreField: "composite", thresholds: [] },
     { name: "WISC/WAIS/WPPSI", scoreField: "index", thresholds: [] },
     { name: "BRIEF-2", scoreField: "t", thresholds: [] },

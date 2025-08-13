@@ -16,20 +16,36 @@ export function SrsPanel({
   return (
     <Card title={title}>
       <div className="grid grid--sm">
-        {domains.map(d=>(
+        {domains.map((d) => (
           <section key={d.key} className="card">
-            <div className="stack stack--sm">
-              <label>
-                <div className="section-title">{d.label}</div>
-                <select
-                  value={srs2[d.key]?.severity || ""}
-                  onChange={(e)=>setSRS2(s=>({ ...s, [d.key]: { ...s[d.key], severity: e.target.value }}))}
-                >
-                  <option value="">Select</option>
-                  {d.severities.map(sev => <option key={sev} value={sev}>{sev}</option>)}
-                </select>
-              </label>
-            </div>
+            <details>
+              <summary className="section-title">
+                {d.label}
+                {srs2[d.key]?.severity ? ` – ${srs2[d.key]?.severity}` : ""}
+              </summary>
+              <div className="stack stack--sm">
+                <label>
+                  <select
+                    value={srs2[d.key]?.severity || ""}
+                    className={srs2[d.key]?.severity ? "" : "invalid"}
+                    title={srs2[d.key]?.severity ? "" : "Select severity"}
+                    onChange={(e) =>
+                      setSRS2((s) => ({
+                        ...s,
+                        [d.key]: { ...s[d.key], severity: e.target.value },
+                      }))
+                    }
+                  >
+                    <option value="">Select</option>
+                    {d.severities.map((sev) => (
+                      <option key={sev} value={sev}>
+                        {sev}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </details>
           </section>
         ))}
       </div>
