@@ -28,16 +28,14 @@ export function ChipGroup({
       {options.map((opt) => {
         const selected = value === opt;
         const bg = selected ? (getColor?.(opt) ?? getBandColor(opt, polarity)) : undefined;
-
-        // Use CSS variable to bypass any !important in your stylesheet
-        const style = bg ? ({ ["--chip-active-bg" as any]: bg } as React.CSSProperties) : undefined;
+        const style = selected && bg ? ({ background: bg, borderColor: bg, color: "#111" } as React.CSSProperties) : undefined;
 
         return (
           <button
             key={String(opt)}
             type="button"
             disabled={disabled}
-            className={"chip" + (selected ? " chip-active" : "")}
+            className={"chip" + (selected ? " chip--active" : "")}
             style={style}
             onClick={() => onChange(String(opt))}
             aria-pressed={selected}
