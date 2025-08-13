@@ -1,16 +1,17 @@
 /* ===== Design tokens (default) ===== */
 :root{
   --radius-xs:6px; --radius-sm:10px; --radius-md:14px;
-  --gap-1:6px; --gap-2:10px; --gap-3:14px; --gap-4:18px;
+  /* relaxed spacing scale */
+  --gap-1:8px; --gap-2:12px; --gap-3:20px; --gap-4:28px;
 
-  --bg:hsl(205 70% 97%);
+  --bg:hsl(205 80% 98%);
   --panel:hsl(0 0% 100%);
-  --elev:hsl(205 70% 95%);
-  --border:hsl(205 40% 85%);
-  --muted:hsl(215 16% 45%);
-  --text:hsl(215 28% 17%);
-  --accent:hsl(205 74% 65%);
-  --accent-2:hsl(30 100% 75%);
+  --elev:hsl(205 80% 96%);
+  --border:hsl(205 40% 86%);
+  --muted:hsl(215 15% 40%);
+  --text:hsl(215 30% 15%);
+  --accent:hsl(205 74% 60%);
+  --accent-2:hsl(30 100% 70%);
   --tone-danger:#fecaca;
   --tone-warn:#fde68a;
   --tone-neutral:#e5e7eb;
@@ -31,7 +32,8 @@
 
 /* ===== App layout ===== */
 .app-shell{max-width:1120px;margin:32px auto;padding:0 24px 48px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;align-items:start}
+/* wider column gap for a calmer layout */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:32px;align-items:start}
 @media (max-width:1100px){.layout{grid-template-columns:1fr}}
 
 /* ===== Base ===== */
@@ -39,15 +41,19 @@
 html,body,#root{height:100%}
 html{scroll-behavior:smooth}
 body{
-  margin:0;background:var(--bg);color:var(--text);
+  margin:0;
+  background:linear-gradient(135deg,var(--bg),color-mix(in hsl,var(--accent) 8%,white 92%));
+  color:var(--text);
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-  font:14px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+  font:14px/1.5 'Poppins',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
   transition:background-color var(--t-med) var(--ease),color var(--t-med) var(--ease);
+  animation:fade-in var(--t-med) var(--ease);
 }
 a,button{transition:color var(--t-fast) var(--ease),background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
 /* neutral button baseline */
 button{background:transparent;color:inherit;border:1px solid transparent;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer}
-button:hover{transform:translateY(-1px)}
+button:hover{transform:translateY(-1px) scale(1.02)}
+button:active{transform:scale(0.97)}
 button:disabled{opacity:.6;cursor:not-allowed}
 :focus-visible{outline:none;box-shadow:0 0 0 2px color-mix(in hsl, var(--accent) 92%, white 8%),0 0 0 6px color-mix(in hsl, var(--accent) 30%, transparent 70%);border-radius:10px}
 
@@ -69,7 +75,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .topbar .title{font-size:16px;margin:0 0 2px 0}
 .topbar .subtitle{color:var(--muted);font-size:12px}
 
-.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-1);padding:16px;transition:box-shadow var(--t-fast) var(--ease)}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-1);padding:20px;transition:box-shadow var(--t-fast) var(--ease)}
 .card:hover{box-shadow:var(--shadow-2)}
 .card__bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .section-title{font-size:14px;font-weight:700;color:var(--muted);margin:0}
@@ -105,6 +111,11 @@ button:disabled{opacity:.6;cursor:not-allowed}
 @media print{
   body.print-summary *{visibility:hidden!important}
   body.print-summary #summary-section, body.print-summary #summary-section *{visibility:visible!important}
-  body.print-summary #summary-section{position:absolute;left:0;top:0;width:100%}
+body.print-summary #summary-section{position:absolute;left:0;top:0;width:100%}
 }
+}
+
+@keyframes fade-in{
+  from{opacity:0;transform:translateY(4px)}
+  to{opacity:1;transform:translateY(0)}
 }
