@@ -14,8 +14,8 @@ export function SummaryPanel({
           </div>
           <div>
             Decision: {model.p >= model.cut
-              ? <span className="badge ok">Above threshold — proceed</span>
-              : <span className="badge warn">Below threshold — consider more data</span>}
+              ? <span className="badge badge--ok">Above threshold — proceed</span>
+              : <span className="badge badge--warn">Below threshold — consider more data</span>}
           </div>
           <div className="card" style={{textAlign:"center"}}>{supportEstimate}</div>
           <div className="row row--between" style={{gap:8}}>
