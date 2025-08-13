@@ -12,8 +12,9 @@ import {
 import type { Config, SeverityState, Condition, AssessmentSelection } from "./types";
 
 import { Header, Footer } from "./components/ui";
-import { Container, Tabs, Card, Row } from "./components/primitives";
+import { Container, Tabs, Card } from "./components/primitives";
 import { SrsPanel } from "./panels/SrsPanel";
+import { AsrsPanel } from "./panels/AsrsPanel";
 import { AbasPanel } from "./panels/AbasPanel";
 import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
@@ -47,6 +48,8 @@ export default function App() {
 
   const [srs2, setSRS2] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
   const [srs2Teacher, setSRS2Teacher] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
+  const [asrs, setASRS] = useState<SeverityState>(() => initSeverityState(config.asrsDomains));
+  const [asrsTeacher, setASRSTeacher] = useState<SeverityState>(() => initSeverityState(config.asrsDomains));
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
   const [abasTeacher, setABASTeacher] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
@@ -142,6 +145,7 @@ export default function App() {
   );
 
   const hasSrs = assessments.some((a) => a.selected === "SRS-2");
+  const hasAsrs = assessments.some((a) => a.selected === "ASRS");
   const hasAbas = assessments.some((a) => a.selected === "ABAS3");
   const hasVineland = assessments.some((a) => a.selected?.startsWith("Vineland"));
 
@@ -173,21 +177,19 @@ export default function App() {
   useEffect(() => {
     if (!isSchoolAge) {
       setSRS2Teacher(() => initSeverityState(config.srs2Domains));
+      setASRSTeacher(() => initSeverityState(config.asrsDomains));
       setABASTeacher(() => initSeverityState(config.abasDomains));
     }
-  }, [isSchoolAge, config.srs2Domains, config.abasDomains]);
+  }, [isSchoolAge, config.srs2Domains, config.asrsDomains, config.abasDomains]);
 
-  // ---------- density ----------
-  const [compact, setCompact] = useState(true);
-  useEffect(() => {
-    document.body.classList.toggle("compact", compact);
-  }, [compact]);
 
   // ---------- engine ----------
   const { datasetStatus, evidence, model, supportEstimate, recommendation } = useAsdEngine(
     config,
     srs2,
     srs2Teacher,
+    asrs,
+    asrsTeacher,
     abas,
     abasTeacher,
     wisc,
@@ -271,13 +273,6 @@ export default function App() {
             </label>
           </Card>
 
-          <Row justify="end">
-            <label className="row small">
-              <input type="checkbox" checked={compact} onChange={(e) => setCompact(e.target.checked)} />
-              Compact mode
-            </label>
-          </Row>
-
           <Card>
             <span className="small">
               <b>Minimum dataset:</b> {ribbon}
@@ -352,7 +347,7 @@ export default function App() {
 
           <div className="layout">
             {/* LEFT: panels per tab */}
-            <section className="stack">
+            <section className="stack stack--md">
               {activeTab === 0 && (
                 <>
                   <AssessmentPanel domain="Autism questionnaires" assessments={assessments} setAssessments={setAssessments} />
@@ -371,9 +366,22 @@ export default function App() {
                       )}
                     </>
                   )}
-                  {selectedAutismQs.filter((n) => n !== "SRS-2").length > 0 && (
+                  {hasAsrs && (
+                    <>
+                      <AsrsPanel title="ASRS Parent" domains={config.asrsDomains} asrs={asrs} setASRS={setASRS} />
+                      {isSchoolAge && (
+                        <AsrsPanel
+                          title="ASRS Teacher"
+                          domains={config.asrsDomains}
+                          asrs={asrsTeacher}
+                          setASRS={setASRSTeacher}
+                        />
+                      )}
+                    </>
+                  )}
+                  {selectedAutismQs.filter((n) => n !== "SRS-2" && n !== "ASRS").length > 0 && (
                     <GenericInstrumentPanel
-                      selected={selectedAutismQs.filter((n) => n !== "SRS-2")}
+                      selected={selectedAutismQs.filter((n) => n !== "SRS-2" && n !== "ASRS")}
                       instruments={instruments}
                       setInstruments={setInstruments}
                       configs={config.defaultInstruments}
@@ -499,6 +507,8 @@ export default function App() {
                   supportEstimate={supportEstimate}
                   srs2={srs2}
                   srs2Teacher={srs2Teacher}
+                  asrs={asrs}
+                  asrsTeacher={asrsTeacher}
                   abas={abas}
                   abasTeacher={abasTeacher}
                   migdas={migdas}
@@ -511,7 +521,7 @@ export default function App() {
             </section>
 
             {/* RIGHT: summary */}
-            <section className="stack">
+            <section className="stack stack--md">
               <SummaryPanel
                 model={model}
                 config={config}

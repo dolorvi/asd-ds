@@ -1,5 +1,5 @@
 // src/config/modelConfig.ts
-import { SRS2_DOMAINS, WISC_DOMAINS, ABAS3_DOMAINS, SRS2_SEVERITIES, WISC_SEVERITIES, ABAS3_SEVERITIES } from "../data/testData";
+import { SRS2_DOMAINS, ASRS_DOMAINS, WISC_DOMAINS, ABAS3_DOMAINS, SRS2_SEVERITIES, ASRS_SEVERITIES, WISC_SEVERITIES, ABAS3_SEVERITIES } from "../data/testData";
 import type { Config, InstrumentBandMap } from "../types";
 
 // ---- Age-band priors (log-odds) ----
@@ -105,6 +105,14 @@ export const DEFAULT_CONFIG: Config = {
     }
     return { key: d.key, label: d.label, severities: [...SRS2_SEVERITIES], mapBySeverity: m };
   }),
+
+  // ----- ASRS domains (label-only) -----
+  asrsDomains: ASRS_DOMAINS.map((d) => ({
+    key: d.key,
+    label: d.label,
+    severities: [...ASRS_SEVERITIES],
+    mapBySeverity: {},
+  })),
 
   // ----- WISC/WAIS/etc domains (context only) -----
   wiscDomains: WISC_DOMAINS.map((d) => ({

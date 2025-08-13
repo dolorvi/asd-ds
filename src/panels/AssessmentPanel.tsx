@@ -50,7 +50,7 @@ export function AssessmentPanel({
 
   return (
     <Card title={domain}>
-      <div className="stack">
+      <div className="stack stack--sm">
         {items.map((a) => (
           <Row key={a.index} justify="between" align="center">
             <label style={{ flex: 1 }}>
