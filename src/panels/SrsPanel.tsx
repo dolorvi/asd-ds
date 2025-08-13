@@ -5,14 +5,18 @@ import { ChipGroup } from "../components/ui";
 import { getBandColor } from "../components/severity";
 
 export function SrsPanel({
-  domains, srs2, setSRS2
+  title,
+  domains,
+  srs2,
+  setSRS2,
 }:{
+  title: string;
   domains:{key:string;label:string;severities:string[]}[];
   srs2:SeverityState;
   setSRS2:(fn:(s:SeverityState)=>SeverityState)=>void;
 }) {
   return (
-    <Card title="SRS-2 — Domain Entries">
+    <Card title={title}>
       <div className="grid">
         {domains.map(d=>(
           <section key={d.key} className="card">

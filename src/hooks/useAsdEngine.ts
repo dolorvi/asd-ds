@@ -6,7 +6,9 @@ import { VINELAND_IMPAIRMENT_MAP } from "../config/modelConfig"; // make sure th
 export function useAsdEngine(
   config: Config,
   srs2: SeverityState,
+  srs2Teacher: SeverityState,
   abas: SeverityState,
+  abasTeacher: SeverityState,
   wisc: SeverityState, // kept for parity, not used in model by default
   migdas: { consistency: string; notes: string[] },
   history: {
@@ -23,38 +25,39 @@ export function useAsdEngine(
   /** ---------------- Minimum dataset gate ---------------- */
   const datasetStatus = useMemo(() => {
     // Instrument present if it has a score OR a non-empty band label
-    const withValues = instruments.filter(
+    let withValues = instruments.filter(
       (i) => i.value !== undefined || (i.band && i.band.trim() !== "")
     );
 
-    const srsEntered = Object.values(srs2).some((d) => !!d.severity);
-    const abasEntered = Object.values(abas).some((d) => !!d.severity);
+    const srsEntered =
+      Object.values(srs2).some((d) => !!d.severity) ||
+      Object.values(srs2Teacher).some((d) => !!d.severity);
+    const abasEntered =
+      Object.values(abas).some((d) => !!d.severity) ||
+      Object.values(abasTeacher).some((d) => !!d.severity);
     const migEntered = migdas.consistency !== "unclear";
+
+    if (srsEntered) withValues = withValues.filter((i) => i.name !== "ASRS");
+    if (abasEntered) withValues = withValues.filter((i) => i.name !== "Vineland-3");
 
     const effectiveInstrumentCount =
       withValues.length + (srsEntered ? 1 : 0) + (abasEntered ? 1 : 0) + (migEntered ? 1 : 0);
 
     // Adaptive satisfied by ABAS domains OR a Vineland score/band
-    const vinelandBandEntered = instruments.some(
+    const vinelandBandEntered = withValues.some(
       (i) => i.name === "Vineland-3" && i.band && i.band.trim() !== ""
     );
     const hasAdaptive =
       abasEntered ||
       vinelandBandEntered ||
-      instruments.some(
-        (i) =>
-          ["Vineland-3", "ABAS-3"].includes(i.name) &&
-          (i.value !== undefined || (i.band && i.band.trim() !== ""))
-      );
+      withValues.some((i) => ["Vineland-3", "ABAS-3"].includes(i.name));
 
     // ASD instrument satisfied by SRS-2/MIGDAS domains or common ASD tools (label-only OK)
     const hasASDInst =
       srsEntered ||
       migEntered ||
-      instruments.some(
-        (i) =>
-          ["SRS-2", "ADOS-2", "MIGDAS-2", "GARS", "ADI-R"].includes(i.name) &&
-          (i.value !== undefined || (i.band && i.band.trim() !== ""))
+      withValues.some((i) =>
+        ["SRS-2", "ADOS-2", "MIGDAS-2", "GARS", "ADI-R", "ASRS"].includes(i.name)
       );
 
     const historyOk = history.developmentalConcerns.trim().length > 10 && history.earlyOnset;
@@ -82,7 +85,7 @@ export function useAsdEngine(
         observationOk: obsOk,
       },
     };
-  }, [config.minDataset, instruments, srs2, abas, migdas, history, observation]);
+  }, [config.minDataset, instruments, srs2, srs2Teacher, abas, abasTeacher, migdas, history, observation]);
 
   /** ---------------- Evidence aggregation ---------------- */
   const evidence = useMemo(() => {
@@ -112,32 +115,45 @@ export function useAsdEngine(
     });
 
     // SRS-2 domain severities → evidence via config maps (label-only)
-    config.srs2Domains.forEach((d) => {
-      const sev = srs2[d.key]?.severity || "";
-      const map = d.mapBySeverity[sev];
-      if (!map) return;
-      Object.entries(map).forEach(([k, v]) => {
-        (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
+    const applySrs = (src: SeverityState) => {
+      config.srs2Domains.forEach((d) => {
+        const sev = src[d.key]?.severity || "";
+        const map = d.mapBySeverity[sev];
+        if (!map) return;
+        Object.entries(map).forEach(([k, v]) => {
+          (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
+        });
       });
-    });
+    };
+    applySrs(srs2);
+    applySrs(srs2Teacher);
 
     // ABAS-3 domain severities → impairment (label-only)
-    config.abasDomains.forEach((d) => {
-      const sev = abas[d.key]?.severity || "";
-      const map = d.mapBySeverity[sev];
-      if (!map) return;
-      Object.entries(map).forEach(([k, v]) => {
-        (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
+    const applyAbas = (src: SeverityState) => {
+      config.abasDomains.forEach((d) => {
+        const sev = src[d.key]?.severity || "";
+        const map = d.mapBySeverity[sev];
+        if (!map) return;
+        Object.entries(map).forEach(([k, v]) => {
+          (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
+        });
       });
-    });
+    };
+    applyAbas(abas);
+    applyAbas(abasTeacher);
 
-    // Vineland-3 composite band → impairment delta (label-only)
-    const vineland = instruments.find(
-      (i) => i.name === "Vineland-3" && i.band && i.band.trim()
-    );
-    if (vineland?.band) {
-      const delta = (VINELAND_IMPAIRMENT_MAP as any)[vineland.band];
-      if (typeof delta === "number") ev.impairment += delta;
+    // Vineland-3 composite band → impairment delta (label-only) if no ABAS present
+    const abasEntered =
+      Object.values(abas).some((d) => !!d.severity) ||
+      Object.values(abasTeacher).some((d) => !!d.severity);
+    if (!abasEntered) {
+      const vineland = instruments.find(
+        (i) => i.name === "Vineland-3" && i.band && i.band.trim()
+      );
+      if (vineland?.band) {
+        const delta = (VINELAND_IMPAIRMENT_MAP as any)[vineland.band];
+        if (typeof delta === "number") ev.impairment += delta;
+      }
     }
 
     // MIGDAS qualitative → balanced push/pull across social/rrb
@@ -156,7 +172,7 @@ export function useAsdEngine(
     }
 
     return ev;
-  }, [config.srs2Domains, config.abasDomains, srs2, abas, migdas, observation, history, diff, instruments]);
+  }, [config.srs2Domains, config.abasDomains, srs2, srs2Teacher, abas, abasTeacher, migdas, observation, history, diff, instruments]);
 
   /** ---------------- Likelihood model ---------------- */
   const model = useMemo(() => {
@@ -186,12 +202,12 @@ export function useAsdEngine(
 
   /** ---------------- Support & recommendations ---------------- */
   const supportEstimate = useMemo(() => {
-    const sevs = Object.values(abas).map((d) => d.severity || "");
+    const sevs = [...Object.values(abas), ...Object.values(abasTeacher)].map((d) => d.severity || "");
     if (sevs.some((s) => s === "Extremely Low" || s === "Very Low")) return "High support likely";
     if (sevs.some((s) => s === "Low Average" || s === "Average")) return "Moderate support possible";
     if (sevs.some((s) => s)) return "Lower support likely";
     return "Insufficient data";
-  }, [abas]);
+  }, [abas, abasTeacher]);
 
   const recommendation = useMemo(() => {
     const recs: string[] = [];
