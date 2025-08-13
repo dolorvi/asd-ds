@@ -52,7 +52,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 :focus-visible{outline:none;box-shadow:0 0 0 2px color-mix(in hsl, var(--accent) 92%, white 8%),0 0 0 6px color-mix(in hsl, var(--accent) 30%, transparent 70%);border-radius:10px}
 
 /* ===== Utilities ===== */
-.row{display:flex;gap:8px}
+.row{display:flex;gap:12px}
 .row--wrap{flex-wrap:wrap}
 .row--between{justify-content:space-between}
 .row--center{align-items:center}
@@ -71,7 +71,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 
 .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-1);padding:16px;transition:box-shadow var(--t-fast) var(--ease)}
 .card:hover{box-shadow:var(--shadow-2)}
-.card__bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.card__bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .section-title{font-size:14px;font-weight:700;color:var(--muted);margin:0}
 
 .btn{height:34px;padding:0 12px;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;box-shadow:var(--shadow-1)}
@@ -79,7 +79,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .btn--accent{background:var(--accent);border-color:transparent;color:#fff}
 .btn--accent:hover{filter:brightness(1.05)}
 
-.tabbar{display:flex;gap:8px;flex-wrap:wrap}
+.tabbar{display:flex;gap:12px;flex-wrap:wrap}
 .tab{border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:6px 12px;font-weight:500;color:var(--muted);transition:background-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .tab--active{color:var(--text);background:color-mix(in hsl, var(--accent) 14%, transparent);border-color:color-mix(in hsl, var(--accent) 30%, transparent)}
 
@@ -96,7 +96,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .progress-bar__fill{height:100%;background:var(--accent-2)}
 
 /* AI chat */
-.chat-log{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;margin-bottom:8px}
+.chat-log{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;margin-bottom:12px}
 .chat-msg{padding:4px 8px;border-radius:10px;max-width:80%}
 .chat-msg--user{align-self:flex-end;background:var(--accent);color:#fff}
 .chat-msg--bot{align-self:flex-start;background:var(--accent-2);color:var(--text)}

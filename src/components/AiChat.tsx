@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Card, Row } from "./primitives";
+import { ASSESSMENT_INFO } from "../data/assessmentInfo";
 
 export function AiChat() {
   const [messages, setMessages] = useState<{ from: "user" | "bot"; text: string }[]>([
@@ -7,17 +8,23 @@ export function AiChat() {
   ]);
   const [input, setInput] = useState("");
 
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
   const send = () => {
     const text = input.trim();
     if (!text) return;
     const userMsg = { from: "user" as const, text };
     setMessages((m) => [...m, userMsg]);
     setInput("");
+
     setTimeout(() => {
-      const botMsg = {
-        from: "bot" as const,
-        text: `Consider how "${text}" relates to social communication and restricted behaviours.`,
-      };
+      const key = Object.keys(ASSESSMENT_INFO).find((k) =>
+        norm(text).includes(k)
+      );
+      const reply = key
+        ? `${ASSESSMENT_INFO[key].name}: ${ASSESSMENT_INFO[key].domains.join(", ")}. ${ASSESSMENT_INFO[key].notes}`
+        : `Consider how "${text}" relates to social communication and restricted behaviours.`;
+      const botMsg = { from: "bot" as const, text: reply };
       setMessages((m) => [...m, botMsg]);
     }, 400);
   };
