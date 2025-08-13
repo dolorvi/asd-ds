@@ -76,8 +76,10 @@ export function ReportPanel({
     const early = history.earlyOnset
       ? "The history indicates symptoms were present in early childhood. "
       : "";
+    const contextNote =
+      " Clinical interpretation should consider developmental history and individual context.";
     return testList
-      ? `${early}Multiple tests completed including the ${testList} ${presence}. ${support}${impactText}.${difficultyText}`
+      ? `${early}Multiple tests completed including the ${testList} ${presence}. ${support}${impactText}.${difficultyText}${contextNote}`
       : "Insufficient data for report.";
   }, [model, supportEstimate, srs2, srs2Teacher, abas, abasTeacher, migdas, instruments, assessments, history, config.abasDomains]);
 

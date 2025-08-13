@@ -2,8 +2,14 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey } from "./config/modelConfig";
 import { useAsdEngine } from "./hooks/useAsdEngine";
-import { CANONICAL_CASES, MIGDAS_CONSISTENCY, ABAS3_SEVERITIES as ABAS_SEVERITIES, VINELAND_SEVERITIES, VINELAND_DOMAINS } from "./data/testData";
-import type { Config, SeverityState, CriterionKey, Condition, AssessmentSelection } from "./types";
+import {
+  CANONICAL_CASES,
+  MIGDAS_CONSISTENCY,
+  ABAS3_SEVERITIES as ABAS_SEVERITIES,
+  VINELAND_SEVERITIES,
+  VINELAND_DOMAINS,
+} from "./data/testData";
+import type { Config, SeverityState, Condition, AssessmentSelection } from "./types";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card, Row } from "./components/primitives";
@@ -33,7 +39,7 @@ export default function App() {
     "History",
     "Comorbidity",
     "Report",
-  ];
+  ] as const;
   const [activeTab, setActiveTab] = useState(0);
   const [devOpen, setDevOpen] = useState(false);
 
@@ -42,7 +48,7 @@ export default function App() {
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
   const [abasTeacher, setABASTeacher] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
- 
+
   const [migdas, setMIGDAS] = useState({
     consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
     notes: [""],
@@ -56,44 +62,60 @@ export default function App() {
   });
 
   const [observation, setObservation] = useState({
-    A1: 0, A2: 0, A3: 0, B1: 0, B2: 0, B3: 0, B4: 0, notes: "",
+    A1: 0,
+    A2: 0,
+    A3: 0,
+    B1: 0,
+    B2: 0,
+    B3: 0,
+    B4: 0,
+    notes: "",
   });
 
   const [diff, setDiff] = useState({
-    ADHD: false, DLD: false, ID: false, Anxiety: false, Depression: false,
-    TraumaPTSD: false, FASD: false, Tics: false, Other: "",
+    ADHD: false,
+    DLD: false,
+    ID: false,
+    Anxiety: false,
+    Depression: false,
+    TraumaPTSD: false,
+    FASD: false,
+    Tics: false,
+    Other: "",
   });
 
   const [clinician, setClinician] = useState({
-    name: "", date: new Date().toISOString().slice(0, 10), attested: false,
+    name: "",
+    date: new Date().toISOString().slice(0, 10),
+    attested: false,
   });
 
   const [reportVoice, setReportVoice] = useState<"clinical" | "dual">("dual");
 
   // ---------- instruments ----------
   const [instruments, setInstruments] = useState(
-    DEFAULT_CONFIG.defaultInstruments.map(i => ({ name: i.name, value: undefined as number | undefined, band: "" }))
+    DEFAULT_CONFIG.defaultInstruments.map((i) => ({ name: i.name, value: undefined as number | undefined, band: "" })),
   );
 
   // ---------- assessment selections ----------
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
-    { domain: "Autism questionnaires", options: ["ASRS","SRS-2","GARS","CARS","AQ"] },
-    { domain: "Autism observations", options: ["MIGDAS","ADOS"] },
+    { domain: "Autism questionnaires", options: ["ASRS", "SRS-2", "GARS", "CARS", "AQ"] },
+    { domain: "Autism observations", options: ["MIGDAS", "ADOS"] },
     { domain: "Autism interviews", options: ["ADI-R"] },
-    { domain: "Adaptive questionnaires", options: ["ABAS3","Vineland"] },
-    { domain: "Executive function questionnaires", options: ["BRIEF2","BDEFS"] },
-    { domain: "Intellectual assessment", options: ["WISC","WPPSI","WAIS"] },
+    { domain: "Adaptive questionnaires", options: ["ABAS3", "Vineland"] },
+    { domain: "Executive function questionnaires", options: ["BRIEF2", "BDEFS"] },
+    { domain: "Intellectual assessment", options: ["WISC", "WPPSI", "WAIS"] },
     { domain: "Language assessment", options: ["CELF5"] },
     { domain: "Sensory Assessment", options: ["Sensory profile 2"] },
   ]);
 
   const getInstrumentBand = useCallback(
-    (name: string) => instruments.find(x => x.name === name)?.band || "",
-    [instruments]
+    (name: string) => instruments.find((x) => x.name === name)?.band || "",
+    [instruments],
   );
   const setInstrumentBand = useCallback(
-    (name: string, band: string) => setInstruments(arr => arr.map(x => (x.name === name ? { ...x, band } : x))),
-    []
+    (name: string, band: string) => setInstruments((arr) => arr.map((x) => (x.name === name ? { ...x, band } : x))),
+    [],
   );
 
   // ---------- prior via age band ----------
@@ -114,11 +136,24 @@ export default function App() {
 
   // ---------- density ----------
   const [compact, setCompact] = useState(true);
-  useEffect(() => { document.body.classList.toggle("compact", compact); }, [compact]);
+  useEffect(() => {
+    document.body.classList.toggle("compact", compact);
+  }, [compact]);
 
   // ---------- engine ----------
-  const { datasetStatus, evidence, model, supportEstimate, recommendation } =
-    useAsdEngine(config, srs2, srs2Teacher, abas, abasTeacher, wisc, migdas, history, observation as any, diff as any, instruments);
+  const { datasetStatus, evidence, model, supportEstimate, recommendation } = useAsdEngine(
+    config,
+    srs2,
+    srs2Teacher,
+    abas,
+    abasTeacher,
+    wisc,
+    migdas,
+    history,
+    observation as any,
+    diff as any,
+    instruments,
+  );
 
   // ---------- ribbon ----------
   const ribbon = useMemo(() => {
@@ -147,7 +182,8 @@ export default function App() {
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {
     const s = JSON.stringify(DEFAULT_CONFIG);
-    let h = 0; for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
     return ("00000000" + (h >>> 0).toString(16)).slice(-8);
   }, []);
 
@@ -157,195 +193,220 @@ export default function App() {
       <Header
         title="ASD Decision Support — MVP"
         subtitle="DSM-5-TR aligned • tabs build"
-        onDevToggle={() => setDevOpen(v => !v)}
+        onDevToggle={() => setDevOpen((v) => !v)}
         onExportSummary={exportSummary}
         onExportFull={() => window.print()}
         condition={condition}
         onConditionChange={setCondition}
       />
 
-      <Row justify="end">
-        <label className="row small">
-          <input type="checkbox" checked={compact} onChange={(e) => setCompact(e.target.checked)} />
-          Compact mode
-        </label>
-      </Row>
+      {condition === "ASD" ? (
+        <>
+          <Row justify="end">
+            <label className="row small">
+              <input type="checkbox" checked={compact} onChange={(e) => setCompact(e.target.checked)} />
+              Compact mode
+            </label>
+          </Row>
 
-      <Card>
-        <span className="small">
-          <b>Minimum dataset:</b> {ribbon}
-        </span>
-      </Card>
+          <Card>
+            <span className="small">
+              <b>Minimum dataset:</b> {ribbon}
+            </span>
+          </Card>
 
-      {devOpen && (
-        <Card>
-          <div className="row">
-            <select id="fixtureSelect">
-              {CANONICAL_CASES.map((c) => (
-                <option key={c.id} value={c.id}>{c.id} — {c.title}</option>
-              ))}
-            </select>
-            <button onClick={() => {
-              const selEl = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
-              const sel = selEl ? CANONICAL_CASES.find(c => c.id === selEl.value) : undefined;
-              if (!sel) return;
-              setSRS2((prev) => {
-                const next = { ...prev } as SeverityState;
-                if (sel.srs2) Object.entries(sel.srs2).forEach(([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }));
-                return next;
-              });
-              setABAS((prev) => {
-                const next = { ...prev } as SeverityState;
-                if (sel.abas3) Object.entries(sel.abas3).forEach(([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }));
-                return next;
-              });
-              setWISC((prev) => {
-                const next = { ...prev } as SeverityState;
-                if (sel.wisc) Object.entries(sel.wisc).forEach(([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }));
-                return next;
-              });
-              if (sel.migdas) setMIGDAS({ consistency: sel.migdas.consistency, notes: sel.migdas.notes });
-              setHistory((h) => ({
-                ...h,
-                developmentalConcerns: "Auto-filled for fixture; replace with clinical history.",
-                earlyOnset: !!sel.flags?.earlyOnset,
-                crossContextImpairment: !!sel.flags?.crossContextImpairment,
-                maskingIndicators: !!sel.flags?.masking,
-              }));
-            }}>
-              Load
-            </button>
-            <div className="small">Dev fixtures for sanity-checks. (Label-only)</div>
-          </div>
-        </Card>
-      )}
+          {devOpen && (
+            <Card>
+              <div className="row">
+                <select id="fixtureSelect">
+                  {CANONICAL_CASES.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.id} — {c.title}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => {
+                    const selEl = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
+                    const sel = selEl ? CANONICAL_CASES.find((c) => c.id === selEl.value) : undefined;
+                    if (!sel) return;
 
-      <Tabs tabs={TABS} active={activeTab} onSelect={setActiveTab} />
+                    setSRS2((prev) => {
+                      const next = { ...prev } as SeverityState;
+                      if (sel.srs2)
+                        Object.entries(sel.srs2).forEach(
+                          ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                        );
+                      return next;
+                    });
 
-      <div className="layout">
-        {/* LEFT: panels per tab */}
-        <section className="stack">
-          {activeTab === 0 && (
-            <>
-              <AssessmentPanel
-                assessments={assessments}
-                setAssessments={setAssessments}
-                domains={["Autism questionnaires", "Autism observations", "Autism interviews"]}
-              />
-              <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
-              {isSchoolAge && (
-                <SrsPanel title="SRS-2 Teacher" domains={config.srs2Domains} srs2={srs2Teacher} setSRS2={setSRS2Teacher} />
-              )}
-              {/* TODO: MIGDAS panel (presentational) */}
-            </>
+                    setABAS((prev) => {
+                      const next = { ...prev } as SeverityState;
+                      if (sel.abas3)
+                        Object.entries(sel.abas3).forEach(
+                          ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                        );
+                      return next;
+                    });
+
+                    setWISC((prev) => {
+                      const next = { ...prev } as SeverityState;
+                      if (sel.wisc)
+                        Object.entries(sel.wisc).forEach(
+                          ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                        );
+                      return next;
+                    });
+
+                    if (sel.migdas) setMIGDAS({ consistency: sel.migdas.consistency, notes: sel.migdas.notes });
+
+                    setHistory((h) => ({
+                      ...h,
+                      developmentalConcerns: "Auto-filled for fixture; replace with clinical history.",
+                      earlyOnset: !!sel.flags?.earlyOnset,
+                      crossContextImpairment: !!sel.flags?.crossContextImpairment,
+                      maskingIndicators: !!sel.flags?.masking,
+                    }));
+                  }}
+                >
+                  Load
+                </button>
+                <div className="small">Dev fixtures for sanity-checks. (Label-only)</div>
+              </div>
+            </Card>
           )}
 
-          {activeTab === 1 && (
-            <>
-              <AssessmentPanel
-                assessments={assessments}
-                setAssessments={setAssessments}
-                domains={["Adaptive questionnaires"]}
-              />
-              <AbasPanel
-                title="ABAS-3 Parent"
-                domains={config.abasDomains}
-                options={ABAS_SEVERITIES}
-                valueMap={abas}
-                setValueMap={setABAS}
-              />
-              {isSchoolAge && (
-                <AbasPanel
-                  title="ABAS-3 Teacher"
-                  domains={config.abasDomains}
-                  options={ABAS_SEVERITIES}
-                  valueMap={abasTeacher}
-                  setValueMap={setABASTeacher}
+          <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
+
+          <div className="layout">
+            {/* LEFT: panels per tab */}
+            <section className="stack">
+              {activeTab === 0 && (
+                <>
+                  <AssessmentPanel
+                    assessments={assessments}
+                    setAssessments={setAssessments}
+                    domains={["Autism questionnaires", "Autism observations", "Autism interviews"]}
+                  />
+                  <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
+                  {isSchoolAge && (
+                    <SrsPanel
+                      title="SRS-2 Teacher"
+                      domains={config.srs2Domains}
+                      srs2={srs2Teacher}
+                      setSRS2={setSRS2Teacher}
+                    />
+                  )}
+                  {/* TODO: MIGDAS panel (presentational) */}
+                </>
+              )}
+
+              {activeTab === 1 && (
+                <>
+                  <AssessmentPanel
+                    assessments={assessments}
+                    setAssessments={setAssessments}
+                    domains={["Adaptive questionnaires"]}
+                  />
+                  <AbasPanel
+                    title="ABAS-3 Parent"
+                    domains={config.abasDomains}
+                    options={ABAS_SEVERITIES}
+                    valueMap={abas}
+                    setValueMap={setABAS}
+                  />
+                  {isSchoolAge && (
+                    <AbasPanel
+                      title="ABAS-3 Teacher"
+                      domains={config.abasDomains}
+                      options={ABAS_SEVERITIES}
+                      valueMap={abasTeacher}
+                      setValueMap={setABASTeacher}
+                    />
+                  )}
+                  <VinelandPanel
+                    title="Vineland-3 Composite"
+                    domains={config.vinelandDomains ?? VINELAND_DOMAINS}
+                    options={VINELAND_SEVERITIES}
+                    valueMap={{
+                      vineland_composite: getInstrumentBand("Vineland-3"),
+                    }}
+                    setValueMap={(fn) => {
+                      const next = fn({
+                        vineland_composite: getInstrumentBand("Vineland-3"),
+                      });
+                      setInstrumentBand("Vineland-3", next.vineland_composite || "");
+                    }}
+                  />
+                </>
+              )}
+
+              {activeTab === 2 && (
+                <AssessmentPanel
+                  assessments={assessments}
+                  setAssessments={setAssessments}
+                  domains={["Intellectual assessment"]}
                 />
               )}
-              <VinelandPanel
-                title="Vineland-3 Composite"
-                domains={config.vinelandDomains ?? VINELAND_DOMAINS}
-                options={VINELAND_SEVERITIES}
-                valueMap={{ vineland_composite: getInstrumentBand("Vineland-3") }}
-                setValueMap={(fn) => {
-                  const next = fn({ vineland_composite: getInstrumentBand("Vineland-3") });
-                  setInstrumentBand("Vineland-3", next.vineland_composite || "");
-                }}
-              />
-            </>
-          )}
 
-          {activeTab === 2 && (
-            <AssessmentPanel
-              assessments={assessments}
-              setAssessments={setAssessments}
-              domains={["Intellectual assessment"]}
-            />
-          )}
+              {activeTab === 3 && (
+                <AssessmentPanel
+                  assessments={assessments}
+                  setAssessments={setAssessments}
+                  domains={["Executive function questionnaires"]}
+                />
+              )}
 
-          {activeTab === 3 && (
-            <AssessmentPanel
-              assessments={assessments}
-              setAssessments={setAssessments}
-              domains={["Executive function questionnaires"]}
-            />
-          )}
+              {activeTab === 4 && (
+                <AssessmentPanel
+                  assessments={assessments}
+                  setAssessments={setAssessments}
+                  domains={["Sensory Assessment"]}
+                />
+              )}
 
-          {activeTab === 4 && (
-            <AssessmentPanel
-              assessments={assessments}
-              setAssessments={setAssessments}
-              domains={["Sensory Assessment"]}
-            />
-          )}
+              {activeTab === 5 && (
+                <AssessmentPanel
+                  assessments={assessments}
+                  setAssessments={setAssessments}
+                  domains={["Language assessment"]}
+                />
+              )}
 
-          {activeTab === 5 && (
-            <AssessmentPanel
-              assessments={assessments}
-              setAssessments={setAssessments}
-              domains={["Language assessment"]}
-            />
-          )}
+              {activeTab === 6 && <Card title="History / Observation">{/* TODO: HistoryPanel */}</Card>}
 
-          {activeTab === 6 && (
-            <Card title="History / Observation">
-              {/* TODO: move history + observation into a HistoryPanel */}
-            </Card>
-          )}
+              {activeTab === 7 && <Card title="Comorbidity / Differential">{/* TODO: DiffPanel */}</Card>}
 
-          {activeTab === 7 && (
-            <Card title="Comorbidity / Differential">
-              {/* TODO: move diff flags into a DiffPanel */}
-            </Card>
-          )}
+              {activeTab === 8 && (
+                <ReportPanel
+                  model={model}
+                  supportEstimate={supportEstimate}
+                  srs2={srs2}
+                  srs2Teacher={srs2Teacher}
+                  abas={abas}
+                  abasTeacher={abasTeacher}
+                  migdas={migdas}
+                  instruments={instruments}
+                  assessments={assessments}
+                  history={history}
+                  config={config}
+                />
+              )}
+            </section>
 
-          {activeTab === 8 && (
-            <ReportPanel
+            {/* RIGHT: summary */}
+            <SummaryPanel
               model={model}
-              supportEstimate={supportEstimate}
-              srs2={srs2}
-              srs2Teacher={srs2Teacher}
-              abas={abas}
-              abasTeacher={abasTeacher}
-              migdas={migdas}
-              instruments={instruments}
-              assessments={assessments}
-              history={history}
               config={config}
+              supportEstimate={supportEstimate}
+              recommendation={recommendation}
+              exportSummary={exportSummary}
             />
-          )}
-        </section>
-
-        {/* RIGHT: summary */}
-        <SummaryPanel
-          model={model}
-          config={config}
-          supportEstimate={supportEstimate}
-          recommendation={recommendation}
-          exportSummary={exportSummary}
-        />
-      </div>
+          </div>
+        </>
+      ) : (
+        <Card title={`${condition} assessments`}>Assessments for {condition} will be added soon.</Card>
+      )}
 
       <Footer version="v0.6" ruleHash={ruleHash} />
     </Container>
