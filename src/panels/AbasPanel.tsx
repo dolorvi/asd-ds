@@ -5,17 +5,23 @@ import { ChipGroup } from "../components/ui";
 import { getBandColor } from "../components/severity";
 
 export function AbasPanel({
-  domains, abas, setABAS
+  title,
+  domains,
+  options,
+  valueMap,
+  setValueMap,
 }:{
-  domains:{key:string;label:string;severities:string[]}[];
-  abas:SeverityState;
-  setABAS:(fn:(s:SeverityState)=>SeverityState)=>void;
+  title: string;
+  domains: { key: string; label: string }[];
+  options: string[];
+  valueMap: SeverityState;
+  setValueMap: (fn: (s: SeverityState) => SeverityState) => void;
 }) {
   return (
-    <Card title="ABAS-3 — Domain Entries">
+    <Card title={title}>
       <div className="grid">
         {domains.map(d=>{
-          const sel = abas[d.key]?.severity || "";
+          const sel = valueMap[d.key]?.severity || "";
           return (
             <section key={d.key} className="card">
               <div className="stack stack--sm">
@@ -24,9 +30,9 @@ export function AbasPanel({
                   {sel && <span className="chip" style={{ background:getBandColor(sel, "goodHigh"), color:"#0b1220" }}>{sel}</span>}
                 </div>
                 <ChipGroup
-                  options={d.severities}
+                  options={options}
                   value={sel}
-                  onChange={(sev)=>setABAS(s=>({ ...s, [d.key]: { ...s[d.key], severity: sev }}))}
+                  onChange={(sev)=>setValueMap(s=>({ ...s, [d.key]: { ...s[d.key], severity: sev }}))}
                   getColor={(label)=>getBandColor(label, "goodHigh")}
                 />
               </div>

@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey } from "./config/modelConfig";
 import { useAsdEngine } from "./hooks/useAsdEngine";
-import { CANONICAL_CASES, MIGDAS_CONSISTENCY } from "./data/testData";
+import { CANONICAL_CASES, MIGDAS_CONSISTENCY, ABAS3_SEVERITIES as ABAS_SEVERITIES, VINELAND_SEVERITIES, VINELAND_DOMAINS } from "./data/testData";
 import type { Config, SeverityState, CriterionKey, Condition } from "./types";
 
 import { Header, Footer } from "./components/ui";
