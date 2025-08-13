@@ -7,9 +7,22 @@ export interface AssessmentInfo {
 export const ASSESSMENT_INFO: Record<string, AssessmentInfo> = {
   asrs: {
     name: "ASRS (Autism Spectrum Rating Scales)",
-    domains: ["Social/Communication", "Unusual Behaviors", "Self-Regulation"],
+    domains: [
+      "Social/Communication",
+      "Unusual Behaviours",
+      "Self-Regulation",
+      "Peer Socialization",
+      "Adult Socialization",
+      "Social/Emotional Reciprocity",
+      "Atypical Language",
+      "Stereotypy",
+      "Behavioural Rigidity",
+      "Sensory Sensitivity",
+      "Attention/Self-Regulation (Age 2–5)",
+      "Attention (Age 6–18)",
+    ],
     notes:
-      "T-scores typically range from 40–90. Includes DSM-5-compatible scales and Treatment Scales. Higher T-scores (\u226565) suggest clinically significant symptoms. Separate forms exist for ages 2–5 and 6–18.",
+      "Scores classify into Average, Slightly Elevated, Elevated, or Very Elevated ranges. T-scores typically span 40–90. Separate forms exist for ages 2–5 and 6–18.",
   },
   srs2: {
     name: "SRS-2 (Social Responsiveness Scale, Second Edition)",

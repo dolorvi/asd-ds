@@ -7,6 +7,8 @@ export function useAsdEngine(
   config: Config,
   srs2: SeverityState,
   srs2Teacher: SeverityState,
+  asrs: SeverityState,
+  asrsTeacher: SeverityState,
   abas: SeverityState,
   abasTeacher: SeverityState,
   wisc: SeverityState, // kept for parity, not used in model by default
@@ -32,12 +34,16 @@ export function useAsdEngine(
     const srsEntered =
       Object.values(srs2).some((d) => !!d.severity) ||
       Object.values(srs2Teacher).some((d) => !!d.severity);
+    const asrsEntered =
+      Object.values(asrs).some((d) => !!d.severity) ||
+      Object.values(asrsTeacher).some((d) => !!d.severity);
     const abasEntered =
       Object.values(abas).some((d) => !!d.severity) ||
       Object.values(abasTeacher).some((d) => !!d.severity);
     const migEntered = migdas.consistency !== "unclear";
 
-    if (srsEntered) withValues = withValues.filter((i) => i.name !== "ASRS");
+    if (srsEntered || asrsEntered)
+      withValues = withValues.filter((i) => i.name !== "ASRS");
     if (abasEntered) withValues = withValues.filter((i) => i.name !== "Vineland-3");
 
     const effectiveInstrumentCount =
@@ -55,6 +61,7 @@ export function useAsdEngine(
     // ASD instrument satisfied by SRS-2/MIGDAS domains or common ASD tools (label-only OK)
     const hasASDInst =
       srsEntered ||
+      asrsEntered ||
       migEntered ||
       withValues.some((i) =>
         ["SRS-2", "ADOS-2", "MIGDAS-2", "GARS", "CARS", "ADI-R", "ASRS", "AQ"].includes(i.name)
@@ -85,7 +92,7 @@ export function useAsdEngine(
         observationOk: obsOk,
       },
     };
-  }, [config.minDataset, instruments, srs2, srs2Teacher, abas, abasTeacher, migdas, history, observation]);
+  }, [config.minDataset, instruments, srs2, srs2Teacher, asrs, asrsTeacher, abas, abasTeacher, migdas, history, observation]);
 
   /** ---------------- Evidence aggregation ---------------- */
   const evidence = useMemo(() => {
@@ -127,6 +134,19 @@ export function useAsdEngine(
     };
     applySrs(srs2);
     applySrs(srs2Teacher);
+
+    const applyAsrs = (src: SeverityState) => {
+      config.asrsDomains.forEach((d) => {
+        const sev = src[d.key]?.severity || "";
+        const map = d.mapBySeverity[sev];
+        if (!map) return;
+        Object.entries(map).forEach(([k, v]) => {
+          (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
+        });
+      });
+    };
+    applyAsrs(asrs);
+    applyAsrs(asrsTeacher);
 
     // ABAS-3 domain severities → impairment (label-only)
     const applyAbas = (src: SeverityState) => {
@@ -172,7 +192,7 @@ export function useAsdEngine(
     }
 
     return ev;
-  }, [config.srs2Domains, config.abasDomains, srs2, srs2Teacher, abas, abasTeacher, migdas, observation, history, diff, instruments]);
+  }, [config.srs2Domains, config.asrsDomains, config.abasDomains, srs2, srs2Teacher, asrs, asrsTeacher, abas, abasTeacher, migdas, observation, history, diff, instruments]);
 
   /** ---------------- Likelihood model ---------------- */
   const model = useMemo(() => {

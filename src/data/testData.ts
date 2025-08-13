@@ -37,6 +37,28 @@ export const SRS2_DOMAINS: DomainLabelConfig[] = [
   { key: "srs_rrb",           label: "Restricted Interests and Repetitive Behaviour",     severities: SRS2_SEVERITIES },
 ];
 
+export const ASRS_SEVERITIES = [
+  "Average",
+  "Slightly Elevated",
+  "Elevated",
+  "Very Elevated",
+] as const;
+
+export const ASRS_DOMAINS: DomainLabelConfig[] = [
+  { key: "asrs_social_communication",      label: "Social/Communication",                     severities: ASRS_SEVERITIES },
+  { key: "asrs_unusual_behaviours",        label: "Unusual Behaviours",                      severities: ASRS_SEVERITIES },
+  { key: "asrs_self_regulation",          label: "Self-Regulation",                         severities: ASRS_SEVERITIES },
+  { key: "asrs_peer_socialization",       label: "Peer Socialization",                      severities: ASRS_SEVERITIES },
+  { key: "asrs_adult_socialization",      label: "Adult Socialization",                     severities: ASRS_SEVERITIES },
+  { key: "asrs_social_emotional_reciprocity", label: "Social/Emotional Reciprocity",        severities: ASRS_SEVERITIES },
+  { key: "asrs_atypical_language",        label: "Atypical Language",                       severities: ASRS_SEVERITIES },
+  { key: "asrs_stereotypy",               label: "Stereotypy",                              severities: ASRS_SEVERITIES },
+  { key: "asrs_behavioural_rigidity",     label: "Behavioural Rigidity",                    severities: ASRS_SEVERITIES },
+  { key: "asrs_sensory_sensitivity",      label: "Sensory Sensitivity",                     severities: ASRS_SEVERITIES },
+  { key: "asrs_attention_self_regulation",label: "Attention/Self-Regulation (Age 2–5)",      severities: ASRS_SEVERITIES },
+  { key: "asrs_attention",                label: "Attention (Age 6–18)",                     severities: ASRS_SEVERITIES },
+];
+
 // ----------------------------- WISC (VCI/VSI/WMI/PSI/FSIQ) -----------------------------
 export const WISC_SEVERITIES = [
   "Extremely Low",

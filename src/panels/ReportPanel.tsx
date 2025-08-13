@@ -7,6 +7,8 @@ export function ReportPanel({
   supportEstimate,
   srs2,
   srs2Teacher,
+  asrs,
+  asrsTeacher,
   abas,
   abasTeacher,
   migdas,
@@ -19,6 +21,8 @@ export function ReportPanel({
   supportEstimate: string;
   srs2: SeverityState;
   srs2Teacher: SeverityState;
+  asrs: SeverityState;
+  asrsTeacher: SeverityState;
   abas: SeverityState;
   abasTeacher: SeverityState;
   migdas: { consistency: string };
@@ -38,6 +42,14 @@ export function ReportPanel({
       if (srsTeach) parts.push("teacher");
       testSet.add(`SRS-2${parts.length ? ` (${parts.join(" & ")})` : ""}`);
     }
+    const asrsParent = has(asrs);
+    const asrsTeach = has(asrsTeacher);
+    if (asrsParent || asrsTeach) {
+      const parts: string[] = [];
+      if (asrsParent) parts.push("parent");
+      if (asrsTeach) parts.push("teacher");
+      testSet.add(`ASRS${parts.length ? ` (${parts.join(" & ")})` : ""}`);
+    }
     const abasParent = has(abas);
     const abasTeach = has(abasTeacher);
     if (abasParent || abasTeach) {
@@ -49,7 +61,7 @@ export function ReportPanel({
     if (migdas.consistency !== "unclear") testSet.add("MIGDAS-2");
     instruments.forEach(i => {
       if (i.name === "Vineland-3" && (abasParent || abasTeach)) return;
-      if (i.name === "ASRS" && (srsParent || srsTeach)) return;
+      if (i.name === "ASRS" && (asrsParent || asrsTeach)) return;
       if (i.value !== undefined || (i.band && i.band.trim() !== "")) testSet.add(i.name);
     });
     assessments.forEach(a => { if (a.selected) testSet.add(a.selected); });
@@ -81,7 +93,7 @@ export function ReportPanel({
     return testList
       ? `${early}Multiple tests completed including the ${testList} ${presence}. ${support}${impactText}.${difficultyText}${contextNote}`
       : "Insufficient data for report.";
-  }, [model, supportEstimate, srs2, srs2Teacher, abas, abasTeacher, migdas, instruments, assessments, history, config.abasDomains]);
+  }, [model, supportEstimate, srs2, srs2Teacher, asrs, asrsTeacher, abas, abasTeacher, migdas, instruments, assessments, history, config.abasDomains]);
 
   return (
     <Card title="Report (preview)">

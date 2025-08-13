@@ -46,6 +46,7 @@ export type Config = {
 
   // Domain sets
   srs2Domains: DomainConfig[];
+  asrsDomains: DomainConfig[];
   wiscDomains: DomainConfig[];
   abasDomains: DomainConfig[];
   vinelandDomains: DomainConfig[]; // ← add this
