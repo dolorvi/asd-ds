@@ -1,6 +1,7 @@
 // src/App.tsx
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { DEFAULT_CONFIG, PRIOR_BY_AGE, DEFAULT_AGE_BAND, type AgeBandKey } from "./config/modelConfig";
+import { useClickSound } from "./hooks/useClickSound";
 import { useAsdEngine } from "./hooks/useAsdEngine";
 import {
   CANONICAL_CASES,
@@ -27,6 +28,7 @@ const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
 
 export default function App() {
+  useClickSound();
   // ---------- condition ----------
   const [condition, setCondition] = useState<Condition>("ASD");
 
