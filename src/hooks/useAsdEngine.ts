@@ -57,7 +57,7 @@ export function useAsdEngine(
       srsEntered ||
       migEntered ||
       withValues.some((i) =>
-        ["SRS-2", "ADOS-2", "MIGDAS-2", "GARS", "ADI-R", "ASRS"].includes(i.name)
+        ["SRS-2", "ADOS-2", "MIGDAS-2", "GARS", "CARS", "ADI-R", "ASRS", "AQ"].includes(i.name)
       );
 
     const historyOk = history.developmentalConcerns.trim().length > 10 && history.earlyOnset;

@@ -62,10 +62,13 @@ export const DEFAULT_CONFIG: Config = {
     { name: "ADI-R", scoreField: "band", thresholds: [] },
     { name: "ASRS",  scoreField: "score", thresholds: [] },
     { name: "GARS", scoreField: "standard", thresholds: [] },
+    { name: "CARS", scoreField: "standard", thresholds: [] },
     { name: "SRS-2", scoreField: "t", thresholds: [] },
     { name: "Vineland-3", scoreField: "composite", thresholds: [] }, // <-- MUST exist
     { name: "ABAS-3", scoreField: "composite", thresholds: [] },
     { name: "WISC/WAIS/WPPSI", scoreField: "index", thresholds: [] },
+    { name: "BRIEF-2", scoreField: "t", thresholds: [] },
+    { name: "BDEFS", scoreField: "t", thresholds: [] },
     { name: "Sensory Profile 2", scoreField: "standard", thresholds: [] },
     { name: "CELF-5", scoreField: "index", thresholds: [] },
     { name: "AQ", scoreField: "raw", thresholds: [] },
