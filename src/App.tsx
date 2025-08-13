@@ -19,6 +19,7 @@ import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
 import { ReportPanel } from "./panels/ReportPanel";
 import { AssessmentPanel } from "./panels/AssessmentPanel";
+import { GenericInstrumentPanel } from "./panels/GenericInstrumentPanel";
 import { AiChat } from "./components/AiChat";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
@@ -110,6 +111,27 @@ export default function App() {
     { domain: "Sensory Assessment", options: ["Sensory profile 2"], selected: "Sensory profile 2", primary: true },
   ]);
 
+  const NAME_MAP: Record<string, string> = {
+    ABAS3: "ABAS-3",
+    Vineland: "Vineland-3",
+    MIGDAS: "MIGDAS-2",
+    ADOS: "ADOS-2",
+    BRIEF2: "BRIEF-2",
+    WISC: "WISC/WAIS/WPPSI",
+    WPPSI: "WISC/WAIS/WPPSI",
+    WAIS: "WISC/WAIS/WPPSI",
+    "Sensory profile 2": "Sensory Profile 2",
+    CELF5: "CELF-5",
+  };
+
+  const getSelectedNames = useCallback(
+    (domain: string) =>
+      assessments
+        .filter((a) => a.domain === domain && a.selected)
+        .map((a) => NAME_MAP[a.selected!] || a.selected!) ,
+    [assessments],
+  );
+
   const getInstrumentBand = useCallback(
     (name: string) => instruments.find((x) => x.name === name)?.band || "",
     [instruments],
@@ -122,6 +144,14 @@ export default function App() {
   const hasSrs = assessments.some((a) => a.selected === "SRS-2");
   const hasAbas = assessments.some((a) => a.selected === "ABAS3");
   const hasVineland = assessments.some((a) => a.selected?.startsWith("Vineland"));
+
+  const selectedAutismQs = getSelectedNames("Autism questionnaires");
+  const selectedAutismObs = getSelectedNames("Autism observations");
+  const selectedAutismInterviews = getSelectedNames("Autism interviews");
+  const selectedIntellectual = Array.from(new Set(getSelectedNames("Intellectual assessment")));
+  const selectedExecutive = getSelectedNames("Executive function questionnaires");
+  const selectedSensory = getSelectedNames("Sensory Assessment");
+  const selectedLanguage = getSelectedNames("Language assessment");
 
   // ---------- prior via age band ----------
   const [age, setAge] = useState(10);
@@ -341,6 +371,30 @@ export default function App() {
                       )}
                     </>
                   )}
+                  {selectedAutismQs.filter((n) => n !== "SRS-2").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedAutismQs.filter((n) => n !== "SRS-2")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
+                  {selectedAutismObs.filter((n) => n !== "MIGDAS-2").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedAutismObs.filter((n) => n !== "MIGDAS-2")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
+                  {selectedAutismInterviews.length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedAutismInterviews}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
                   {/* TODO: MIGDAS panel (presentational) */}
                 </>
               )}
@@ -388,19 +442,51 @@ export default function App() {
               )}
 
               {activeTab === 2 && (
-                <AssessmentPanel domain="Intellectual assessment" assessments={assessments} setAssessments={setAssessments} />
+                <>
+                  <AssessmentPanel domain="Intellectual assessment" assessments={assessments} setAssessments={setAssessments} />
+                  <GenericInstrumentPanel
+                    selected={selectedIntellectual}
+                    instruments={instruments}
+                    setInstruments={setInstruments}
+                    configs={config.defaultInstruments}
+                  />
+                </>
               )}
 
               {activeTab === 3 && (
-                <AssessmentPanel domain="Executive function questionnaires" assessments={assessments} setAssessments={setAssessments} />
+                <>
+                  <AssessmentPanel domain="Executive function questionnaires" assessments={assessments} setAssessments={setAssessments} />
+                  <GenericInstrumentPanel
+                    selected={selectedExecutive}
+                    instruments={instruments}
+                    setInstruments={setInstruments}
+                    configs={config.defaultInstruments}
+                  />
+                </>
               )}
 
               {activeTab === 4 && (
-                <AssessmentPanel domain="Sensory Assessment" assessments={assessments} setAssessments={setAssessments} />
+                <>
+                  <AssessmentPanel domain="Sensory Assessment" assessments={assessments} setAssessments={setAssessments} />
+                  <GenericInstrumentPanel
+                    selected={selectedSensory}
+                    instruments={instruments}
+                    setInstruments={setInstruments}
+                    configs={config.defaultInstruments}
+                  />
+                </>
               )}
 
               {activeTab === 5 && (
-                <AssessmentPanel domain="Language assessment" assessments={assessments} setAssessments={setAssessments} />
+                <>
+                  <AssessmentPanel domain="Language assessment" assessments={assessments} setAssessments={setAssessments} />
+                  <GenericInstrumentPanel
+                    selected={selectedLanguage}
+                    instruments={instruments}
+                    setInstruments={setInstruments}
+                    configs={config.defaultInstruments}
+                  />
+                </>
               )}
 
               {activeTab === 6 && <Card title="History / Observation">{/* TODO: HistoryPanel */}</Card>}
