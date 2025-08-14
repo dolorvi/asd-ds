@@ -100,7 +100,7 @@ export function useAsdEngine(
   }, [config.minDataset, instruments, srs2, srs2Teacher, asrs, asrsTeacher, abas, abasTeacher, migdas, history, observation]);
 
   /** ---------------- Evidence aggregation ---------------- */
-  const evidence = useMemo(() => {
+  const [evidence, sources] = useMemo(() => {
     const ev: Record<CriterionKey | AltKey, number> = {
       A1: 0,
       A2: 0,
@@ -109,75 +109,80 @@ export function useAsdEngine(
       B2: 0,
       B3: 0,
       B4: 0,
-      onsetEarly: history.earlyOnset ? 1 : 0,
-      impairment: history.crossContextImpairment ? 1 : 0,
-      masking: history.maskingIndicators ? 1 : 0,
-      langDisorder: (diff as any).DLD ? 1 : 0,
-      intellectualDisability: (diff as any).ID ? 1 : 0,
-      altTrauma: (diff as any).TraumaPTSD ? 1 : 0,
-      altADHD: (diff as any).ADHD ? 1 : 0,
-      altAnxiety: (diff as any).Anxiety || (diff as any).Depression ? 1 : 0,
-      altOther: (diff as any).FASD || (diff as any).Tics || !!(diff as any).Other ? 1 : 0,
+      onsetEarly: 0,
+      impairment: 0,
+      masking: 0,
+      langDisorder: 0,
+      intellectualDisability: 0,
+      altTrauma: 0,
+      altADHD: 0,
+      altAnxiety: 0,
+      altOther: 0,
+    };
+    const src: Record<string, Record<CriterionKey | AltKey, number>> = {};
+    const add = (s: string, k: keyof typeof ev, v: number) => {
+      ev[k] += v;
+      if (!src[s]) src[s] = {} as any;
+      (src[s][k] as number | undefined) = (src[s][k] ?? 0) + v;
     };
 
-    // Developmental history indicators
-    ev.A1 += history.earlySocial ? 0.6 : -0.2;
-    ev.A3 += history.earlyCommunication ? 0.6 : -0.2;
-    ev.B2 += history.earlyRRB ? 0.6 : -0.2;
-    if (history.regression) {
-      ev.A1 += 0.3;
-      ev.A3 += 0.3;
-    }
-    if (history.familyHistory) ev.onsetEarly += 0.2;
+    add("Early history", "onsetEarly", history.earlyOnset ? 1 : 0);
+    add("Early history", "impairment", history.crossContextImpairment ? 1 : 0);
+    add("Early history", "masking", history.maskingIndicators ? 1 : 0);
+    add("Differentials", "langDisorder", (diff as any).DLD ? 1 : 0);
+    add("Differentials", "intellectualDisability", (diff as any).ID ? 1 : 0);
+    add("Differentials", "altTrauma", (diff as any).TraumaPTSD ? 1 : 0);
+    add("Differentials", "altADHD", (diff as any).ADHD ? 1 : 0);
+    add("Differentials", "altAnxiety", (diff as any).Anxiety || (diff as any).Depression ? 1 : 0);
+    add("Differentials", "altOther", (diff as any).FASD || (diff as any).Tics || !!(diff as any).Other ? 1 : 0);
 
-    // Clinician observation (0..3 each)
+    add("Early history", "A1", history.earlySocial ? 0.6 : -0.2);
+    add("Early history", "A3", history.earlyCommunication ? 0.6 : -0.2);
+    add("Early history", "B2", history.earlyRRB ? 0.6 : -0.2);
+    if (history.regression) {
+      add("Early history", "A1", 0.3);
+      add("Early history", "A3", 0.3);
+    }
+    if (history.familyHistory) add("Early history", "onsetEarly", 0.2);
+
     (["A1", "A2", "A3", "B1", "B2", "B3", "B4"] as const).forEach((k) => {
       const v = Number(observation[k]);
-      if (!Number.isNaN(v)) (ev as any)[k] += v;
+      if (!Number.isNaN(v)) add("Observation", k, v);
     });
 
-    // SRS-2 domain severities → evidence via config maps (label-only)
-    const applySrs = (src: SeverityState) => {
+    const applySrs = (srcData: SeverityState) => {
       config.srs2Domains.forEach((d) => {
-        const sev = src[d.key]?.severity || "";
+        const sev = srcData[d.key]?.severity || "";
         const map = d.mapBySeverity[sev];
         if (!map) return;
-        Object.entries(map).forEach(([k, v]) => {
-          (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
-        });
+        Object.entries(map).forEach(([k, v]) => add("SRS-2", k as any, v as number));
       });
     };
     applySrs(srs2);
     applySrs(srs2Teacher);
 
-    const applyAsrs = (src: SeverityState) => {
+    const applyAsrs = (srcData: SeverityState) => {
       config.asrsDomains.forEach((d) => {
-        const sev = src[d.key]?.severity || "";
+        const sev = srcData[d.key]?.severity || "";
         const map = d.mapBySeverity[sev];
         if (!map) return;
-        Object.entries(map).forEach(([k, v]) => {
-          (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
-        });
+        Object.entries(map).forEach(([k, v]) => add("ASRS", k as any, v as number));
       });
     };
     applyAsrs(asrs);
     applyAsrs(asrsTeacher);
 
-    // ABAS-3 domain severities → impairment (label-only)
-    const applyAbas = (src: SeverityState) => {
+    const applyAbas = (srcData: SeverityState) => {
       config.abasDomains.forEach((d) => {
-        const sev = src[d.key]?.severity || "";
+        const sev = srcData[d.key]?.severity || "";
         const map = d.mapBySeverity[sev];
         if (!map) return;
-        Object.entries(map).forEach(([k, v]) => {
-          (ev as any)[k] = ((ev as any)[k] ?? 0) + (v as number);
-        });
+        Object.entries(map).forEach(([k, v]) => add("ABAS-3", k as any, v as number));
       });
     };
     applyAbas(abas);
     applyAbas(abasTeacher);
 
-    // Vineland-3 composite band → impairment delta (label-only) if no ABAS present
     const abasEntered =
       Object.values(abas).some((d) => !!d.severity) ||
       Object.values(abasTeacher).some((d) => !!d.severity);
@@ -187,26 +192,25 @@ export function useAsdEngine(
       );
       if (vineland?.band) {
         const delta = (VINELAND_IMPAIRMENT_MAP as any)[vineland.band];
-        if (typeof delta === "number") ev.impairment += delta;
+        if (typeof delta === "number") add("Vineland-3", "impairment", delta);
       }
     }
 
-    // MIGDAS qualitative → balanced push/pull across social/rrb
     if (migdas.consistency === "consistent") {
-      ev.A1 += 0.6;
-      ev.A2 += 0.6;
-      ev.A3 += 0.6;
-      ev.B2 += 0.6;
-      ev.B3 += 0.6;
+      add("MIGDAS-2", "A1", 0.6);
+      add("MIGDAS-2", "A2", 0.6);
+      add("MIGDAS-2", "A3", 0.6);
+      add("MIGDAS-2", "B2", 0.6);
+      add("MIGDAS-2", "B3", 0.6);
     } else if (migdas.consistency === "inconsistent") {
-      ev.A1 -= 0.4;
-      ev.A2 -= 0.4;
-      ev.A3 -= 0.4;
-      ev.B2 -= 0.3;
-      ev.B3 -= 0.3;
+      add("MIGDAS-2", "A1", -0.4);
+      add("MIGDAS-2", "A2", -0.4);
+      add("MIGDAS-2", "A3", -0.4);
+      add("MIGDAS-2", "B2", -0.3);
+      add("MIGDAS-2", "B3", -0.3);
     }
 
-    return ev;
+    return [ev, src] as const;
   }, [config.srs2Domains, config.asrsDomains, config.abasDomains, srs2, srs2Teacher, asrs, asrsTeacher, abas, abasTeacher, migdas, observation, history, diff, instruments]);
 
   /** ---------------- Likelihood model ---------------- */
@@ -228,12 +232,22 @@ export function useAsdEngine(
     const pB = Math.min(1, Math.max(0, B / (4 * 3)));
 
     const cut =
-      config.riskTolerance === "sensitive" ? 0.35 :
-      config.riskTolerance === "specific"  ? 0.70 :
+      config.riskTolerance === "sensitive" ? 0.40 :
+      config.riskTolerance === "specific"  ? 0.60 :
       0.50;
 
-    return { p, lp, pA, pB, cut, terms };
-  }, [config, evidence]);
+    const drivers = Object.entries(sources).map(([name, contrib]) => {
+      const prod = Object.entries(contrib).reduce(
+        (sum, [k, v]) => sum + v * (w as any)[k],
+        0
+      );
+      const lpWithout = lp - prod;
+      const pWithout = 1 / (1 + Math.exp(-lpWithout));
+      return { name, delta: (p - pWithout) * 100 };
+    }).sort((a,b) => b.delta - a.delta);
+
+    return { p, lp, pA, pB, cut, terms, drivers };
+  }, [config, evidence, sources]);
 
   /** ---------------- Support & recommendations ---------------- */
   const supportEstimate = useMemo(() => {

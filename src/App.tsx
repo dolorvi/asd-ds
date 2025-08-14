@@ -263,6 +263,10 @@ export default function App() {
     }, 0);
   };
 
+  const handleRiskToleranceChange = (v: any) => {
+    setConfig((c) => ({ ...c, riskTolerance: v }));
+  };
+
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {
     const s = JSON.stringify(DEFAULT_CONFIG);
@@ -623,6 +627,7 @@ export default function App() {
                   recommendation={recommendation}
                   exportSummary={exportSummary}
                   minDatasetItems={minDatasetItems}
+                  onRiskToleranceChange={handleRiskToleranceChange}
                 />
               </section>
             </div>
