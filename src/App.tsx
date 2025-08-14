@@ -617,6 +617,7 @@ export default function App() {
                   supportEstimate={supportEstimate}
                   recommendation={recommendation}
                   exportSummary={exportSummary}
+                  minDatasetItems={minDatasetItems}
                 />
               </section>
             </div>

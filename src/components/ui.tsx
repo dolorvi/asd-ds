@@ -50,11 +50,21 @@ export function Header({
           )}
         </div>
 
-        <div className="row row--wrap">
-          {onThemeToggle && <button className="btn" onClick={onThemeToggle}>{theme === "dark" ? "Day" : "Night"}</button>}
-          {onDevToggle && <button className="btn" onClick={onDevToggle}>Dev</button>}
-          {onExportSummary && <button className="btn" onClick={onExportSummary}>Export summary</button>}
-          {onExportFull && <button className="btn btn--accent" onClick={onExportFull}>Export (full)</button>}
+        <div className="toolbar">
+          {onThemeToggle && (
+            <button className="btn btn--sm" onClick={onThemeToggle}>
+              {theme === "dark" ? "Day" : "Night"}
+            </button>
+          )}
+          {onDevToggle && (
+            <button className="btn btn--sm" onClick={onDevToggle}>Dev</button>
+          )}
+          {onExportSummary && (
+            <button className="btn btn--sm" onClick={onExportSummary}>Export summary</button>
+          )}
+          {onExportFull && (
+            <button className="btn btn--accent" onClick={onExportFull}>Export (full)</button>
+          )}
         </div>
       </div>
     </div>

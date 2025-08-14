@@ -84,6 +84,8 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .btn:hover{box-shadow:var(--shadow-2)}
 .btn--accent{background:var(--accent);border-color:transparent;color:#fff}
 .btn--accent:hover{filter:brightness(1.05)}
+.btn--sm{height:28px;padding:0 8px;font-size:12px}
+.toolbar{display:flex;gap:4px;flex-wrap:wrap}
 
 .tabbar{display:flex;gap:16px;flex-wrap:wrap}
 .tab{border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:6px 12px;font-weight:500;color:var(--muted);transition:background-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
