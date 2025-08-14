@@ -75,3 +75,38 @@ export type ClientProfile = {
   name: string;
   age: string;
 };
+
+export type SeverityLevel = "severe" | "moderate" | "typical";
+
+export type WeightDelta = {
+  severe: number;
+  moderate: number;
+  typical: number;
+};
+
+export type WeightDirection = "high" | "low";
+
+export type WeightDomain = {
+  name: string;
+  direction: WeightDirection;
+  delta_pct: WeightDelta;
+};
+
+export type InstrumentWeight = {
+  cap_pct: number;
+  subscales?: WeightDomain[];
+  quadrants?: WeightDomain[];
+  modalities?: WeightDomain[];
+  rules?: WeightDomain[];
+};
+
+export type GlobalWeight = {
+  max_positive_from_instruments_pct: number;
+  max_positive_from_history_context_pct: number;
+  max_negative_from_differentials_pct: number;
+};
+
+export type ASDWeightConfig = {
+  global: GlobalWeight;
+  instruments: Record<string, InstrumentWeight>;
+};
