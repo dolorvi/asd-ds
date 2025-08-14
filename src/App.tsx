@@ -33,6 +33,8 @@ import { ReportPanel } from "./panels/ReportPanel";
 import { AssessmentPanel } from "./panels/AssessmentPanel";
 import { GenericInstrumentPanel } from "./panels/GenericInstrumentPanel";
 import { DomainPanel } from "./panels/DomainPanel";
+import { HistoryPanel } from "./panels/HistoryPanel";
+import { DiffPanel } from "./panels/DiffPanel";
 import { AiChat } from "./components/AiChat";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
@@ -84,7 +86,12 @@ export default function App() {
   const [history, setHistory] = useState({
     developmentalConcerns: "",
     earlyOnset: false,
+    earlySocial: false,
+    earlyCommunication: false,
+    earlyRRB: false,
+    regression: false,
     crossContextImpairment: false,
+    familyHistory: false,
     maskingIndicators: false,
   });
 
@@ -577,9 +584,16 @@ export default function App() {
                 </>
               )}
 
-              {activeTab === 6 && <Card title="History / Observation">{/* TODO: HistoryPanel */}</Card>}
+              {activeTab === 6 && (
+                <HistoryPanel
+                  history={history}
+                  setHistory={setHistory}
+                  observation={observation}
+                  setObservation={setObservation}
+                />
+              )}
 
-              {activeTab === 7 && <Card title="Comorbidity / Differential">{/* TODO: DiffPanel */}</Card>}
+              {activeTab === 7 && <DiffPanel diff={diff} setDiff={setDiff} />}
 
               {activeTab === 8 && (
                 <ReportPanel
