@@ -75,10 +75,12 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .topbar .title{font-size:16px;margin:0 0 2px 0}
 .topbar .subtitle{color:var(--muted);font-size:12px}
 
-.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-1);padding:20px;transition:box-shadow var(--t-fast) var(--ease)}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-1);padding:12px;transition:box-shadow var(--t-fast) var(--ease)}
 .card:hover{box-shadow:var(--shadow-2)}
 .card__bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.section-title{font-size:16px;font-weight:700;color:var(--text);margin:0 0 4px 0;text-decoration:underline}
+.section-title{font-size:16px;font-weight:700;color:var(--text);margin:0 0 4px 0;text-decoration:none;text-transform:capitalize}
+.card-title{font-size:14px;font-weight:600;color:var(--text);margin:0 0 4px 0}
+.helper-text{font-size:12px;color:var(--muted);margin:0 0 12px 0}
 
 .btn{height:34px;padding:0 12px;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;box-shadow:var(--shadow-1)}
 .btn:hover{box-shadow:var(--shadow-2)}
@@ -100,14 +102,14 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .badge--danger{background:var(--tone-danger);border:1px solid color-mix(in hsl, var(--tone-danger) 60%, black 40%)}
 
 /* assessment picker & cards */
-.assessment-add-row{display:grid;gap:4px;background:color-mix(in hsl,var(--accent) 14%,transparent);border:1px solid var(--accent);border-radius:10px;padding:8px 12px}
+.assessment-add-row{display:grid;gap:4px;background:color-mix(in hsl,var(--accent) 14%,transparent);border:1px solid var(--accent);border-radius:12px;padding:12px}
 .assessment-add-row input,.assessment-add-row select{background:transparent;border:none;width:100%}
 .assessment-divider{margin:12px 0;border:none;border-top:1px solid var(--border)}
-.assessment-card{background:var(--elev);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-1);padding:12px}
+.assessment-card{background:var(--elev);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-1);padding:12px}
 .assessment-card__header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .assessment-card__body{margin-bottom:8px}
 .assessment-card__footer{text-align:right}
-.assessment-placeholder{padding:16px;border:2px dashed var(--border);border-radius:10px;text-align:center;color:var(--muted)}
+.assessment-placeholder{padding:12px;border:2px dashed var(--border);border-radius:12px;text-align:center;color:var(--muted)}
 .text-danger{color:color-mix(in hsl,var(--tone-danger) 60%,black 40%)}
 
 /* progress bar */

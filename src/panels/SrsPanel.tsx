@@ -21,7 +21,7 @@ export function SrsPanel({
           return (
             <section key={d.key} className="card">
               <div className="stack stack--sm">
-                <div className="section-title">{d.label}</div>
+                <div className="card-title">{d.label}</div>
                 <label>
                   <select
                     value={sel}

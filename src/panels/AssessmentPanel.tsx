@@ -62,7 +62,7 @@ export function AssessmentPanel({
 
   return (
     <Card title={domain}>
-      <div className="stack stack--sm">
+      <div className="stack stack--lg">
         <div className="assessment-add-row">
           <input
             type="text"
@@ -99,19 +99,19 @@ export function AssessmentPanel({
             ))}
           </select>
         </div>
-        <p className={`small${pickerError ? " text-danger" : ""}`}>
+        <p className={`helper-text${pickerError ? " text-danger" : ""}`}>
           {pickerError || "Choose a tool to add it below."}
         </p>
         <hr className="assessment-divider" />
         {items.length === 0 && (
           <div className="assessment-placeholder">
-            No assessments added — select one above to get started.
+            No assessments added — select one above.
           </div>
         )}
         {items.map((a) => (
           <div key={a.index} className="assessment-card">
             <div className="assessment-card__header">
-              <span>{a.selected || "Select"}</span>
+              <span className="card-title">{a.selected || "Select"}</span>
               <button
                 type="button"
                 className={`badge${a.primary ? " badge--ok" : ""}`}
