@@ -7,9 +7,22 @@ const CATEGORY_MAP: Record<string, string> = {
   "Autism interviews": "Interview",
   "Adaptive questionnaires": "Adaptive",
   "Executive function questionnaires": "Executive",
+  "Intellectual assessment": "Intellectual",
+  "Language assessment": "Language",
+  "Sensory Assessment": "Sensory",
 };
 
-const FILTERS = ["All", "Questionnaires", "Observation", "Interview", "Adaptive", "Executive"] as const;
+const FILTERS = [
+  "All",
+  "Questionnaires",
+  "Observation",
+  "Interview",
+  "Adaptive",
+  "Executive",
+  "Intellectual",
+  "Language",
+  "Sensory",
+] as const;
 
 const PRESETS: Record<string, string[]> = {
   core: ["SRS-2", "ADOS", "ADI-R", "Vineland"],
