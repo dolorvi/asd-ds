@@ -18,6 +18,7 @@ import {
   BRIEF2_DOMAINS,
   SENSORY_PROFILE_DOMAINS,
   CELF5_DOMAINS,
+  FASD_NEURO_DOMAINS,
 } from "./data/testData";
 import type { Config, SeverityState, Condition, AssessmentSelection, ClientProfile } from "./types";
 
@@ -35,6 +36,7 @@ import { DomainPanel } from "./panels/DomainPanel";
 import { HistoryPanel } from "./panels/HistoryPanel";
 import { DiffPanel } from "./panels/DiffPanel";
 import { AiChat } from "./components/AiChat";
+import { FasdPanel } from "./panels/FasdPanel";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -78,6 +80,7 @@ export default function App() {
   const [brief, setBRIEF] = useState<SeverityState>(() => initSeverityState(BRIEF2_DOMAINS));
   const [sensory, setSensory] = useState<SeverityState>(() => initSeverityState(SENSORY_PROFILE_DOMAINS));
   const [celf, setCELF] = useState<SeverityState>(() => initSeverityState(CELF5_DOMAINS));
+  const [fasdNeuro, setFasdNeuro] = useState<SeverityState>(() => initSeverityState(FASD_NEURO_DOMAINS));
 
   const [migdas, setMIGDAS] = useState({
     consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
@@ -674,8 +677,14 @@ export default function App() {
               </section>
             </div>
           </>
+        ) : condition === "FASD" ? (
+          <div className="stack stack--lg">
+            <FasdPanel valueMap={fasdNeuro} setValueMap={setFasdNeuro} />
+          </div>
         ) : (
-          <Card title={`${condition} assessments`}>Assessments for {condition} will be added soon.</Card>
+          <Card title={`${condition} assessments`}>
+            Assessments for {condition} will be added soon.
+          </Card>
         )}
 
         <Footer version={VERSION} ruleHash={ruleHash} />
