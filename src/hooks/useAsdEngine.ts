@@ -17,12 +17,12 @@ export function useAsdEngine(
     developmentalConcerns: string;
     earlyOnset: boolean;
     earlySocial: boolean;
-    earlyCommunication: boolean;
     earlyRRB: boolean;
     regression: boolean;
     crossContextImpairment: boolean;
     familyHistory: boolean;
     maskingIndicators: boolean;
+    verbalFluency: string;
   },
   observation: Record<CriterionKey | "notes", any>,
   diff: Record<string, boolean | unknown>,
@@ -129,15 +129,14 @@ export function useAsdEngine(
     add("Early history", "onsetEarly", history.earlyOnset ? 1 : 0);
     add("Early history", "impairment", history.crossContextImpairment ? 1 : 0);
     add("Early history", "masking", history.maskingIndicators ? 1 : 0);
-    add("Differentials", "langDisorder", (diff as any).DLD ? 1 : 0);
-    add("Differentials", "intellectualDisability", (diff as any).ID ? 1 : 0);
-    add("Differentials", "altTrauma", (diff as any).TraumaPTSD ? 1 : 0);
-    add("Differentials", "altADHD", (diff as any).ADHD ? 1 : 0);
-    add("Differentials", "altAnxiety", (diff as any).Anxiety || (diff as any).Depression ? 1 : 0);
-    add("Differentials", "altOther", (diff as any).FASD || (diff as any).Tics || !!(diff as any).Other ? 1 : 0);
+    add("Differentials", "langDisorder", (diff as any).languageDisorder ? 1 : 0);
+    add("Differentials", "intellectualDisability", (diff as any).globalID ? 1 : 0);
+    add("Differentials", "altTrauma", (diff as any).trauma ? 1 : 0);
+    add("Differentials", "altADHD", (diff as any).adhdFeatures ? 1 : 0);
+    add("Differentials", "altAnxiety", (diff as any).anxietyPrimary ? 1 : 0);
+    add("Differentials", "altOther", (diff as any).ocdFeatures ? 1 : 0);
 
     add("Early history", "A1", history.earlySocial ? 0.6 : -0.2);
-    add("Early history", "A3", history.earlyCommunication ? 0.6 : -0.2);
     add("Early history", "B2", history.earlyRRB ? 0.6 : -0.2);
     if (history.regression) {
       add("Early history", "A1", 0.3);

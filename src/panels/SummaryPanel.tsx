@@ -9,6 +9,7 @@ export function SummaryPanel({
   exportSummary,
   minDatasetItems,
   onRiskToleranceChange,
+  history,
 }:{
   model: any;
   config: any;
@@ -17,6 +18,7 @@ export function SummaryPanel({
   exportSummary: () => void;
   minDatasetItems: MinDatasetItem[];
   onRiskToleranceChange: (v: any) => void;
+  history: { maskingIndicators: boolean; verbalFluency: string };
 }) {
   const handleExport = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value;
@@ -80,6 +82,19 @@ export function SummaryPanel({
             <div className="card" style={{textAlign:"center",flex:1}}>{supportEstimate}</div>
             <span className="badge">{confidence} confidence</span>
           </div>
+          {(history.maskingIndicators || history.verbalFluency) && (
+            <div className="chip-row">
+              {history.maskingIndicators && (
+                <span className="chip chip--active">Masking</span>
+              )}
+              {history.verbalFluency && (
+                <span className="chip chip--active">{history.verbalFluency}</span>
+              )}
+            </div>
+          )}
+          {history.maskingIndicators && (
+            <div className="small">Weights adjusted for masking</div>
+          )}
           {drivers.length > 0 && (
             <div>
               <div className="small">Top contributors</div>

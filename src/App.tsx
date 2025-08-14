@@ -88,12 +88,12 @@ export default function App() {
     developmentalConcerns: "",
     earlyOnset: false,
     earlySocial: false,
-    earlyCommunication: false,
     earlyRRB: false,
     regression: false,
     crossContextImpairment: false,
     familyHistory: false,
     maskingIndicators: false,
+    verbalFluency: "",
   });
 
   const [observation, setObservation] = useState({
@@ -108,15 +108,12 @@ export default function App() {
   });
 
   const [diff, setDiff] = useState({
-    ADHD: false,
-    DLD: false,
-    ID: false,
-    Anxiety: false,
-    Depression: false,
-    TraumaPTSD: false,
-    FASD: false,
-    Tics: false,
-    Other: "",
+    adhdFeatures: false,
+    languageDisorder: false,
+    globalID: false,
+    anxietyPrimary: false,
+    ocdFeatures: false,
+    trauma: false,
   });
 
   const [clinician, setClinician] = useState({
@@ -628,6 +625,7 @@ export default function App() {
                   exportSummary={exportSummary}
                   minDatasetItems={minDatasetItems}
                   onRiskToleranceChange={handleRiskToleranceChange}
+                  history={history}
                 />
               </section>
             </div>
