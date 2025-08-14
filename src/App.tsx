@@ -19,7 +19,7 @@ import {
   SENSORY_PROFILE_DOMAINS,
   CELF5_DOMAINS,
 } from "./data/testData";
-import type { Config, SeverityState, Condition, AssessmentSelection } from "./types";
+import type { Config, SeverityState, Condition, AssessmentSelection, ClientProfile } from "./types";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -123,6 +123,14 @@ export default function App() {
     date: new Date().toISOString().slice(0, 10),
     attested: false,
   });
+
+  const [client, setClient] = useState<ClientProfile>({ name: "", age: "" });
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("clientProfile");
+      if (stored) setClient(JSON.parse(stored));
+    }
+  }, []);
 
   const [reportVoice, setReportVoice] = useState<"clinical" | "dual">("dual");
 
@@ -610,6 +618,8 @@ export default function App() {
                   assessments={assessments}
                   history={history}
                   config={config}
+                  client={client}
+                  setClient={setClient}
                 />
               )}
             </section>

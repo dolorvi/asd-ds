@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
-import type { SeverityState, Config, AssessmentSelection } from "../types";
-import { Card } from "../components/primitives";
+import type { SeverityState, Config, AssessmentSelection, ClientProfile } from "../types";
+import { Card, Row } from "../components/primitives";
+import { ASSESSMENT_INFO } from "../data/assessmentInfo";
 
 export function ReportPanel({
   model,
@@ -16,6 +17,8 @@ export function ReportPanel({
   assessments,
   history,
   config,
+  client,
+  setClient,
 }:{
   model: { p:number; cut:number };
   supportEstimate: string;
@@ -30,53 +33,78 @@ export function ReportPanel({
   assessments: AssessmentSelection[];
   history: { earlyOnset: boolean };
   config: Config;
+  client: ClientProfile;
+  setClient: React.Dispatch<React.SetStateAction<ClientProfile>>;
 }){
   const report = useMemo(() => {
-    const has = (obj: SeverityState) => Object.values(obj).some(d => !!d.severity);
-    const testSet = new Set<string>();
+    const has = (obj: SeverityState) => Object.values(obj).some((d) => !!d.severity);
+    const lines: string[] = [];
+
+    const formatDomains = (domains: { key: string; label: string }[], data: SeverityState) =>
+      domains
+        .map((d) => {
+          const entry = data[d.key];
+          if (!entry || (!entry.severity && entry.score === undefined)) return null;
+          const score = entry.score !== undefined ? ` (${entry.score})` : "";
+          return `${d.label}: ${entry.severity}${score}`;
+        })
+        .filter(Boolean)
+        .join(", ");
+
     const srsParent = has(srs2);
     const srsTeach = has(srs2Teacher);
     if (srsParent || srsTeach) {
-      const parts: string[] = [];
-      if (srsParent) parts.push("parent");
-      if (srsTeach) parts.push("teacher");
-      testSet.add(`SRS-2${parts.length ? ` (${parts.join(" & ")})` : ""}`);
+      const details: string[] = [];
+      if (srsParent) details.push(`Parent - ${formatDomains(config.srs2Domains, srs2)}`);
+      if (srsTeach) details.push(`Teacher - ${formatDomains(config.srs2Domains, srs2Teacher)}`);
+      lines.push(`${ASSESSMENT_INFO.srs2.name}: ${details.join(" | ")}`);
     }
+
     const asrsParent = has(asrs);
     const asrsTeach = has(asrsTeacher);
     if (asrsParent || asrsTeach) {
-      const parts: string[] = [];
-      if (asrsParent) parts.push("parent");
-      if (asrsTeach) parts.push("teacher");
-      testSet.add(`ASRS${parts.length ? ` (${parts.join(" & ")})` : ""}`);
+      const details: string[] = [];
+      if (asrsParent) details.push(`Parent - ${formatDomains(config.asrsDomains, asrs)}`);
+      if (asrsTeach) details.push(`Teacher - ${formatDomains(config.asrsDomains, asrsTeacher)}`);
+      lines.push(`${ASSESSMENT_INFO.asrs.name}: ${details.join(" | ")}`);
     }
+
     const abasParent = has(abas);
     const abasTeach = has(abasTeacher);
     if (abasParent || abasTeach) {
-      const parts: string[] = [];
-      if (abasParent) parts.push("parent");
-      if (abasTeach) parts.push("teacher");
-      testSet.add(`ABAS-3${parts.length ? ` (${parts.join(" & ")})` : ""}`);
+      const details: string[] = [];
+      if (abasParent) details.push(`Parent - ${formatDomains(config.abasDomains, abas)}`);
+      if (abasTeach) details.push(`Teacher - ${formatDomains(config.abasDomains, abasTeacher)}`);
+      lines.push(`${ASSESSMENT_INFO.abas3.name}: ${details.join(" | ")}`);
     }
-    if (migdas.consistency !== "unclear") testSet.add("MIGDAS-2");
-    instruments.forEach(i => {
+
+    if (migdas.consistency !== "unclear")
+      lines.push(`${ASSESSMENT_INFO.migdas2.name}: Consistency ${migdas.consistency}`);
+
+    instruments.forEach((i) => {
       if (i.name === "Vineland-3" && (abasParent || abasTeach)) return;
       if (i.name === "ASRS" && (asrsParent || asrsTeach)) return;
-      if (i.value !== undefined || (i.band && i.band.trim() !== "")) testSet.add(i.name);
+      if (i.value !== undefined || (i.band && i.band.trim() !== ""))
+        lines.push(`${i.name}: ${i.value !== undefined ? i.value : i.band}`);
     });
-    assessments.forEach(a => { if (a.selected) testSet.add(a.selected); });
-    const testList = Array.from(testSet).join(", ");
-    const presence = model.p >= model.cut
-      ? "indicate the presence of Autism symptoms"
-      : "do not indicate Autism symptoms";
+
+    assessments.forEach((a) => {
+      if (a.selected) lines.push(a.selected);
+    });
+
+    const testList = lines.map((l) => l.split(":")[0]).join(", ");
+    const presence =
+      model.p >= model.cut
+        ? "indicate the presence of Autism symptoms"
+        : "do not indicate Autism symptoms";
     let support = "Support needs cannot be determined";
     if (supportEstimate.includes("High")) support = "The need for support is high";
     else if (supportEstimate.includes("Moderate")) support = "The need for support is moderate";
     else if (supportEstimate.includes("Lower")) support = "The need for support is low";
     const impactedKeys = new Set<string>();
-    config.abasDomains.forEach(d => {
+    config.abasDomains.forEach((d) => {
       const sev = abas[d.key]?.severity || abasTeacher[d.key]?.severity || "";
-      if (sev && ["Extremely Low","Very Low","Low Average"].includes(sev)) {
+      if (sev && ["Extremely Low", "Very Low", "Low Average"].includes(sev)) {
         impactedKeys.add(d.label);
       }
     });
@@ -90,14 +118,68 @@ export function ReportPanel({
       : "";
     const contextNote =
       " Clinical interpretation should consider developmental history and individual context.";
-    return testList
-      ? `${early}Multiple tests completed including the ${testList} ${presence}. ${support}${impactText}.${difficultyText}${contextNote}`
+    const assessmentsText = lines.length
+      ? `Assessments:\n${lines.map((l) => `- ${l}`).join("\n")}\n\n`
+      : "";
+    const intro = client.name || client.age ? `${client.name || "Client"}, Age ${client.age || "N/A"}\n\n` : "";
+    const summary = testList
+      ? `${early}Multiple tests completed including ${testList} ${presence}. ${support}${impactText}.${difficultyText}${contextNote}`
       : "Insufficient data for report.";
-  }, [model, supportEstimate, srs2, srs2Teacher, asrs, asrsTeacher, abas, abasTeacher, migdas, instruments, assessments, history, config.abasDomains]);
+    return `${intro}${assessmentsText}${summary}`;
+  }, [
+    model,
+    supportEstimate,
+    srs2,
+    srs2Teacher,
+    asrs,
+    asrsTeacher,
+    abas,
+    abasTeacher,
+    migdas,
+    instruments,
+    assessments,
+    history,
+    config.srs2Domains,
+    config.asrsDomains,
+    config.abasDomains,
+    client,
+  ]);
+
+  const saveProfile = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("clientProfile", JSON.stringify(client));
+    }
+  };
 
   return (
-    <Card title="Report (preview)">
-      <p>{report}</p>
-    </Card>
+    <>
+      <Card title="Client">
+        <div className="stack stack--sm">
+          <label>
+            Name
+            <input
+              value={client.name}
+              onChange={(e) => setClient({ ...client, name: e.target.value })}
+            />
+          </label>
+          <label>
+            Age
+            <input
+              type="number"
+              value={client.age}
+              onChange={(e) => setClient({ ...client, age: e.target.value })}
+            />
+          </label>
+          <Row>
+            <button type="button" className="btn" onClick={saveProfile}>
+              Save Profile
+            </button>
+          </Row>
+        </div>
+      </Card>
+      <Card title="Report (preview)">
+        <pre style={{ whiteSpace: "pre-wrap" }}>{report}</pre>
+      </Card>
+    </>
   );
 }

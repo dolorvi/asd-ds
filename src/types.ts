@@ -70,3 +70,8 @@ export type AssessmentSelection = {
   selected?: string;
   primary?: boolean;
 };
+
+export type ClientProfile = {
+  name: string;
+  age: string;
+};
