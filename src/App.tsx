@@ -21,7 +21,7 @@ import {
 } from "./data/testData";
 import type { Config, SeverityState, Condition, AssessmentSelection, ClientProfile } from "./types";
 
-import { Header, Footer } from "./components/ui";
+import { Header, Footer, ConditionSelector } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
 import { MinDatasetProgress } from "./components/MinDatasetProgress";
 import { SrsPanel } from "./panels/SrsPanel";
@@ -132,6 +132,12 @@ export default function App() {
     }
   }, []);
 
+  const saveClientProfile = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("clientProfile", JSON.stringify(client));
+    }
+  };
+
   const [reportVoice, setReportVoice] = useState<"clinical" | "dual">("dual");
 
   // ---------- instruments ----------
@@ -195,7 +201,7 @@ export default function App() {
   const selectedLanguage = getSelectedNames("Language assessment");
 
   // ---------- prior via age band ----------
-  const [age, setAge] = useState(10);
+  const age = Number(client.age) || 0;
   const [ageBand, setAgeBand] = useState<AgeBandKey>(DEFAULT_AGE_BAND);
   const [autoPrior, setAutoPrior] = useState(true);
   useEffect(() => {
@@ -289,28 +295,36 @@ export default function App() {
         onDevToggle={() => setDevOpen((v) => !v)}
         onExportSummary={exportSummary}
         onExportFull={exportFull}
-        condition={condition}
-        onConditionChange={setCondition}
         version={VERSION}
         timestamp={exportTimestamp}
       />
+      <ConditionSelector condition={condition} onChange={setCondition} />
+      <Card title="Client">
+        <div className="row row--wrap" style={{ gap: 8 }}>
+          <label style={{ flex: 1 }}>
+            Name
+            <input
+              value={client.name}
+              onChange={(e) => setClient({ ...client, name: e.target.value })}
+            />
+          </label>
+          <label style={{ width: 100 }}>
+            Age
+            <input
+              type="number"
+              value={client.age}
+              onChange={(e) => setClient({ ...client, age: e.target.value })}
+            />
+          </label>
+          <button type="button" className="btn" onClick={saveClientProfile}>
+            Save
+          </button>
+        </div>
+      </Card>
 
       {condition === "ASD" ? (
         <>
           <div className="stack stack--lg">
-            <Card>
-              <label className="row row--center" style={{ gap: 8 }}>
-                Age
-                <input
-                  type="number"
-                  value={age}
-                  min={0}
-                  onChange={(e) => setAge(Number(e.target.value))}
-                  style={{ width: 60 }}
-                />
-              </label>
-            </Card>
-
             {devOpen && (
               <Card>
                 <div className="row">
@@ -392,7 +406,6 @@ export default function App() {
                       setAssessments={setAssessments}
                     />
                   </div>
-                  <AssessmentPanel domain="Autism observations" assessments={assessments} setAssessments={setAssessments} />
                   <AssessmentPanel domain="Autism interviews" assessments={assessments} setAssessments={setAssessments} />
                   {hasSrs && (
                     <>
@@ -592,14 +605,21 @@ export default function App() {
               )}
 
               {activeTab === 6 && (
-                <div id="history-section">
-                  <HistoryPanel
-                    history={history}
-                    setHistory={setHistory}
-                    observation={observation}
-                    setObservation={setObservation}
+                <>
+                  <AssessmentPanel
+                    domain="Autism observations"
+                    assessments={assessments}
+                    setAssessments={setAssessments}
                   />
-                </div>
+                  <div id="history-section">
+                    <HistoryPanel
+                      history={history}
+                      setHistory={setHistory}
+                      observation={observation}
+                      setObservation={setObservation}
+                    />
+                  </div>
+                </>
               )}
 
               {activeTab === 7 && <DiffPanel diff={diff} setDiff={setDiff} />}
@@ -620,7 +640,6 @@ export default function App() {
                   history={history}
                   config={config}
                   client={client}
-                  setClient={setClient}
                 />
               )}
             </section>

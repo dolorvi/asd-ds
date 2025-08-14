@@ -10,18 +10,8 @@ export type HeaderProps = {
   onExportSummary?: () => void;
   onThemeToggle?: () => void;
   theme?: "dark" | "light";
-  condition?: Condition;
-  onConditionChange?: (c: Condition) => void;
   version: string;
   timestamp: string;
-};
-
-const CONDITIONS: Condition[] = ["ASD", "ADHD", "ID", "FASD"];
-const CONDITION_TITLES: Record<Condition, string> = {
-  ASD: "Autism Spectrum Disorder",
-  ADHD: "Attention-Deficit/Hyperactivity Disorder",
-  ID: "Intellectual Disability",
-  FASD: "Fetal Alcohol Spectrum Disorder",
 };
 
 export function Header({
@@ -32,35 +22,16 @@ export function Header({
   onExportSummary,
   onThemeToggle,
   theme = "dark",
-  condition,
-  onConditionChange,
   version,
   timestamp,
 }: HeaderProps) {
   return (
-    <div className="topbar">
+    <header className="topbar">
       <div className="row row--between row--center row--wrap">
         <div className="stack stack--sm">
           <h1 className="title">{title}</h1>
           {subtitle ? <div className="subtitle">{subtitle}</div> : null}
           <div className="print-only small">Generated {timestamp} • Version {version}</div>
-
-          {onConditionChange && (
-            <div className="row row--wrap">
-              {CONDITIONS.map((c) => (
-                <button
-                  key={c}
-                  className={`chip ${condition === c ? "chip--active" : ""}`}
-                  onClick={() => onConditionChange(c)}
-                  title={CONDITION_TITLES[c]}
-                  aria-label={CONDITION_TITLES[c]}
-                  aria-pressed={condition === c}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className="toolbar">
@@ -80,6 +51,42 @@ export function Header({
           )}
         </div>
       </div>
+    </header>
+  );
+}
+
+const CONDITIONS: Condition[] = ["ASD", "ADHD", "ID", "FASD"];
+const CONDITION_TITLES: Record<Condition, string> = {
+  ASD: "Autism Spectrum Disorder",
+  ADHD: "Attention-Deficit/Hyperactivity Disorder",
+  ID: "Intellectual Disability",
+  FASD: "Fetal Alcohol Spectrum Disorder",
+};
+
+export function ConditionSelector({
+  condition,
+  onChange,
+}: {
+  condition: Condition;
+  onChange: (c: Condition) => void;
+}) {
+  return (
+    <div
+      className="row row--wrap"
+      style={{ justifyContent: "center", gap: 8, margin: "8px 0" }}
+    >
+      {CONDITIONS.map((c) => (
+        <button
+          key={c}
+          className={`chip ${condition === c ? "chip--active" : ""}`}
+          onClick={() => onChange(c)}
+          title={CONDITION_TITLES[c]}
+          aria-label={CONDITION_TITLES[c]}
+          aria-pressed={condition === c}
+        >
+          {c}
+        </button>
+      ))}
     </div>
   );
 }
