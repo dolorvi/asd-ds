@@ -16,7 +16,12 @@ export function useAsdEngine(
   history: {
     developmentalConcerns: string;
     earlyOnset: boolean;
+    earlySocial: boolean;
+    earlyCommunication: boolean;
+    earlyRRB: boolean;
+    regression: boolean;
     crossContextImpairment: boolean;
+    familyHistory: boolean;
     maskingIndicators: boolean;
   },
   observation: Record<CriterionKey | "notes", any>,
@@ -114,6 +119,16 @@ export function useAsdEngine(
       altAnxiety: (diff as any).Anxiety || (diff as any).Depression ? 1 : 0,
       altOther: (diff as any).FASD || (diff as any).Tics || !!(diff as any).Other ? 1 : 0,
     };
+
+    // Developmental history indicators
+    ev.A1 += history.earlySocial ? 0.6 : -0.2;
+    ev.A3 += history.earlyCommunication ? 0.6 : -0.2;
+    ev.B2 += history.earlyRRB ? 0.6 : -0.2;
+    if (history.regression) {
+      ev.A1 += 0.3;
+      ev.A3 += 0.3;
+    }
+    if (history.familyHistory) ev.onsetEarly += 0.2;
 
     // Clinician observation (0..3 each)
     (["A1", "A2", "A3", "B1", "B2", "B3", "B4"] as const).forEach((k) => {
