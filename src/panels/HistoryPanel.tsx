@@ -37,7 +37,7 @@ export function HistoryPanel({
               checked={history.earlyOnset}
               onChange={(e) => updateHistory("earlyOnset", e.target.checked)}
             />
-            Onset <3y
+            Onset {'<'}3y
           </label>
           <label>
             <input
