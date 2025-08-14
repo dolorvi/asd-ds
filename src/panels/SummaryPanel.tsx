@@ -35,11 +35,6 @@ export function SummaryPanel({
   const met = minDatasetItems.filter((i) => i.met).length;
   const unmet = minDatasetItems.filter((i) => !i.met);
   const percent = Math.round((met / minDatasetItems.length) * 100);
-  const scrollTo = (id?: string) => {
-    if (!id) return;
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
 
   const drivers = (model.drivers || []).slice(0,3);
   const suggestionFor = (label: string) => {
@@ -117,21 +112,6 @@ export function SummaryPanel({
               <div>Minimum dataset</div>
               <div>{percent}%</div>
             </div>
-            {unmet.length > 0 && (
-              <div className="chip-row">
-                {unmet.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    className="chip"
-                    onClick={() => scrollTo(item.targetId)}
-                    aria-label={item.label}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
           {suggestions.length > 0 && (
             <div className="small">
