@@ -72,8 +72,8 @@ export function Header({
 }
 
 /* -------------------- Card -------------------- */
-export function Card({ title, right, children }:{
-  title?: string; right?: React.ReactNode; children: React.ReactNode;
+export function Card({ title, right, helper, children }:{
+  title?: string; right?: React.ReactNode; helper?: string; children: React.ReactNode;
 }) {
   return (
     <section className="card">
@@ -83,6 +83,7 @@ export function Card({ title, right, children }:{
           {right}
         </div>
       )}
+      {helper && <p className="helper-text">{helper}</p>}
       {children}
     </section>
   );

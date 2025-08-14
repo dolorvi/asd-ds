@@ -28,7 +28,7 @@ export function HistoryPanel({
     setObservation((o: any) => ({ ...o, [k]: v }));
 
   return (
-    <div className="stack stack--md">
+    <div className="stack stack--lg">
       <Card title="History quick checklist">
         <div className="stack stack--sm">
           <label>
@@ -85,7 +85,7 @@ export function HistoryPanel({
       <Card title="Developmental History">
         <div className="stack stack--sm">
           <label>
-            <div className="section-title">Developmental concerns</div>
+            <div className="card-title">Developmental concerns</div>
             <textarea
               value={history.developmentalConcerns}
               onChange={(e) => updateHistory("developmentalConcerns", e.target.value)}
@@ -100,7 +100,7 @@ export function HistoryPanel({
             Masking indicators
           </label>
           <label className="stack stack--xs">
-            <div className="section-title">Verbal fluency</div>
+            <div className="card-title">Verbal fluency</div>
             <select
               value={history.verbalFluency}
               onChange={(e) => updateHistory("verbalFluency", e.target.value)}
@@ -116,11 +116,11 @@ export function HistoryPanel({
         </div>
       </Card>
 
-      <Card title="Clinician Observation">
+      <Card title="Clinician Observation" helper="Direct observation carries the highest weight.">
         <div className="grid grid--sm" style={{ marginBottom: 16 }}>
           {["A1", "A2", "A3", "B1", "B2", "B3", "B4"].map((k) => (
             <label key={k} className="stack stack--xs">
-              <div className="section-title">{k}</div>
+              <div className="card-title">{k}</div>
               <select
                 value={observation[k]}
                 onChange={(e) => updateObservation(k, Number(e.target.value))}
@@ -135,7 +135,7 @@ export function HistoryPanel({
           ))}
         </div>
         <label className="stack stack--xs">
-          <div className="section-title">Notes</div>
+          <div className="card-title">Notes</div>
           <textarea
             value={observation.notes}
             onChange={(e) => updateObservation("notes", e.target.value)}

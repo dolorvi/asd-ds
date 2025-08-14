@@ -368,7 +368,7 @@ export default function App() {
 
           <div className="layout">
             {/* LEFT: panels per tab */}
-            <section className="stack stack--md">
+            <section className="stack stack--lg">
               {activeTab === 0 && (
                 <>
                   <QuickAddPresets
@@ -616,7 +616,7 @@ export default function App() {
             </section>
 
             {/* RIGHT: summary */}
-            <section className="stack stack--md">
+            <section className="stack stack--lg">
                 <SummaryPanel
                   model={model}
                   config={config}

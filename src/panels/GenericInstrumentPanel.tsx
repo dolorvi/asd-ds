@@ -50,6 +50,9 @@ export function GenericInstrumentPanel({
                   )
                 }
               />
+              {i.value !== undefined && (i.value < 40 || i.value > 90) && (
+                <p className="small text-danger">Score must be 40–90 (T-score).</p>
+              )}
             </label>
             {(() => {
               const cfg = getConfig(i.name);

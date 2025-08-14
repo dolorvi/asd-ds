@@ -20,7 +20,7 @@ export function AsrsPanel({
           <section key={d.key} className="card">
             <div className="stack stack--sm">
               <label>
-                <div className="section-title">{d.label}</div>
+                <div className="card-title">{d.label}</div>
                 <select
                   value={asrs[d.key]?.severity || ""}
                   onChange={(e)=>setASRS(s=>({ ...s, [d.key]: { ...s[d.key], severity: e.target.value }}))}

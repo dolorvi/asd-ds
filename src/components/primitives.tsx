@@ -14,8 +14,8 @@ export const Row = ({ children, wrap=false, justify, align }:{
 export const Stack = ({ children, gap="md" }:{ children: React.ReactNode; gap?: "sm"|"md"|"lg"}) =>
   <div className={`stack stack--${gap}`}>{children}</div>;
 
-export const Card = ({ title, right, children }:{
-  title?: string; right?: React.ReactNode; children: React.ReactNode;
+export const Card = ({ title, right, helper, children }:{
+  title?: string; right?: React.ReactNode; helper?: string; children: React.ReactNode;
 }) => (
   <section className="card">
     {(title || right) && (
@@ -24,6 +24,7 @@ export const Card = ({ title, right, children }:{
         {right}
       </div>
     )}
+    {helper && <p className="helper-text">{helper}</p>}
     {children}
   </section>
 );
