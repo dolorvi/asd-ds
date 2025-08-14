@@ -1,5 +1,6 @@
 import React from "react";
 import { Card } from "../components/primitives";
+import { VERBAL_FLUENCY_OPTIONS } from "../data/autismProfile";
 
 export function HistoryPanel({
   history,
@@ -11,12 +12,12 @@ export function HistoryPanel({
     developmentalConcerns: string;
     earlyOnset: boolean;
     earlySocial: boolean;
-    earlyCommunication: boolean;
     earlyRRB: boolean;
     regression: boolean;
     crossContextImpairment: boolean;
     familyHistory: boolean;
     maskingIndicators: boolean;
+    verbalFluency: string;
   };
   setHistory: (fn: (h: any) => any) => void;
   observation: Record<string, any>;
@@ -28,6 +29,59 @@ export function HistoryPanel({
 
   return (
     <div className="stack stack--md">
+      <Card title="History quick checklist">
+        <div className="stack stack--sm">
+          <label>
+            <input
+              type="checkbox"
+              checked={history.earlyOnset}
+              onChange={(e) => updateHistory("earlyOnset", e.target.checked)}
+            />
+            Onset <3y
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={history.regression}
+              onChange={(e) => updateHistory("regression", e.target.checked)}
+            />
+            Regression
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={history.earlySocial}
+              onChange={(e) => updateHistory("earlySocial", e.target.checked)}
+            />
+            Early social signs
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={history.earlyRRB}
+              onChange={(e) => updateHistory("earlyRRB", e.target.checked)}
+            />
+            Early RRB
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={history.crossContextImpairment}
+              onChange={(e) => updateHistory("crossContextImpairment", e.target.checked)}
+            />
+            Cross-setting
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={history.familyHistory}
+              onChange={(e) => updateHistory("familyHistory", e.target.checked)}
+            />
+            Family history
+          </label>
+        </div>
+      </Card>
+
       <Card title="Developmental History">
         <div className="stack stack--sm">
           <label>
@@ -40,66 +94,24 @@ export function HistoryPanel({
           <label>
             <input
               type="checkbox"
-              checked={history.earlyOnset}
-              onChange={(e) => updateHistory("earlyOnset", e.target.checked)}
-            />
-            Symptom onset before 3 years
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={history.earlySocial}
-              onChange={(e) => updateHistory("earlySocial", e.target.checked)}
-            />
-            Early social delays
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={history.earlyCommunication}
-              onChange={(e) => updateHistory("earlyCommunication", e.target.checked)}
-            />
-            Early communication delays
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={history.earlyRRB}
-              onChange={(e) => updateHistory("earlyRRB", e.target.checked)}
-            />
-            Early restricted or repetitive behaviours
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={history.regression}
-              onChange={(e) => updateHistory("regression", e.target.checked)}
-            />
-            Regression in language or social skills
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={history.crossContextImpairment}
-              onChange={(e) => updateHistory("crossContextImpairment", e.target.checked)}
-            />
-            Consistent symptoms across environments
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={history.familyHistory}
-              onChange={(e) => updateHistory("familyHistory", e.target.checked)}
-            />
-            Family history of ASD or related conditions
-          </label>
-          <label>
-            <input
-              type="checkbox"
               checked={history.maskingIndicators}
               onChange={(e) => updateHistory("maskingIndicators", e.target.checked)}
             />
             Masking indicators
+          </label>
+          <label className="stack stack--xs">
+            <div className="section-title">Verbal fluency</div>
+            <select
+              value={history.verbalFluency}
+              onChange={(e) => updateHistory("verbalFluency", e.target.value)}
+            >
+              <option value=""></option>
+              {VERBAL_FLUENCY_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
       </Card>

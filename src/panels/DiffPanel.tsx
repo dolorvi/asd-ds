@@ -10,38 +10,29 @@ export function DiffPanel({
 }) {
   const update = (k: string, v: any) => setDiff((d: any) => ({ ...d, [k]: v }));
 
-  const items: [string, string][] = [
-    ["ADHD", "ADHD indicators"],
-    ["DLD", "Language disorder"],
-    ["ID", "Intellectual disability"],
-    ["Anxiety", "Anxiety/OCD"],
-    ["Depression", "Depression"],
-    ["TraumaPTSD", "Trauma/PTSD"],
-    ["FASD", "FASD"],
-    ["Tics", "Tics"],
+  const items: { key: string; label: string; tip: string }[] = [
+    { key: "adhdFeatures", label: "ADHD features", tip: "ADHD traits may overlap" },
+    { key: "languageDisorder", label: "Language disorder (structural)", tip: "Structural language issues" },
+    { key: "globalID", label: "Global ID", tip: "Global intellectual disability" },
+    { key: "anxietyPrimary", label: "Anxiety primary", tip: "Anxiety appears primary driver" },
+    { key: "ocdFeatures", label: "OCD features", tip: "Obsessive-compulsive traits" },
+    { key: "trauma", label: "Trauma", tip: "Significant trauma history" },
   ];
 
   return (
-    <Card title="Comorbidity / Differential">
+    <Card title="Comorbidity">
       <div className="stack stack--sm">
-        {items.map(([key, label]) => (
-          <label key={key}>
+        {items.map((item) => (
+          <label key={item.key} className="row" style={{ alignItems: "center", gap: 4 }}>
             <input
               type="checkbox"
-              checked={!!diff[key]}
-              onChange={(e) => update(key, e.target.checked)}
+              checked={!!diff[item.key]}
+              onChange={(e) => update(item.key, e.target.checked)}
             />
-            {label}
+            {item.label}
+            <span title={item.tip} style={{ marginLeft: 4 }}>?</span>
           </label>
         ))}
-        <label>
-          Other
-          <input
-            type="text"
-            value={diff.Other || ""}
-            onChange={(e) => update("Other", e.target.value)}
-          />
-        </label>
       </div>
     </Card>
   );
