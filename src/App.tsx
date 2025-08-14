@@ -9,6 +9,15 @@ import {
   ABAS3_SEVERITIES as ABAS_SEVERITIES,
   VINELAND_SEVERITIES,
   VINELAND_DOMAINS,
+  GARS3_DOMAINS,
+  CARS2_DOMAINS,
+  AQ_DOMAINS,
+  ADOS2_DOMAINS,
+  MIGDAS_DOMAINS,
+  ADIR_DOMAINS,
+  BRIEF2_DOMAINS,
+  SENSORY_PROFILE_DOMAINS,
+  CELF5_DOMAINS,
 } from "./data/testData";
 import type { Config, SeverityState, Condition, AssessmentSelection } from "./types";
 
@@ -23,6 +32,7 @@ import { VinelandPanel } from "./panels/VinelandPanel";
 import { ReportPanel } from "./panels/ReportPanel";
 import { AssessmentPanel } from "./panels/AssessmentPanel";
 import { GenericInstrumentPanel } from "./panels/GenericInstrumentPanel";
+import { DomainPanel } from "./panels/DomainPanel";
 import { AiChat } from "./components/AiChat";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
@@ -36,7 +46,7 @@ export default function App() {
   // ---------- core state ----------
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
   const TABS = [
-    "ASD Measures",
+    "Autism",
     "Adaptive",
     "Intellectual",
     "Executive Function",
@@ -56,6 +66,15 @@ export default function App() {
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
   const [abasTeacher, setABASTeacher] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
+  const [gars, setGARS] = useState<SeverityState>(() => initSeverityState(GARS3_DOMAINS));
+  const [cars, setCARS] = useState<SeverityState>(() => initSeverityState(CARS2_DOMAINS));
+  const [aq, setAQ] = useState<SeverityState>(() => initSeverityState(AQ_DOMAINS));
+  const [ados, setADOS] = useState<SeverityState>(() => initSeverityState(ADOS2_DOMAINS));
+  const [migdasDomains, setMigdasDomains] = useState<SeverityState>(() => initSeverityState(MIGDAS_DOMAINS));
+  const [adir, setADIR] = useState<SeverityState>(() => initSeverityState(ADIR_DOMAINS));
+  const [brief, setBRIEF] = useState<SeverityState>(() => initSeverityState(BRIEF2_DOMAINS));
+  const [sensory, setSensory] = useState<SeverityState>(() => initSeverityState(SENSORY_PROFILE_DOMAINS));
+  const [celf, setCELF] = useState<SeverityState>(() => initSeverityState(CELF5_DOMAINS));
 
   const [migdas, setMIGDAS] = useState({
     consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
@@ -393,31 +412,48 @@ export default function App() {
                       )}
                     </>
                   )}
-                  {selectedAutismQs.filter((n) => n !== "SRS-2" && n !== "ASRS").length > 0 && (
+                  {selectedAutismQs.includes("GARS") && (
+                    <DomainPanel title="GARS-3" domains={GARS3_DOMAINS} valueMap={gars} setValueMap={setGARS} />
+                  )}
+                  {selectedAutismQs.includes("CARS") && (
+                    <DomainPanel title="CARS-2" domains={CARS2_DOMAINS} valueMap={cars} setValueMap={setCARS} />
+                  )}
+                  {selectedAutismQs.includes("AQ") && (
+                    <DomainPanel title="AQ" domains={AQ_DOMAINS} valueMap={aq} setValueMap={setAQ} />
+                  )}
+                  {selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "GARS", "CARS", "AQ"].includes(n)).length > 0 && (
                     <GenericInstrumentPanel
-                      selected={selectedAutismQs.filter((n) => n !== "SRS-2" && n !== "ASRS")}
+                      selected={selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "GARS", "CARS", "AQ"].includes(n))}
                       instruments={instruments}
                       setInstruments={setInstruments}
                       configs={config.defaultInstruments}
                     />
                   )}
-                  {selectedAutismObs.filter((n) => n !== "MIGDAS-2").length > 0 && (
+                  {selectedAutismObs.includes("ADOS-2") && (
+                    <DomainPanel title="ADOS-2" domains={ADOS2_DOMAINS} valueMap={ados} setValueMap={setADOS} />
+                  )}
+                  {selectedAutismObs.includes("MIGDAS-2") && (
+                    <DomainPanel title="MIGDAS-2" domains={MIGDAS_DOMAINS} valueMap={migdasDomains} setValueMap={setMigdasDomains} />
+                  )}
+                  {selectedAutismObs.filter((n) => !["ADOS-2", "MIGDAS-2"].includes(n)).length > 0 && (
                     <GenericInstrumentPanel
-                      selected={selectedAutismObs.filter((n) => n !== "MIGDAS-2")}
+                      selected={selectedAutismObs.filter((n) => !["ADOS-2", "MIGDAS-2"].includes(n))}
                       instruments={instruments}
                       setInstruments={setInstruments}
                       configs={config.defaultInstruments}
                     />
                   )}
-                  {selectedAutismInterviews.length > 0 && (
+                  {selectedAutismInterviews.includes("ADI-R") && (
+                    <DomainPanel title="ADI-R" domains={ADIR_DOMAINS} valueMap={adir} setValueMap={setADIR} />
+                  )}
+                  {selectedAutismInterviews.filter((n) => n !== "ADI-R").length > 0 && (
                     <GenericInstrumentPanel
-                      selected={selectedAutismInterviews}
+                      selected={selectedAutismInterviews.filter((n) => n !== "ADI-R")}
                       instruments={instruments}
                       setInstruments={setInstruments}
                       configs={config.defaultInstruments}
                     />
                   )}
-                  {/* TODO: MIGDAS panel (presentational) */}
                 </>
               )}
 
@@ -466,48 +502,78 @@ export default function App() {
               {activeTab === 2 && (
                 <>
                   <AssessmentPanel domain="Intellectual assessment" assessments={assessments} setAssessments={setAssessments} />
-                  <GenericInstrumentPanel
-                    selected={selectedIntellectual}
-                    instruments={instruments}
-                    setInstruments={setInstruments}
-                    configs={config.defaultInstruments}
-                  />
+                  {selectedIntellectual.includes("WISC/WAIS/WPPSI") && (
+                    <DomainPanel
+                      title="WISC-V / WAIS-IV / WPPSI-IV"
+                      domains={config.wiscDomains}
+                      valueMap={wisc}
+                      setValueMap={setWISC}
+                    />
+                  )}
+                  {selectedIntellectual.filter((n) => n !== "WISC/WAIS/WPPSI").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedIntellectual.filter((n) => n !== "WISC/WAIS/WPPSI")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
                 </>
               )}
 
               {activeTab === 3 && (
                 <>
                   <AssessmentPanel domain="Executive function questionnaires" assessments={assessments} setAssessments={setAssessments} />
-                  <GenericInstrumentPanel
-                    selected={selectedExecutive}
-                    instruments={instruments}
-                    setInstruments={setInstruments}
-                    configs={config.defaultInstruments}
-                  />
+                  {selectedExecutive.includes("BRIEF-2") && (
+                    <DomainPanel title="BRIEF-2" domains={BRIEF2_DOMAINS} valueMap={brief} setValueMap={setBRIEF} />
+                  )}
+                  {selectedExecutive.filter((n) => n !== "BRIEF-2").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedExecutive.filter((n) => n !== "BRIEF-2")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
                 </>
               )}
 
               {activeTab === 4 && (
                 <>
                   <AssessmentPanel domain="Sensory Assessment" assessments={assessments} setAssessments={setAssessments} />
-                  <GenericInstrumentPanel
-                    selected={selectedSensory}
-                    instruments={instruments}
-                    setInstruments={setInstruments}
-                    configs={config.defaultInstruments}
-                  />
+                  {selectedSensory.includes("Sensory Profile 2") && (
+                    <DomainPanel
+                      title="Sensory Profile 2"
+                      domains={SENSORY_PROFILE_DOMAINS}
+                      valueMap={sensory}
+                      setValueMap={setSensory}
+                    />
+                  )}
+                  {selectedSensory.filter((n) => n !== "Sensory Profile 2").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedSensory.filter((n) => n !== "Sensory Profile 2")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
                 </>
               )}
 
               {activeTab === 5 && (
                 <>
                   <AssessmentPanel domain="Language assessment" assessments={assessments} setAssessments={setAssessments} />
-                  <GenericInstrumentPanel
-                    selected={selectedLanguage}
-                    instruments={instruments}
-                    setInstruments={setInstruments}
-                    configs={config.defaultInstruments}
-                  />
+                  {selectedLanguage.includes("CELF-5") && (
+                    <DomainPanel title="CELF-5" domains={CELF5_DOMAINS} valueMap={celf} setValueMap={setCELF} />
+                  )}
+                  {selectedLanguage.filter((n) => n !== "CELF-5").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedLanguage.filter((n) => n !== "CELF-5")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
                 </>
               )}
 
