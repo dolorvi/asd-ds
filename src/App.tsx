@@ -274,8 +274,8 @@ export default function App() {
     window.print();
   };
 
-  const handleRiskToleranceChange = (v: any) => {
-    setConfig((c) => ({ ...c, riskTolerance: v }));
+  const handleThresholdChange = (v: any) => {
+    setConfig((c) => ({ ...c, certaintyThreshold: parseFloat(v) }));
   };
 
   // ---------- rule signature ----------
@@ -656,7 +656,7 @@ export default function App() {
                   version={VERSION}
                   timestamp={exportTimestamp}
                   minDatasetItems={minDatasetItems}
-                  onRiskToleranceChange={handleRiskToleranceChange}
+                  onThresholdChange={handleThresholdChange}
                   history={history}
                 />
               </section>

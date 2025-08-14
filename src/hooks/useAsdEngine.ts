@@ -230,10 +230,7 @@ export function useAsdEngine(
     const pA = Math.min(1, Math.max(0, A / (3 * 3)));
     const pB = Math.min(1, Math.max(0, B / (4 * 3)));
 
-    const cut =
-      config.riskTolerance === "sensitive" ? 0.40 :
-      config.riskTolerance === "specific"  ? 0.60 :
-      0.50;
+    const cut = config.certaintyThreshold;
 
     const drivers = Object.entries(sources).map(([name, contrib]) => {
       const prod = Object.entries(contrib).reduce(
