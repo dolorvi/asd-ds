@@ -138,13 +138,6 @@ export default function App() {
   const [instruments, setInstruments] = useState(
     DEFAULT_CONFIG.defaultInstruments.map((i) => ({ name: i.name, value: undefined as number | undefined, band: "" })),
   );
-  const metInstrumentCount = useMemo(
-    () =>
-      instruments.filter(
-        (i) => i.value !== undefined || (i.band && i.band.trim() !== "")
-      ).length,
-    [instruments],
-  );
 
   // ---------- assessment selections ----------
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
@@ -244,32 +237,20 @@ export default function App() {
     instruments,
   );
 
-  const progress = useMemo(() => {
+  // ---------- minimum dataset checklist ----------
+  const minDatasetItems = useMemo(() => {
     const r = config.minDataset;
     const c = datasetStatus.counts;
-    let count = 0;
-    if (c.hasASDInstrument) count += 1;
-    if (c.hasAdaptive) count += 1;
-    if (c.historyOk) count += 1;
-    if (c.observationOk) count += 1;
-    count += Math.min(c.effectiveInstrumentCount, r.minInstruments);
-    const total = 4 + r.minInstruments;
-    return total ? count / total : 0;
-  }, [datasetStatus, config.minDataset]);
-
-  // ---------- ribbon ----------
-  const ribbon = useMemo(() => {
-    const need: string[] = [];
-    const r = config.minDataset;
-    const c = datasetStatus.counts;
-    if (r.requireASDInstrument && !c.hasASDInstrument) need.push("≥1 ASD instrument");
-    if (r.requireAdaptive && !c.hasAdaptive) need.push("adaptive measure");
-    if (r.requireHistory && !c.historyOk) need.push("history");
-    if (r.requireObservation && !c.observationOk) need.push("observation");
-    if (c.effectiveInstrumentCount < r.minInstruments) need.push(`min instruments ${r.minInstruments}`);
-    return datasetStatus.passes
-      ? "All requirements met"
-      : `${c.effectiveInstrumentCount}/${r.minInstruments} met — need: ${need.join(", ") || "—"}`;
+    return [
+      { label: "ASD instrument", met: c.hasASDInstrument, targetId: "asd-inst-section" },
+      { label: "Adaptive measure", met: c.hasAdaptive, targetId: "adaptive-measure-section" },
+      { label: "History", met: c.historyOk, targetId: "history-section" },
+      {
+        label: `≥${r.minInstruments} instruments`,
+        met: c.effectiveInstrumentCount >= r.minInstruments,
+        targetId: "asd-inst-section",
+      },
+    ];
   }, [datasetStatus, config.minDataset]);
 
   // ---------- summary print ----------
@@ -316,15 +297,6 @@ export default function App() {
                   style={{ width: 60 }}
                 />
               </label>
-            </Card>
-
-            <Card>
-              <span className="small">
-                <b>Minimum dataset:</b> {ribbon}
-              </span>
-              <div className="progress-bar">
-                <div className="progress-bar__fill" style={{ width: `${progress * 100}%` }} />
-              </div>
             </Card>
 
             {devOpen && (
@@ -387,8 +359,7 @@ export default function App() {
                 </div>
               </Card>
             )}
-
-            <MinDatasetProgress count={metInstrumentCount} total={config.minDataset.minInstruments} />
+            <MinDatasetProgress items={minDatasetItems} />
 
             <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
           </div>
@@ -398,7 +369,13 @@ export default function App() {
             <section className="stack stack--md">
               {activeTab === 0 && (
                 <>
-                  <AssessmentPanel domain="Autism questionnaires" assessments={assessments} setAssessments={setAssessments} />
+                  <div id="asd-inst-section">
+                    <AssessmentPanel
+                      domain="Autism questionnaires"
+                      assessments={assessments}
+                      setAssessments={setAssessments}
+                    />
+                  </div>
                   <AssessmentPanel domain="Autism observations" assessments={assessments} setAssessments={setAssessments} />
                   <AssessmentPanel domain="Autism interviews" assessments={assessments} setAssessments={setAssessments} />
                   {hasSrs && (
@@ -474,7 +451,13 @@ export default function App() {
 
               {activeTab === 1 && (
                 <>
-                  <AssessmentPanel domain="Adaptive questionnaires" assessments={assessments} setAssessments={setAssessments} />
+                  <div id="adaptive-measure-section">
+                    <AssessmentPanel
+                      domain="Adaptive questionnaires"
+                      assessments={assessments}
+                      setAssessments={setAssessments}
+                    />
+                  </div>
                   {hasAbas && (
                     <>
                       <AbasPanel
@@ -593,12 +576,14 @@ export default function App() {
               )}
 
               {activeTab === 6 && (
-                <HistoryPanel
-                  history={history}
-                  setHistory={setHistory}
-                  observation={observation}
-                  setObservation={setObservation}
-                />
+                <div id="history-section">
+                  <HistoryPanel
+                    history={history}
+                    setHistory={setHistory}
+                    observation={observation}
+                    setObservation={setObservation}
+                  />
+                </div>
               )}
 
               {activeTab === 7 && <DiffPanel diff={diff} setDiff={setDiff} />}

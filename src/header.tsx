@@ -56,17 +56,24 @@ export function Header({
         </div>
 
         <div className="row" style={{ gap: 8 }}>
-          <button type="button" className="btn" onClick={onDevToggle} disabled={!onDevToggle}>
-            Dev
-          </button>
-          <button
-            type="button"
-            className="btn"
-            onClick={onExportSummary}
-            disabled={!onExportSummary}
-          >
-            Export summary
-          </button>
+          <label>
+            <select
+              defaultValue=""
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "dev") onDevToggle?.();
+                if (v === "summary") onExportSummary?.();
+                e.target.value = "";
+              }}
+              title="More actions"
+            >
+              <option value="" disabled>
+                More
+              </option>
+              <option value="dev">Dev</option>
+              <option value="summary">Export summary</option>
+            </select>
+          </label>
           <button type="button" className="btn" onClick={onExportFull} disabled={!onExportFull}>
             Export (full)
           </button>
