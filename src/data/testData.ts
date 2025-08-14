@@ -45,21 +45,15 @@ export const ASRS_SEVERITIES = [
 ] as const;
 
 export const ASRS_DOMAINS: DomainLabelConfig[] = [
-  { key: "asrs_social_communication",      label: "Social/Communication",                     severities: ASRS_SEVERITIES },
-  { key: "asrs_unusual_behaviours",        label: "Unusual Behaviours",                      severities: ASRS_SEVERITIES },
-  { key: "asrs_self_regulation",          label: "Self-Regulation",                         severities: ASRS_SEVERITIES },
-  { key: "asrs_peer_socialization",       label: "Peer Socialization",                      severities: ASRS_SEVERITIES },
-  { key: "asrs_adult_socialization",      label: "Adult Socialization",                     severities: ASRS_SEVERITIES },
-  { key: "asrs_social_emotional_reciprocity", label: "Social/Emotional Reciprocity",        severities: ASRS_SEVERITIES },
-  { key: "asrs_atypical_language",        label: "Atypical Language",                       severities: ASRS_SEVERITIES },
-  { key: "asrs_stereotypy",               label: "Stereotypy",                              severities: ASRS_SEVERITIES },
-  { key: "asrs_behavioural_rigidity",     label: "Behavioural Rigidity",                    severities: ASRS_SEVERITIES },
-  { key: "asrs_sensory_sensitivity",      label: "Sensory Sensitivity",                     severities: ASRS_SEVERITIES },
-  { key: "asrs_attention_self_regulation",label: "Attention/Self-Regulation (Age 2–5)",      severities: ASRS_SEVERITIES },
-  { key: "asrs_attention",                label: "Attention (Age 6–18)",                     severities: ASRS_SEVERITIES },
+  { key: "asrs_social_communication", label: "Social/Communication", severities: ASRS_SEVERITIES },
+  { key: "asrs_unusual_behaviours",  label: "Unusual Behaviors",    severities: ASRS_SEVERITIES },
+  { key: "asrs_self_regulation",    label: "Self-Regulation",       severities: ASRS_SEVERITIES },
 ];
 
-// ----------------------------- WISC (VCI/VSI/WMI/PSI/FSIQ) -----------------------------
+// Generic severities for instruments without published bands
+export const GENERIC_SEVERITIES = ["Average", "Mild", "Moderate", "Severe"] as const;
+
+// ----------------------------- WISC (VCI/VSI/FRI/WMI/PSI) -----------------------------
 export const WISC_SEVERITIES = [
   "Extremely Low",
   "Very Low",
@@ -73,9 +67,9 @@ export const WISC_SEVERITIES = [
 export const WISC_DOMAINS: DomainLabelConfig[] = [
   { key: "wisc_vci",  label: "Verbal Comprehension", severities: WISC_SEVERITIES },
   { key: "wisc_vsi",  label: "Visual Spatial",       severities: WISC_SEVERITIES },
+  { key: "wisc_fri",  label: "Fluid Reasoning",      severities: WISC_SEVERITIES },
   { key: "wisc_wmi",  label: "Working Memory",       severities: WISC_SEVERITIES },
   { key: "wisc_psi",  label: "Processing Speed",     severities: WISC_SEVERITIES },
-  { key: "wisc_fsiq", label: "Full Scale IQ",        severities: WISC_SEVERITIES },
 ];
 
 // ----------------------------- Adaptive Behaviour (Conceptual/Social/Practical) -----------------------------
@@ -85,6 +79,7 @@ export const ABAS3_DOMAINS: DomainLabelConfig[] = [
   { key: "abas_conceptual", label: "Conceptual", severities: ABAS3_SEVERITIES },
   { key: "abas_social",     label: "Social",     severities: ABAS3_SEVERITIES },
   { key: "abas_practical",  label: "Practical",  severities: ABAS3_SEVERITIES },
+  { key: "abas_gac",        label: "General Adaptive Composite", severities: ABAS3_SEVERITIES },
 ];
 
 export const VINELAND_SEVERITIES = [
@@ -100,6 +95,116 @@ export const VINELAND_DOMAINS: DomainLabelConfig[] = [
   { key: "vineland_socialization",     label: "Socialization",     severities: VINELAND_SEVERITIES },
   { key: "vineland_dls",  label: "Daily Living Skills",  severities: VINELAND_SEVERITIES },
   { key: "vineland_motor",  label: "Motor Skills",  severities: VINELAND_SEVERITIES },
+];
+
+// ----------------------------- Additional Autism Questionnaires -----------------------------
+export const GARS3_DOMAINS: DomainLabelConfig[] = [
+  { key: "gars_rrb",         label: "Restrictive/Repetitive Behaviors", severities: GENERIC_SEVERITIES },
+  { key: "gars_social",      label: "Social Interaction",               severities: GENERIC_SEVERITIES },
+  { key: "gars_communication", label: "Communication",                  severities: GENERIC_SEVERITIES },
+  { key: "gars_emotional",   label: "Emotional Responses",              severities: GENERIC_SEVERITIES },
+  { key: "gars_cognitive",   label: "Cognitive Style",                  severities: GENERIC_SEVERITIES },
+  { key: "gars_speech",      label: "Maladaptive Speech",               severities: GENERIC_SEVERITIES },
+];
+
+export const CARS2_DOMAINS: DomainLabelConfig[] = [
+  { key: "cars_relating",      label: "Relating to People",      severities: GENERIC_SEVERITIES },
+  { key: "cars_emotion",       label: "Emotional Response",      severities: GENERIC_SEVERITIES },
+  { key: "cars_body_use",      label: "Body Use",                severities: GENERIC_SEVERITIES },
+  { key: "cars_object_use",    label: "Object Use",              severities: GENERIC_SEVERITIES },
+  { key: "cars_adaptation",    label: "Adaptation to Change",    severities: GENERIC_SEVERITIES },
+  { key: "cars_listening",     label: "Listening Response",      severities: GENERIC_SEVERITIES },
+  { key: "cars_visual",        label: "Visual Response",         severities: GENERIC_SEVERITIES },
+  { key: "cars_taste_smell",   label: "Taste/Smell/Touch",       severities: GENERIC_SEVERITIES },
+  { key: "cars_fear",          label: "Fear/Nervousness",        severities: GENERIC_SEVERITIES },
+  { key: "cars_verbal",        label: "Verbal Communication",    severities: GENERIC_SEVERITIES },
+  { key: "cars_nonverbal",     label: "Nonverbal Communication", severities: GENERIC_SEVERITIES },
+  { key: "cars_activity",      label: "Activity Level",          severities: GENERIC_SEVERITIES },
+  { key: "cars_intellectual",  label: "Intellectual Response",   severities: GENERIC_SEVERITIES },
+  { key: "cars_general",       label: "General Impressions",     severities: GENERIC_SEVERITIES },
+];
+
+export const AQ_DOMAINS: DomainLabelConfig[] = [
+  { key: "aq_social",     label: "Social Skill",         severities: GENERIC_SEVERITIES },
+  { key: "aq_switching",  label: "Attention Switching",  severities: GENERIC_SEVERITIES },
+  { key: "aq_detail",     label: "Attention to Detail",  severities: GENERIC_SEVERITIES },
+  { key: "aq_communication", label: "Communication",     severities: GENERIC_SEVERITIES },
+  { key: "aq_imagination", label: "Imagination",         severities: GENERIC_SEVERITIES },
+];
+
+// ----------------------------- Autism Observations -----------------------------
+export const ADOS2_DOMAINS: DomainLabelConfig[] = [
+  { key: "ados_social", label: "Social Affect",                 severities: GENERIC_SEVERITIES },
+  { key: "ados_rrb",    label: "Restricted/Repetitive Behaviors", severities: GENERIC_SEVERITIES },
+];
+
+export const MIGDAS_DOMAINS: DomainLabelConfig[] = [
+  { key: "migdas_sensory",      label: "Sensory Interests",     severities: GENERIC_SEVERITIES },
+  { key: "migdas_special",      label: "Special Interests",     severities: GENERIC_SEVERITIES },
+  { key: "migdas_reciprocity",  label: "Social Reciprocity",    severities: GENERIC_SEVERITIES },
+  { key: "migdas_communication",label: "Communication Style",   severities: GENERIC_SEVERITIES },
+];
+
+// ----------------------------- Autism Interviews -----------------------------
+export const ADIR_DOMAINS: DomainLabelConfig[] = [
+  { key: "adir_social",        label: "Social Interaction",            severities: GENERIC_SEVERITIES },
+  { key: "adir_communication", label: "Communication",                 severities: GENERIC_SEVERITIES },
+  { key: "adir_rrb",          label: "Restricted/Repetitive Behaviors", severities: GENERIC_SEVERITIES },
+  { key: "adir_history",      label: "Developmental History",          severities: GENERIC_SEVERITIES },
+];
+
+// ----------------------------- Executive Functioning -----------------------------
+export const BRIEF2_DOMAINS: DomainLabelConfig[] = [
+  { key: "brief_inhibition",      label: "Inhibition",             severities: GENERIC_SEVERITIES },
+  { key: "brief_self_monitor",    label: "Self-Monitoring",        severities: GENERIC_SEVERITIES },
+  { key: "brief_shift",          label: "Shift",                  severities: GENERIC_SEVERITIES },
+  { key: "brief_emotional",      label: "Emotional Control",      severities: GENERIC_SEVERITIES },
+  { key: "brief_initiate",       label: "Initiate",               severities: GENERIC_SEVERITIES },
+  { key: "brief_working_memory", label: "Working Memory",          severities: GENERIC_SEVERITIES },
+  { key: "brief_plan_organize",  label: "Plan/Organize",           severities: GENERIC_SEVERITIES },
+  { key: "brief_task_monitor",   label: "Task-Monitor",            severities: GENERIC_SEVERITIES },
+  { key: "brief_materials",      label: "Organization of Materials", severities: GENERIC_SEVERITIES },
+];
+
+// ----------------------------- Language -----------------------------
+export const CELF5_DOMAINS: DomainLabelConfig[] = [
+  { key: "celf_core",       label: "Core Language",       severities: WISC_SEVERITIES },
+  { key: "celf_receptive",  label: "Receptive",           severities: WISC_SEVERITIES },
+  { key: "celf_expressive", label: "Expressive",          severities: WISC_SEVERITIES },
+  { key: "celf_content",    label: "Language Content",    severities: WISC_SEVERITIES },
+  { key: "celf_structure",  label: "Language Structure",  severities: WISC_SEVERITIES },
+];
+
+// ----------------------------- Sensory -----------------------------
+export const SENSORY_PROFILE_SEVERITIES = [
+  "Much Less Than Others",
+  "Less Than Others",
+  "Just Like the Majority",
+  "More Than Others",
+  "Much More Than Others",
+] as const;
+
+export const SENSORY_PROFILE_DOMAINS: DomainLabelConfig[] = [
+  { key: "sensory_auditory_seeking",      label: "Auditory Seeking",      severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_auditory_avoiding",     label: "Auditory Avoiding",     severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_auditory_sensitivity",  label: "Auditory Sensitivity",  severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_auditory_registration", label: "Auditory Registration", severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_visual_seeking",        label: "Visual Seeking",        severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_visual_avoiding",       label: "Visual Avoiding",       severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_visual_sensitivity",    label: "Visual Sensitivity",    severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_visual_registration",   label: "Visual Registration",   severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_tactile_seeking",       label: "Tactile Seeking",       severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_tactile_avoiding",      label: "Tactile Avoiding",      severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_tactile_sensitivity",   label: "Tactile Sensitivity",   severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_tactile_registration",  label: "Tactile Registration",  severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_vestibular_seeking",    label: "Vestibular Seeking",    severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_vestibular_avoiding",   label: "Vestibular Avoiding",   severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_vestibular_sensitivity",label: "Vestibular Sensitivity", severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_vestibular_registration",label: "Vestibular Registration", severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_oral_seeking",          label: "Oral Seeking",          severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_oral_avoiding",         label: "Oral Avoiding",         severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_oral_sensitivity",      label: "Oral Sensitivity",      severities: SENSORY_PROFILE_SEVERITIES },
+  { key: "sensory_oral_registration",     label: "Oral Registration",     severities: SENSORY_PROFILE_SEVERITIES },
 ];
 
 // ----------------------------- MIGDAS (Qualitative) -----------------------------
@@ -233,7 +338,7 @@ export const CANONICAL_CASES: CanonicalCase[] = [
       srs_motivation: "Moderate",
       srs_rrb: "Severe",
     },
-    wisc: { wisc_fsiq: "Very Low" },
+    wisc: { wisc_fri: "Very Low" },
     abas3: {
       abas_conceptual: "Very Low",
       abas_social: "Very Low",
