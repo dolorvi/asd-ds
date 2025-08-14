@@ -11,7 +11,7 @@ export function SummaryPanel({
   version,
   timestamp,
   minDatasetItems,
-  onRiskToleranceChange,
+  onThresholdChange,
   history,
 }:{
   model: any;
@@ -23,7 +23,7 @@ export function SummaryPanel({
   version: string;
   timestamp: string;
   minDatasetItems: MinDatasetItem[];
-  onRiskToleranceChange: (v: any) => void;
+  onThresholdChange: (v: any) => void;
   history: { maskingIndicators: boolean; verbalFluency: string };
 }) {
   const handleExport = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -54,10 +54,10 @@ export function SummaryPanel({
   const confidence =
     percent === 100 ? "High" : percent >= 50 && hasInstrumentMix ? "Medium" : "Low";
 
-  const riskExplain: Record<string,string> = {
-    balanced: "50% cutpoint balances false positives and negatives.",
-    sensitive: "40% cutpoint favors sensitivity to catch more cases.",
-    specific: "60% cutpoint favors specificity to avoid false positives.",
+  const thresholdExplain: Record<number,string> = {
+    0.8: "Requires at least 80% likelihood to proceed.",
+    0.9: "Requires at least 90% likelihood to proceed.",
+    0.99: "Requires near-certainty at 99% likelihood.",
   };
   return (
     <aside className="summary" id="summary-section" style={{position:"sticky", top:0}}>
@@ -70,15 +70,15 @@ export function SummaryPanel({
             <label className="small row" style={{gap:8,alignItems:"center"}}>
               <span>Threshold:</span>
               <select
-                value={config.riskTolerance}
-                onChange={(e) => onRiskToleranceChange(e.target.value)}
+                value={config.certaintyThreshold}
+                onChange={(e) => onThresholdChange(e.target.value)}
               >
-                <option value="balanced">Balanced (50%)</option>
-                <option value="sensitive">Sensitivity-favored (40%)</option>
-                <option value="specific">Specificity-favored (60%)</option>
+                <option value={0.8}>80%</option>
+                <option value={0.9}>90%</option>
+                <option value={0.99}>99%</option>
               </select>
             </label>
-            <div className="small">{riskExplain[config.riskTolerance]}</div>
+            <div className="small">{thresholdExplain[config.certaintyThreshold]}</div>
           </div>
           <div>
             Decision: {model.p >= model.cut
