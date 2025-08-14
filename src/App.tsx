@@ -29,6 +29,7 @@ import { AsrsPanel } from "./panels/AsrsPanel";
 import { AbasPanel } from "./panels/AbasPanel";
 import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
+import { QuickAddPresets } from "./components/QuickAddPresets";
 import { ReportPanel } from "./panels/ReportPanel";
 import { AssessmentPanel } from "./panels/AssessmentPanel";
 import { GenericInstrumentPanel } from "./panels/GenericInstrumentPanel";
@@ -369,6 +370,10 @@ export default function App() {
             <section className="stack stack--md">
               {activeTab === 0 && (
                 <>
+                  <QuickAddPresets
+                    assessments={assessments}
+                    setAssessments={setAssessments}
+                  />
                   <div id="asd-inst-section">
                     <AssessmentPanel
                       domain="Autism questionnaires"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Card } from "../components/primitives";
 import type { AssessmentSelection } from "../types";
 
@@ -19,6 +19,9 @@ export function AssessmentPanel({
 
   const [pickerValue, setPickerValue] = useState("");
   const [pickerError, setPickerError] = useState("");
+  const [pickerSearch, setPickerSearch] = useState("");
+
+  const selectRefs = useRef<Record<number, HTMLSelectElement | null>>({});
 
   const addAssessment = (value: string) => {
     const template = items[0];
@@ -53,26 +56,43 @@ export function AssessmentPanel({
     });
   };
 
+  const filteredOptions = options.filter((o) =>
+    o.toLowerCase().includes(pickerSearch.toLowerCase()),
+  );
+
   return (
     <Card title={domain}>
       <div className="stack stack--sm">
         <div className="assessment-add-row">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={pickerSearch}
+            onChange={(e) => setPickerSearch(e.target.value)}
+          />
           <select
             value={pickerValue}
             onChange={(e) => {
               const val = e.target.value;
               if (!val) return;
-              if (items.some((a) => a.selected === val)) {
+              const existing = items.find((a) => a.selected === val);
+              if (existing) {
                 setPickerError("Already added.");
+                const ref = selectRefs.current[existing.index];
+                if (ref) {
+                  ref.focus();
+                  ref.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
               } else {
                 addAssessment(val);
                 setPickerError("");
               }
               setPickerValue("");
+              setPickerSearch("");
             }}
           >
             <option value="">+ Add assessment...</option>
-            {options.map((o) => (
+            {filteredOptions.map((o) => (
               <option key={o} value={o}>
                 {o}
               </option>
@@ -103,6 +123,9 @@ export function AssessmentPanel({
             <div className="assessment-card__body">
               <label>
                 <select
+                  ref={(el) => {
+                    selectRefs.current[a.index] = el;
+                  }}
                   value={a.selected || ""}
                   className={a.selected ? "" : "invalid"}
                   title={a.selected ? "" : "Select assessment"}

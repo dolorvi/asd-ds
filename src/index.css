@@ -100,8 +100,8 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .badge--danger{background:var(--tone-danger);border:1px solid color-mix(in hsl, var(--tone-danger) 60%, black 40%)}
 
 /* assessment picker & cards */
-.assessment-add-row{background:color-mix(in hsl,var(--accent) 14%,transparent);border:1px solid var(--accent);border-radius:10px;padding:8px 12px}
-.assessment-add-row select{background:transparent;border:none;width:100%}
+.assessment-add-row{display:grid;gap:4px;background:color-mix(in hsl,var(--accent) 14%,transparent);border:1px solid var(--accent);border-radius:10px;padding:8px 12px}
+.assessment-add-row input,.assessment-add-row select{background:transparent;border:none;width:100%}
 .assessment-divider{margin:12px 0;border:none;border-top:1px solid var(--border)}
 .assessment-card{background:var(--elev);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-1);padding:12px}
 .assessment-card__header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
