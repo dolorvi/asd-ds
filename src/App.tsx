@@ -43,6 +43,8 @@ const initSeverityState = (domains: { key: string }[]): SeverityState =>
 
 export default function App() {
   useClickSound();
+  const VERSION = "v0.6";
+  const [exportTimestamp, setExportTimestamp] = useState("");
   // ---------- condition ----------
   const [condition, setCondition] = useState<Condition>("ASD");
 
@@ -251,13 +253,19 @@ export default function App() {
     ];
   }, [datasetStatus, config.minDataset]);
 
-  // ---------- summary print ----------
+  // ---------- summary/full export ----------
   const exportSummary = () => {
+    setExportTimestamp(new Date().toLocaleString());
     document.body.classList.add("print-summary");
     setTimeout(() => {
       window.print();
       setTimeout(() => document.body.classList.remove("print-summary"), 0);
     }, 0);
+  };
+  const exportFull = () => {
+    setExportTimestamp(new Date().toLocaleString());
+    document.body.classList.remove("print-summary");
+    window.print();
   };
 
   const handleRiskToleranceChange = (v: any) => {
@@ -280,9 +288,11 @@ export default function App() {
         subtitle="DSM-5-TR aligned • tabs build"
         onDevToggle={() => setDevOpen((v) => !v)}
         onExportSummary={exportSummary}
-        onExportFull={() => window.print()}
+        onExportFull={exportFull}
         condition={condition}
         onConditionChange={setCondition}
+        version={VERSION}
+        timestamp={exportTimestamp}
       />
 
       {condition === "ASD" ? (
@@ -623,6 +633,9 @@ export default function App() {
                   supportEstimate={supportEstimate}
                   recommendation={recommendation}
                   exportSummary={exportSummary}
+                  exportFull={exportFull}
+                  version={VERSION}
+                  timestamp={exportTimestamp}
                   minDatasetItems={minDatasetItems}
                   onRiskToleranceChange={handleRiskToleranceChange}
                   history={history}
@@ -634,7 +647,7 @@ export default function App() {
           <Card title={`${condition} assessments`}>Assessments for {condition} will be added soon.</Card>
         )}
 
-        <Footer version="v0.6" ruleHash={ruleHash} />
+        <Footer version={VERSION} ruleHash={ruleHash} />
         <AiChat />
       </Container>
     );

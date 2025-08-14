@@ -116,6 +116,8 @@ export function AssessmentPanel({
                 type="button"
                 className={`badge${a.primary ? " badge--ok" : ""}`}
                 onClick={() => togglePrimary(a.index)}
+                aria-pressed={a.primary}
+                aria-label="Toggle main assessment"
               >
                 Main
               </button>

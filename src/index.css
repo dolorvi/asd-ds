@@ -30,6 +30,9 @@
   .tone-warn    { background:#fde68a; color:#78350f; border-color:#fde68a; }
   .tone-danger  { background:#fecaca; color:#7f1d1d; border-color:#fecaca; }
 
+  .print-only { display:none; }
+  @media print { .print-only { display:block; } }
+
 /* ===== App layout ===== */
 .app-shell{max-width:1120px;margin:32px auto;padding:0 24px 48px}
 /* wider column gap for a calmer layout */
@@ -51,7 +54,7 @@ body{
 }
 a,button{transition:color var(--t-fast) var(--ease),background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
 /* neutral button baseline */
-button{background:transparent;color:inherit;border:1px solid transparent;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer}
+button{background:transparent;color:inherit;border:1px solid transparent;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer;min-width:44px;min-height:44px}
 button:hover{transform:translateY(-1px) scale(1.02)}
 button:active{transform:scale(0.97)}
 button:disabled{opacity:.6;cursor:not-allowed}
@@ -82,11 +85,11 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .card-title{font-size:14px;font-weight:600;color:var(--text);margin:0 0 4px 0}
 .helper-text{font-size:12px;color:var(--muted);margin:0 0 12px 0}
 
-.btn{height:34px;padding:0 12px;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;box-shadow:var(--shadow-1)}
+.btn{min-height:44px;padding:0 12px;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;box-shadow:var(--shadow-1)}
 .btn:hover{box-shadow:var(--shadow-2)}
 .btn--accent{background:var(--accent);border-color:transparent;color:#fff}
 .btn--accent:hover{filter:brightness(1.05)}
-.btn--sm{height:28px;padding:0 8px;font-size:12px}
+.btn--sm{padding:0 8px;font-size:12px}
 .toolbar{display:flex;gap:4px;flex-wrap:wrap}
 
 .tabbar{display:flex;gap:16px;flex-wrap:wrap}
@@ -100,6 +103,9 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .badge--ok{background:var(--tone-good);border:1px solid color-mix(in hsl, var(--tone-good) 60%, black 40%)}
 .badge--warn{background:var(--tone-warn);border:1px solid color-mix(in hsl, var(--tone-warn) 60%, black 40%)}
 .badge--danger{background:var(--tone-danger);border:1px solid color-mix(in hsl, var(--tone-danger) 60%, black 40%)}
+.badge--ok::before{content:"\2713";margin-right:4px}
+.badge--warn::before{content:"\26A0";margin-right:4px}
+.badge--danger::before{content:"\2717";margin-right:4px}
 
 /* assessment picker & cards */
 .assessment-add-row{display:grid;gap:4px;background:color-mix(in hsl,var(--accent) 14%,transparent);border:1px solid var(--accent);border-radius:12px;padding:12px}
@@ -116,7 +122,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .progress-bar{width:100%;height:8px;background:var(--tone-neutral);border-radius:4px;overflow:hidden}
 .progress-bar__fill{height:100%;background:var(--accent-2)}
 
-input,select{padding:4px 6px;font-size:14px;width:100%}
+input,select{padding:4px 6px;font-size:14px;width:100%;min-height:44px}
 .invalid{border:1px solid var(--tone-danger)}
 
 /* floating chat */

@@ -35,15 +35,16 @@ export const Button = ({ kind="neutral", children, ...props }:{
   <button className={`btn ${kind==="primary" ? "btn--accent":""}`} {...props}>{children}</button>;
 
 export const Chip = ({
-  active, children, onClick, activeBg, activeColor
+  active, children, activeBg, activeColor, ...props
 }:{
-  active?: boolean; children: React.ReactNode; onClick?: ()=>void;
+  active?: boolean; children: React.ReactNode;
   activeBg?: string; activeColor?: string;
-}) => (
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     className={`chip ${active ? "chip--active":""}`}
-    onClick={onClick}
     style={active ? { background: activeBg, color: activeColor } : undefined}
+    aria-pressed={active}
+    {...props}
   >
     {children}
   </button>
