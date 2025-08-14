@@ -108,51 +108,80 @@ export function AssessmentPanel({
             No assessments added — select one above to get started.
           </div>
         )}
-        {items.map((a) => (
-          <div key={a.index} className="assessment-card">
-            <div className="assessment-card__header">
-              <span>{a.selected || "Select"}</span>
-              <button
-                type="button"
-                className={`badge${a.primary ? " badge--ok" : ""}`}
-                onClick={() => togglePrimary(a.index)}
-              >
-                Main
-              </button>
-            </div>
-            <div className="assessment-card__body">
-              <label>
-                <select
-                  ref={(el) => {
-                    selectRefs.current[a.index] = el;
-                  }}
-                  value={a.selected || ""}
-                  className={a.selected ? "" : "invalid"}
-                  title={a.selected ? "" : "Select assessment"}
-                  onChange={(e) => changeSelection(a.index, e.target.value)}
+        {items.map((a) => {
+          const state = a.selected ? "complete" : "empty";
+          const chipClass =
+            state === "complete"
+              ? "badge badge--ok"
+              : state === "partial"
+              ? "badge badge--warn"
+              : "badge badge--neutral";
+          const chipLabel =
+            state === "complete" ? "Complete" : state === "partial" ? "Partial" : "Empty";
+          return (
+            <div key={a.index} className={`assessment-card assessment-card--${state}`}>
+              <div className="assessment-card__header">
+                <span className="assessment-card__title">{a.selected || "Select"}</span>
+                <span className={chipClass}>{chipLabel}</span>
+                <button
+                  type="button"
+                  className={`badge${a.primary ? " badge--ok" : ""}`}
+                  onClick={() => togglePrimary(a.index)}
+                  title="Toggle main assessment"
                 >
-                  <option value="">Select</option>
-                  {a.options.map((o) => (
-                    <option key={o} value={o}>
-                      {o}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div className="assessment-card__footer">
-              {items.length > 1 && (
+                  ★
+                </button>
+              </div>
+              <p className="small assessment-card__hint">
+                Choose an assessment and enter scores.
+              </p>
+              <div className="assessment-card__body">
+                <label>
+                  <select
+                    ref={(el) => {
+                      selectRefs.current[a.index] = el;
+                    }}
+                    value={a.selected || ""}
+                    className={a.selected ? "" : "invalid"}
+                    title={a.selected ? "" : "Select assessment"}
+                    onChange={(e) => changeSelection(a.index, e.target.value)}
+                  >
+                    <option value="">Select</option>
+                    {a.options.map((o) => (
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="assessment-card__actions">
                 <button
                   type="button"
                   className="btn"
                   onClick={() => removeAssessment(a.index)}
                 >
-                  × Remove
+                  Remove
                 </button>
-              )}
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => window.alert(`Info about ${a.selected || "this assessment"}`)}
+                >
+                  Info
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  title="Drag to reorder"
+                  style={{ cursor: "grab" }}
+                >
+                  ≡
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </Card>
   );
