@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import type { SeverityState, Config, AssessmentSelection, ClientProfile } from "../types";
-import { Card, Row } from "../components/primitives";
+import { Card } from "../components/primitives";
 import { ASSESSMENT_INFO } from "../data/assessmentInfo";
 
 export function ReportPanel({
@@ -18,7 +18,6 @@ export function ReportPanel({
   history,
   config,
   client,
-  setClient,
 }:{
   model: { p:number; cut:number };
   supportEstimate: string;
@@ -34,7 +33,6 @@ export function ReportPanel({
   history: { earlyOnset: boolean };
   config: Config;
   client: ClientProfile;
-  setClient: React.Dispatch<React.SetStateAction<ClientProfile>>;
 }){
   const report = useMemo(() => {
     const has = (obj: SeverityState) => Object.values(obj).some((d) => !!d.severity);
@@ -145,41 +143,9 @@ export function ReportPanel({
     client,
   ]);
 
-  const saveProfile = () => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("clientProfile", JSON.stringify(client));
-    }
-  };
-
   return (
-    <>
-      <Card title="Client">
-        <div className="stack stack--sm">
-          <label>
-            Name
-            <input
-              value={client.name}
-              onChange={(e) => setClient({ ...client, name: e.target.value })}
-            />
-          </label>
-          <label>
-            Age
-            <input
-              type="number"
-              value={client.age}
-              onChange={(e) => setClient({ ...client, age: e.target.value })}
-            />
-          </label>
-          <Row>
-            <button type="button" className="btn" onClick={saveProfile}>
-              Save Profile
-            </button>
-          </Row>
-        </div>
-      </Card>
-      <Card title="Report (preview)">
-        <pre style={{ whiteSpace: "pre-wrap" }}>{report}</pre>
-      </Card>
-    </>
+    <Card title="Report (preview)">
+      <pre style={{ whiteSpace: "pre-wrap" }}>{report}</pre>
+    </Card>
   );
 }

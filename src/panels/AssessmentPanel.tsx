@@ -62,7 +62,7 @@ export function AssessmentPanel({
 
   return (
     <Card title={domain}>
-      <div className="stack stack--lg">
+      <div className="stack stack--md">
         <div className="assessment-add-row">
           <input
             type="text"
