@@ -423,3 +423,16 @@ export function validateTestData(): string[] {
 
   return problems;
 }
+// ----------------------------- FASD Neurobehavioral -----------------------------
+export const FASD_NEURO_SEVERITIES = ["Severe", "Moderate", "Typical"] as const;
+
+export const FASD_NEURO_DOMAINS: DomainLabelConfig[] = [
+  { key: "fasd_executive_function", label: "Executive Function", severities: FASD_NEURO_SEVERITIES },
+  { key: "fasd_attention", label: "Attention", severities: FASD_NEURO_SEVERITIES },
+  { key: "fasd_learning_academic", label: "Learning/Academic", severities: FASD_NEURO_SEVERITIES },
+  { key: "fasd_memory", label: "Memory", severities: FASD_NEURO_SEVERITIES },
+  { key: "fasd_language", label: "Language", severities: FASD_NEURO_SEVERITIES },
+  { key: "fasd_visuospatial", label: "Visuospatial", severities: FASD_NEURO_SEVERITIES },
+  { key: "fasd_motor", label: "Motor", severities: FASD_NEURO_SEVERITIES },
+  { key: "fasd_social_emotional", label: "Social/Emotional Regulation", severities: FASD_NEURO_SEVERITIES },
+];
