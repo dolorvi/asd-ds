@@ -29,7 +29,7 @@ import { AsrsPanel } from "./panels/AsrsPanel";
 import { AbasPanel } from "./panels/AbasPanel";
 import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
-import { QuickAddPresets } from "./components/QuickAddPresets";
+import { AssessmentSelector } from "./components/AssessmentSelector";
 import { ReportPanel } from "./panels/ReportPanel";
 import { AssessmentPanel } from "./panels/AssessmentPanel";
 import { GenericInstrumentPanel } from "./panels/GenericInstrumentPanel";
@@ -395,7 +395,7 @@ export default function App() {
             <section className="stack stack--lg">
               {activeTab === 0 && (
                 <>
-                  <QuickAddPresets
+                  <AssessmentSelector
                     assessments={assessments}
                     setAssessments={setAssessments}
                   />
