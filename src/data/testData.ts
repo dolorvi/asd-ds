@@ -374,14 +374,51 @@ export const CANONICAL_CASES: CanonicalCase[] = [
 // These are *data* integrity checks (not Jest). Consumers can import and run them in dev.
 export function validateTestData(): string[] {
   const problems: string[] = [];
-  const srsKeys = new Set(SRS2_DOMAINS.map(d => d.key));
-  const wiscKeys = new Set(WISC_DOMAINS.map(d => d.key));
-  const abasKeys = new Set(ABAS3_DOMAINS.map(d => d.key));
+
+  // Build maps of domain key -> allowed severity labels for each instrument.
+  const srsDomainMap = new Map(
+    SRS2_DOMAINS.map(d => [d.key, new Set(d.severities)])
+  );
+  const wiscDomainMap = new Map(
+    WISC_DOMAINS.map(d => [d.key, new Set(d.severities)])
+  );
+  const abasDomainMap = new Map(
+    ABAS3_DOMAINS.map(d => [d.key, new Set(d.severities)])
+  );
 
   for (const c of CANONICAL_CASES) {
-    if (c.srs2) for (const k of Object.keys(c.srs2)) if (!srsKeys.has(k)) problems.push(`${c.id}: unknown SRS-2 key ${k}`);
-    if (c.wisc) for (const k of Object.keys(c.wisc)) if (!wiscKeys.has(k)) problems.push(`${c.id}: unknown WISC key ${k}`);
-    if (c.abas3) for (const k of Object.keys(c.abas3)) if (!abasKeys.has(k)) problems.push(`${c.id}: unknown ABAS-3 key ${k}`);
+    if (c.srs2) {
+      for (const [k, severity] of Object.entries(c.srs2)) {
+        const allowed = srsDomainMap.get(k);
+        if (!allowed) {
+          problems.push(`${c.id}: unknown SRS-2 key ${k}`);
+        } else if (!allowed.has(severity)) {
+          problems.push(`${c.id}: invalid severity for ${k}: ${severity}`);
+        }
+      }
+    }
+
+    if (c.wisc) {
+      for (const [k, severity] of Object.entries(c.wisc)) {
+        const allowed = wiscDomainMap.get(k);
+        if (!allowed) {
+          problems.push(`${c.id}: unknown WISC key ${k}`);
+        } else if (!allowed.has(severity)) {
+          problems.push(`${c.id}: invalid severity for ${k}: ${severity}`);
+        }
+      }
+    }
+
+    if (c.abas3) {
+      for (const [k, severity] of Object.entries(c.abas3)) {
+        const allowed = abasDomainMap.get(k);
+        if (!allowed) {
+          problems.push(`${c.id}: unknown ABAS-3 key ${k}`);
+        } else if (!allowed.has(severity)) {
+          problems.push(`${c.id}: invalid severity for ${k}: ${severity}`);
+        }
+      }
+    }
   }
 
   return problems;
