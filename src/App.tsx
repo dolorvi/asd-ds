@@ -30,7 +30,6 @@ import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
 import { AssessmentSelector } from "./components/AssessmentSelector";
 import { ReportPanel } from "./panels/ReportPanel";
-import { AssessmentPanel } from "./panels/AssessmentPanel";
 import { GenericInstrumentPanel } from "./panels/GenericInstrumentPanel";
 import { DomainPanel } from "./panels/DomainPanel";
 import { HistoryPanel } from "./panels/HistoryPanel";
@@ -393,54 +392,13 @@ export default function App() {
             <section className="stack stack--lg">
               {activeTab === 0 && (
                 <>
-                  <AssessmentSelector
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                  />
                   <div id="asd-inst-section">
-                    <AssessmentPanel
-                      domain="Autism questionnaires"
+                    <AssessmentSelector
                       assessments={assessments}
                       setAssessments={setAssessments}
                     />
                   </div>
-                  <AssessmentPanel
-                    domain="Autism observations"
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                  />
-                  <AssessmentPanel
-                    domain="Autism interviews"
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                  />
-                  <div id="adaptive-measure-section">
-                    <AssessmentPanel
-                      domain="Adaptive questionnaires"
-                      assessments={assessments}
-                      setAssessments={setAssessments}
-                    />
-                  </div>
-                  <AssessmentPanel
-                    domain="Intellectual assessment"
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                  />
-                  <AssessmentPanel
-                    domain="Executive function questionnaires"
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                  />
-                  <AssessmentPanel
-                    domain="Sensory Assessment"
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                  />
-                  <AssessmentPanel
-                    domain="Language assessment"
-                    assessments={assessments}
-                    setAssessments={setAssessments}
-                  />
+                  <div id="adaptive-measure-section" />
                   {hasSrs && (
                     <>
                       <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
