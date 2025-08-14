@@ -7,6 +7,9 @@ export function SummaryPanel({
   supportEstimate,
   recommendation,
   exportSummary,
+  exportFull,
+  version,
+  timestamp,
   minDatasetItems,
   onRiskToleranceChange,
   history,
@@ -16,6 +19,9 @@ export function SummaryPanel({
   supportEstimate: string;
   recommendation: string[];
   exportSummary: () => void;
+  exportFull: () => void;
+  version: string;
+  timestamp: string;
   minDatasetItems: MinDatasetItem[];
   onRiskToleranceChange: (v: any) => void;
   history: { maskingIndicators: boolean; verbalFluency: string };
@@ -23,7 +29,7 @@ export function SummaryPanel({
   const handleExport = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value;
     if (v === "summary") exportSummary();
-    if (v === "full") window.print();
+    if (v === "full") exportFull();
     e.target.value = "";
   };
   const met = minDatasetItems.filter((i) => i.met).length;
@@ -54,7 +60,8 @@ export function SummaryPanel({
     specific: "60% cutpoint favors specificity to avoid false positives.",
   };
   return (
-    <aside className="summary" style={{position:"sticky", top:0}}>
+    <aside className="summary" id="summary-section" style={{position:"sticky", top:0}}>
+      <div className="print-only small" style={{marginBottom:8}}>Generated {timestamp} • Version {version}</div>
       <Card title="Summary">
         <Stack>
           <div>
@@ -85,10 +92,10 @@ export function SummaryPanel({
           {(history.maskingIndicators || history.verbalFluency) && (
             <div className="chip-row">
               {history.maskingIndicators && (
-                <span className="chip chip--active">Masking</span>
+                <span className="chip chip--active" role="status" aria-label="Masking">Masking</span>
               )}
               {history.verbalFluency && (
-                <span className="chip chip--active">{history.verbalFluency}</span>
+                <span className="chip chip--active" role="status" aria-label={history.verbalFluency}>{history.verbalFluency}</span>
               )}
             </div>
           )}
@@ -98,7 +105,7 @@ export function SummaryPanel({
           {drivers.length > 0 && (
             <div>
               <div className="small">Top contributors</div>
-              <ul className="small" style={{paddingLeft:16}}>
+              <ul className="small" style={{paddingLeft:16}} aria-label="Top drivers">
                 {drivers.map((d: any) => (
                   <li key={d.name}>{d.name} {d.delta >=0 ? "+" : ""}{d.delta.toFixed(0)}%</li>
                 ))}
@@ -118,6 +125,7 @@ export function SummaryPanel({
                     type="button"
                     className="chip"
                     onClick={() => scrollTo(item.targetId)}
+                    aria-label={item.label}
                   >
                     {item.label}
                   </button>
@@ -141,11 +149,11 @@ export function SummaryPanel({
                 <option value="" disabled>
                   Export...
                 </option>
-                <option value="summary" title="Export only the summary view">
-                  Summary
+                <option value="summary" title="Export key findings and drivers">
+                  Summary report (key findings & drivers)
                 </option>
-                <option value="full" title="Export the full report">
-                  Full
+                <option value="full" title="Export all inputs and scores">
+                  Full report (all inputs & scores)
                 </option>
               </select>
             </label>

@@ -39,6 +39,7 @@ export function ChipGroup({
             style={style}
             onClick={() => onChange(String(opt))}
             aria-pressed={selected}
+            aria-label={String(opt)}
           >
             {opt}
           </button>

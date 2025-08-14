@@ -12,9 +12,17 @@ export type HeaderProps = {
   theme?: "dark" | "light";
   condition?: Condition;
   onConditionChange?: (c: Condition) => void;
+  version: string;
+  timestamp: string;
 };
 
 const CONDITIONS: Condition[] = ["ASD", "ADHD", "ID", "FASD"];
+const CONDITION_TITLES: Record<Condition, string> = {
+  ASD: "Autism Spectrum Disorder",
+  ADHD: "Attention-Deficit/Hyperactivity Disorder",
+  ID: "Intellectual Disability",
+  FASD: "Fetal Alcohol Spectrum Disorder",
+};
 
 export function Header({
   title,
@@ -26,6 +34,8 @@ export function Header({
   theme = "dark",
   condition,
   onConditionChange,
+  version,
+  timestamp,
 }: HeaderProps) {
   return (
     <div className="topbar">
@@ -33,6 +43,7 @@ export function Header({
         <div className="stack stack--sm">
           <h1 className="title">{title}</h1>
           {subtitle ? <div className="subtitle">{subtitle}</div> : null}
+          <div className="print-only small">Generated {timestamp} • Version {version}</div>
 
           {onConditionChange && (
             <div className="row row--wrap">
@@ -41,7 +52,9 @@ export function Header({
                   key={c}
                   className={`chip ${condition === c ? "chip--active" : ""}`}
                   onClick={() => onConditionChange(c)}
-                  title={c}
+                  title={CONDITION_TITLES[c]}
+                  aria-label={CONDITION_TITLES[c]}
+                  aria-pressed={condition === c}
                 >
                   {c}
                 </button>
@@ -125,16 +138,18 @@ export function ChipGroup({
         const active = value === opt;
         const bg = active && getColor ? getColor(opt) : undefined;
         return (
-          <button
-            key={opt}
-            onClick={() => onChange(opt)}
-            className={`chip ${active ? "chip--active" : ""}`}
-            style={bg ? { background: bg, color: "var(--text)" } : undefined}
-          >
-            {opt}
-          </button>
-        );
-      })}
+        <button
+          key={opt}
+          onClick={() => onChange(opt)}
+          className={`chip ${active ? "chip--active" : ""}`}
+          style={bg ? { background: bg, color: "var(--text)" } : undefined}
+          aria-pressed={active}
+          aria-label={opt}
+        >
+          {opt}
+        </button>
+      );
+    })}
     </div>
   );
 }
