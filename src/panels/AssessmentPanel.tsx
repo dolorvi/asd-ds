@@ -1,5 +1,5 @@
-import React from "react";
-import { Card, Row } from "../components/primitives";
+import React, { useState } from "react";
+import { Card } from "../components/primitives";
 import type { AssessmentSelection } from "../types";
 
 export function AssessmentPanel({
@@ -15,12 +15,17 @@ export function AssessmentPanel({
     .map((a, index) => ({ ...a, index }))
     .filter((a) => a.domain === domain);
 
-  const addAssessment = () => {
+  const options = items[0]?.options || [];
+
+  const [pickerValue, setPickerValue] = useState("");
+  const [pickerError, setPickerError] = useState("");
+
+  const addAssessment = (value: string) => {
     const template = items[0];
     if (!template) return;
     setAssessments((arr) => [
       ...arr,
-      { domain, options: template.options, selected: "", primary: false },
+      { domain, options: template.options, selected: value, primary: false },
     ]);
   };
 
@@ -51,43 +56,80 @@ export function AssessmentPanel({
   return (
     <Card title={domain}>
       <div className="stack stack--sm">
+        <div className="assessment-add-row">
+          <select
+            value={pickerValue}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (!val) return;
+              if (items.some((a) => a.selected === val)) {
+                setPickerError("Already added.");
+              } else {
+                addAssessment(val);
+                setPickerError("");
+              }
+              setPickerValue("");
+            }}
+          >
+            <option value="">+ Add assessment...</option>
+            {options.map((o) => (
+              <option key={o} value={o}>
+                {o}
+              </option>
+            ))}
+          </select>
+        </div>
+        <p className={`small${pickerError ? " text-danger" : ""}`}>
+          {pickerError || "Choose a tool to add it below."}
+        </p>
+        <hr className="assessment-divider" />
+        {items.length === 0 && (
+          <div className="assessment-placeholder">
+            No assessments added — select one above to get started.
+          </div>
+        )}
         {items.map((a) => (
-          <Row key={a.index} justify="between" align="center">
-            <label style={{ flex: 1 }}>
-              <select
-                value={a.selected || ""}
-                className={a.selected ? "" : "invalid"}
-                title={a.selected ? "" : "Select assessment"}
-                onChange={(e) => changeSelection(a.index, e.target.value)}
+          <div key={a.index} className="assessment-card">
+            <div className="assessment-card__header">
+              <span>{a.selected || "Select"}</span>
+              <button
+                type="button"
+                className={`badge${a.primary ? " badge--ok" : ""}`}
+                onClick={() => togglePrimary(a.index)}
               >
-                <option value="">Select</option>
-                {a.options.map((o) => (
-                  <option key={o} value={o}>
-                    {o}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="row row--center" style={{ gap: 4 }}>
-              <input
-                type="checkbox"
-                checked={a.primary || false}
-                onChange={() => togglePrimary(a.index)}
-              />
-              Main
-            </label>
-            {items.length > 1 && (
-              <button type="button" className="btn" onClick={() => removeAssessment(a.index)}>
-                Remove
+                Main
               </button>
-            )}
-          </Row>
+            </div>
+            <div className="assessment-card__body">
+              <label>
+                <select
+                  value={a.selected || ""}
+                  className={a.selected ? "" : "invalid"}
+                  title={a.selected ? "" : "Select assessment"}
+                  onChange={(e) => changeSelection(a.index, e.target.value)}
+                >
+                  <option value="">Select</option>
+                  {a.options.map((o) => (
+                    <option key={o} value={o}>
+                      {o}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div className="assessment-card__footer">
+              {items.length > 1 && (
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => removeAssessment(a.index)}
+                >
+                  × Remove
+                </button>
+              )}
+            </div>
+          </div>
         ))}
-        <Row>
-          <button type="button" className="btn" onClick={addAssessment}>
-            Add Assessment
-          </button>
-        </Row>
       </div>
     </Card>
   );
