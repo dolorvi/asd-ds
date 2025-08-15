@@ -30,7 +30,7 @@ export const VINELAND_IMPAIRMENT_MAP: Record<(typeof VINELAND_SEVERITIES)[number
 
 export const DEFAULT_CONFIG: Config = {
   prior: 0,
-  certaintyThreshold: 0.9,
+  certaintyThreshold: 0.5,
   domainWeights: {
     A1: 0.5,
     A2: 0.48,

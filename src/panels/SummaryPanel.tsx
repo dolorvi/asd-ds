@@ -1,5 +1,7 @@
+import React, { useState } from "react";
 import { Card, Stack } from "../components/primitives";
 import type { MinDatasetItem } from "../components/MinDatasetProgress";
+import type { Condition } from "../types";
 
 export function SummaryPanel({
   model,
@@ -49,16 +51,67 @@ export function SummaryPanel({
   const confidence =
     percent === 100 ? "High" : percent >= 50 && hasInstrumentMix ? "Medium" : "Low";
 
+  type PathwayState = {
+    name: Condition;
+    included: boolean;
+    status: "Active" | "Candidate" | "Inactive";
+  };
+
+  const [pathways, setPathways] = useState<PathwayState[]>([
+    { name: "ASD", included: true, status: "Active" },
+    { name: "ADHD", included: false, status: "Inactive" },
+    { name: "FASD", included: false, status: "Inactive" },
+    { name: "ID", included: false, status: "Inactive" },
+  ]);
+  const [primary, setPrimary] = useState<Condition>("ASD");
+
+  const toggleInclude = (name: Condition) => {
+    setPathways((prev) => {
+      const updated = prev.map((p) =>
+        p.name === name ? { ...p, included: !p.included, status: !p.included ? "Active" : "Inactive" } : p
+      );
+      const toggled = updated.find((p) => p.name === name);
+      if (primary === name && toggled && !toggled.included) {
+        const first = updated.find((p) => p.included);
+        setPrimary(first ? first.name : (undefined as any));
+      }
+      return updated;
+    });
+  };
+
   const thresholdExplain: Record<number,string> = {
-    0.8: "Requires at least 80% likelihood to proceed.",
-    0.9: "Requires at least 90% likelihood to proceed.",
-    0.99: "Requires near-certainty at 99% likelihood.",
+    0.5: "Balanced accuracy at 50% threshold.",
+    0.4: "Prioritises sensitivity at 40% threshold.",
+    0.6: "Prioritises specificity at 60% threshold.",
   };
   return (
     <aside className="summary" id="summary-section" style={{position:"sticky", top:0}}>
       <div className="print-only small" style={{marginBottom:8}}>Generated {timestamp} • Version {version}</div>
       <Card title="Summary">
         <Stack>
+          <div className="chip-row" role="group" aria-label="Pathways">
+            {pathways.map((p) => (
+              <button
+                key={p.name}
+                type="button"
+                className={"chip" + (p.included ? " chip--active" : "")}
+                aria-pressed={p.included}
+                title={p.status}
+                onClick={() => toggleInclude(p.name)}
+              >
+                {p.included && (
+                  <input
+                    type="radio"
+                    name="primary-pathway"
+                    checked={primary === p.name}
+                    onChange={() => setPrimary(p.name)}
+                    style={{ marginRight: 4 }}
+                  />
+                )}
+                {p.name}
+              </button>
+            ))}
+          </div>
           <div>
             <div style={{fontSize:32,fontWeight:800}}>{(model.p*100).toFixed(1)}%</div>
             <div className="small">Overall ASD likelihood</div>
@@ -68,9 +121,9 @@ export function SummaryPanel({
                 value={config.certaintyThreshold}
                 onChange={(e) => onThresholdChange(e.target.value)}
               >
-                <option value={0.8}>80%</option>
-                <option value={0.9}>90%</option>
-                <option value={0.99}>99%</option>
+                <option value={0.5}>Balanced 50%</option>
+                <option value={0.4}>Sensitivity 40%</option>
+                <option value={0.6}>Specificity 60%</option>
               </select>
             </label>
             <div className="small">{thresholdExplain[config.certaintyThreshold]}</div>

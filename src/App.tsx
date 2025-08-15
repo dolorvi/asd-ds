@@ -30,6 +30,7 @@ import { AbasPanel } from "./panels/AbasPanel";
 import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
 import { AssessmentSelector } from "./components/AssessmentSelector";
+import { MinDatasetProgress } from "./components/MinDatasetProgress";
 import { ReportPanel } from "./panels/ReportPanel";
 import { GenericInstrumentPanel } from "./panels/GenericInstrumentPanel";
 import { DomainPanel } from "./panels/DomainPanel";
@@ -288,6 +289,9 @@ export default function App() {
         version={VERSION}
         timestamp={exportTimestamp}
       />
+      <div style={{ position: "sticky", top: 0, background: "var(--bg)", zIndex: 5 }}>
+        <MinDatasetProgress items={minDatasetItems} />
+      </div>
       <Card title="Client">
         <div className="row row--wrap" style={{ gap: 8 }}>
           <label style={{ flex: 1 }}>
