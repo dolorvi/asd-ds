@@ -50,17 +50,7 @@ export default function App() {
 
   // ---------- core state ----------
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
-  const TABS = [
-    "Autism",
-    "Adaptive",
-    "Intellectual",
-    "Executive Function",
-    "Sensory",
-    "Language",
-    "History",
-    "Comorbidity",
-    "Report",
-  ] as const;
+  const TABS = ["Assessment", "Impression and Summary"] as const;
   const [activeTab, setActiveTab] = useState(0);
   const [devOpen, setDevOpen] = useState(false);
 
@@ -390,81 +380,121 @@ export default function App() {
             <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
           </div>
 
-          <div className="layout">
-            {/* LEFT: panels per tab */}
+          {activeTab === 0 && (
             <section className="stack stack--lg">
-              {activeTab === 0 && (
+              <div id="asd-inst-section">
+                <AssessmentSelector
+                  assessments={assessments}
+                  setAssessments={setAssessments}
+                />
+              </div>
+              <div id="adaptive-measure-section" />
+              {hasSrs && (
                 <>
-                  <div id="asd-inst-section">
-                    <AssessmentSelector
-                      assessments={assessments}
-                      setAssessments={setAssessments}
+                  <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
+                  {isSchoolAge && (
+                    <SrsPanel
+                      title="SRS-2 Teacher"
+                      domains={config.srs2Domains}
+                      srs2={srs2Teacher}
+                      setSRS2={setSRS2Teacher}
                     />
-                  </div>
-                  <div id="adaptive-measure-section" />
-                  {hasSrs && (
+                  )}
+                </>
+              )}
+              {hasAsrs && (
+                <>
+                  <AsrsPanel title="ASRS Parent" domains={config.asrsDomains} asrs={asrs} setASRS={setASRS} />
+                  {isSchoolAge && (
+                    <AsrsPanel
+                      title="ASRS Teacher"
+                      domains={config.asrsDomains}
+                      asrs={asrsTeacher}
+                      setASRS={setASRSTeacher}
+                    />
+                  )}
+                </>
+              )}
+              {selectedAutismQs.includes("GARS") && (
+                <DomainPanel title="GARS-3" domains={GARS3_DOMAINS} valueMap={gars} setValueMap={setGARS} />
+              )}
+              {selectedAutismQs.includes("CARS") && (
+                <DomainPanel title="CARS-2" domains={CARS2_DOMAINS} valueMap={cars} setValueMap={setCARS} />
+              )}
+              {selectedAutismQs.includes("AQ") && (
+                <DomainPanel title="AQ" domains={AQ_DOMAINS} valueMap={aq} setValueMap={setAQ} />
+              )}
+              {selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "GARS", "CARS", "AQ"].includes(n)).length > 0 && (
+                <GenericInstrumentPanel
+                  selected={selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "GARS", "CARS", "AQ"].includes(n))}
+                  instruments={instruments}
+                  setInstruments={setInstruments}
+                  configs={config.defaultInstruments}
+                />
+              )}
+              {selectedAutismObs.includes("ADOS-2") && (
+                <DomainPanel title="ADOS-2" domains={ADOS2_DOMAINS} valueMap={ados} setValueMap={setADOS} />
+              )}
+              {selectedAutismObs.includes("MIGDAS-2") && (
+                <DomainPanel title="MIGDAS-2" domains={MIGDAS_DOMAINS} valueMap={migdasDomains} setValueMap={setMigdasDomains} />
+              )}
+              {selectedAutismObs.filter((n) => !["ADOS-2", "MIGDAS-2"].includes(n)).length > 0 && (
+                <GenericInstrumentPanel
+                  selected={selectedAutismObs.filter((n) => !["ADOS-2", "MIGDAS-2"].includes(n))}
+                  instruments={instruments}
+                  setInstruments={setInstruments}
+                  configs={config.defaultInstruments}
+                />
+              )}
+              {selectedAutismInterviews.includes("ADI-R") && (
+                <DomainPanel title="ADI-R" domains={ADIR_DOMAINS} valueMap={adir} setValueMap={setADIR} />
+              )}
+              {selectedAutismInterviews.filter((n) => n !== "ADI-R").length > 0 && (
+                <GenericInstrumentPanel
+                  selected={selectedAutismInterviews.filter((n) => n !== "ADI-R")}
+                  instruments={instruments}
+                  setInstruments={setInstruments}
+                  configs={config.defaultInstruments}
+                />
+              )}
+
+              {selectedAdaptive.length > 0 && (
+                <>
+                  {hasAbas && (
                     <>
-                      <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
+                      <AbasPanel
+                        title="ABAS-3 Parent"
+                        domains={config.abasDomains}
+                        options={ABAS_SEVERITIES}
+                        valueMap={abas}
+                        setValueMap={setABAS}
+                      />
                       {isSchoolAge && (
-                        <SrsPanel
-                          title="SRS-2 Teacher"
-                          domains={config.srs2Domains}
-                          srs2={srs2Teacher}
-                          setSRS2={setSRS2Teacher}
+                        <AbasPanel
+                          title="ABAS-3 Teacher"
+                          domains={config.abasDomains}
+                          options={ABAS_SEVERITIES}
+                          valueMap={abasTeacher}
+                          setValueMap={setABASTeacher}
                         />
                       )}
                     </>
                   )}
-                  {hasAsrs && (
-                    <>
-                      <AsrsPanel title="ASRS Parent" domains={config.asrsDomains} asrs={asrs} setASRS={setASRS} />
-                      {isSchoolAge && (
-                        <AsrsPanel
-                          title="ASRS Teacher"
-                          domains={config.asrsDomains}
-                          asrs={asrsTeacher}
-                          setASRS={setASRSTeacher}
-                        />
-                      )}
-                    </>
-                  )}
-                  {selectedAutismQs.includes("GARS") && (
-                    <DomainPanel title="GARS-3" domains={GARS3_DOMAINS} valueMap={gars} setValueMap={setGARS} />
-                  )}
-                  {selectedAutismQs.includes("CARS") && (
-                    <DomainPanel title="CARS-2" domains={CARS2_DOMAINS} valueMap={cars} setValueMap={setCARS} />
-                  )}
-                  {selectedAutismQs.includes("AQ") && (
-                    <DomainPanel title="AQ" domains={AQ_DOMAINS} valueMap={aq} setValueMap={setAQ} />
-                  )}
-                  {selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "GARS", "CARS", "AQ"].includes(n)).length > 0 && (
-                    <GenericInstrumentPanel
-                      selected={selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "GARS", "CARS", "AQ"].includes(n))}
-                      instruments={instruments}
-                      setInstruments={setInstruments}
-                      configs={config.defaultInstruments}
+                  {hasVineland && (
+                    <VinelandPanel
+                      title="Vineland-3 Composite"
+                      domains={config.vinelandDomains ?? VINELAND_DOMAINS}
+                      options={VINELAND_SEVERITIES}
+                      valueMap={{ vineland_composite: getInstrumentBand("Vineland-3") }}
+                      setValueMap={(fn) => {
+                        const next = fn({ vineland_composite: getInstrumentBand("Vineland-3") });
+                        setInstrumentBand("Vineland-3", next.vineland_composite || "");
+                      }}
                     />
                   )}
-                  {selectedAutismObs.includes("ADOS-2") && (
-                    <DomainPanel title="ADOS-2" domains={ADOS2_DOMAINS} valueMap={ados} setValueMap={setADOS} />
-                  )}
-                  {selectedAutismObs.includes("MIGDAS-2") && (
-                    <DomainPanel title="MIGDAS-2" domains={MIGDAS_DOMAINS} valueMap={migdasDomains} setValueMap={setMigdasDomains} />
-                  )}
-                  {selectedAutismObs.filter((n) => !["ADOS-2", "MIGDAS-2"].includes(n)).length > 0 && (
+                  {selectedAdaptive.filter((n) => !["ABAS-3", "Vineland-3"].includes(n)).length > 0 && (
                     <GenericInstrumentPanel
-                      selected={selectedAutismObs.filter((n) => !["ADOS-2", "MIGDAS-2"].includes(n))}
-                      instruments={instruments}
-                      setInstruments={setInstruments}
-                      configs={config.defaultInstruments}
-                    />
-                  )}
-                  {selectedAutismInterviews.includes("ADI-R") && (
-                    <DomainPanel title="ADI-R" domains={ADIR_DOMAINS} valueMap={adir} setValueMap={setADIR} />
-                  )}
-                  {selectedAutismInterviews.filter((n) => n !== "ADI-R").length > 0 && (
-                    <GenericInstrumentPanel
-                      selected={selectedAutismInterviews.filter((n) => n !== "ADI-R")}
+                      selected={selectedAdaptive.filter((n) => !["ABAS-3", "Vineland-3"].includes(n))}
                       instruments={instruments}
                       setInstruments={setInstruments}
                       configs={config.defaultInstruments}
@@ -473,173 +503,96 @@ export default function App() {
                 </>
               )}
 
-              {activeTab === 1 && (
-                selectedAdaptive.length === 0 ? (
-                  <button type="button" className="btn" onClick={() => setActiveTab(0)}>
-                    Select an assessment
-                  </button>
-                ) : (
-                  <>
-                    {hasAbas && (
-                      <>
-                        <AbasPanel
-                          title="ABAS-3 Parent"
-                          domains={config.abasDomains}
-                          options={ABAS_SEVERITIES}
-                          valueMap={abas}
-                          setValueMap={setABAS}
-                        />
-                        {isSchoolAge && (
-                          <AbasPanel
-                            title="ABAS-3 Teacher"
-                            domains={config.abasDomains}
-                            options={ABAS_SEVERITIES}
-                            valueMap={abasTeacher}
-                            setValueMap={setABASTeacher}
-                          />
-                        )}
-                      </>
-                    )}
-                    {hasVineland && (
-                      <VinelandPanel
-                        title="Vineland-3 Composite"
-                        domains={config.vinelandDomains ?? VINELAND_DOMAINS}
-                        options={VINELAND_SEVERITIES}
-                        valueMap={{
-                          vineland_composite: getInstrumentBand("Vineland-3"),
-                        }}
-                        setValueMap={(fn) => {
-                          const next = fn({
-                            vineland_composite: getInstrumentBand("Vineland-3"),
-                          });
-                          setInstrumentBand("Vineland-3", next.vineland_composite || "");
-                        }}
-                      />
-                    )}
-                    {selectedAdaptive.filter((n) => !["ABAS-3", "Vineland-3"].includes(n)).length > 0 && (
-                      <GenericInstrumentPanel
-                        selected={selectedAdaptive.filter((n) => !["ABAS-3", "Vineland-3"].includes(n))}
-                        instruments={instruments}
-                        setInstruments={setInstruments}
-                        configs={config.defaultInstruments}
-                      />
-                    )}
-                  </>
-                )
+              {selectedIntellectual.length > 0 && (
+                <>
+                  {selectedIntellectual.includes("WISC/WAIS/WPPSI") && (
+                    <DomainPanel
+                      title="WISC-V / WAIS-IV / WPPSI-IV"
+                      domains={config.wiscDomains}
+                      valueMap={wisc}
+                      setValueMap={setWISC}
+                    />
+                  )}
+                  {selectedIntellectual.filter((n) => n !== "WISC/WAIS/WPPSI").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedIntellectual.filter((n) => n !== "WISC/WAIS/WPPSI")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
+                </>
               )}
 
-              {activeTab === 2 && (
-                selectedIntellectual.length === 0 ? (
-                  <button type="button" className="btn" onClick={() => setActiveTab(0)}>
-                    Select an assessment
-                  </button>
-                ) : (
-                  <>
-                    {selectedIntellectual.includes("WISC/WAIS/WPPSI") && (
-                      <DomainPanel
-                        title="WISC-V / WAIS-IV / WPPSI-IV"
-                        domains={config.wiscDomains}
-                        valueMap={wisc}
-                        setValueMap={setWISC}
-                      />
-                    )}
-                    {selectedIntellectual.filter((n) => n !== "WISC/WAIS/WPPSI").length > 0 && (
-                      <GenericInstrumentPanel
-                        selected={selectedIntellectual.filter((n) => n !== "WISC/WAIS/WPPSI")}
-                        instruments={instruments}
-                        setInstruments={setInstruments}
-                        configs={config.defaultInstruments}
-                      />
-                    )}
-                  </>
-                )
+              {selectedExecutive.length > 0 && (
+                <>
+                  {selectedExecutive.includes("BRIEF-2") && (
+                    <DomainPanel title="BRIEF-2" domains={BRIEF2_DOMAINS} valueMap={brief} setValueMap={setBRIEF} />
+                  )}
+                  {selectedExecutive.filter((n) => n !== "BRIEF-2").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedExecutive.filter((n) => n !== "BRIEF-2")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
+                </>
               )}
 
-              {activeTab === 3 && (
-                selectedExecutive.length === 0 ? (
-                  <button type="button" className="btn" onClick={() => setActiveTab(0)}>
-                    Select an assessment
-                  </button>
-                ) : (
-                  <>
-                    {selectedExecutive.includes("BRIEF-2") && (
-                      <DomainPanel title="BRIEF-2" domains={BRIEF2_DOMAINS} valueMap={brief} setValueMap={setBRIEF} />
-                    )}
-                    {selectedExecutive.filter((n) => n !== "BRIEF-2").length > 0 && (
-                      <GenericInstrumentPanel
-                        selected={selectedExecutive.filter((n) => n !== "BRIEF-2")}
-                        instruments={instruments}
-                        setInstruments={setInstruments}
-                        configs={config.defaultInstruments}
-                      />
-                    )}
-                  </>
-                )
+              {selectedSensory.length > 0 && (
+                <>
+                  {selectedSensory.includes("Sensory Profile 2") && (
+                    <DomainPanel
+                      title="Sensory Profile 2"
+                      domains={SENSORY_PROFILE_DOMAINS}
+                      valueMap={sensory}
+                      setValueMap={setSensory}
+                    />
+                  )}
+                  {selectedSensory.filter((n) => n !== "Sensory Profile 2").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedSensory.filter((n) => n !== "Sensory Profile 2")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
+                </>
               )}
 
-              {activeTab === 4 && (
-                selectedSensory.length === 0 ? (
-                  <button type="button" className="btn" onClick={() => setActiveTab(0)}>
-                    Select an assessment
-                  </button>
-                ) : (
-                  <>
-                    {selectedSensory.includes("Sensory Profile 2") && (
-                      <DomainPanel
-                        title="Sensory Profile 2"
-                        domains={SENSORY_PROFILE_DOMAINS}
-                        valueMap={sensory}
-                        setValueMap={setSensory}
-                      />
-                    )}
-                    {selectedSensory.filter((n) => n !== "Sensory Profile 2").length > 0 && (
-                      <GenericInstrumentPanel
-                        selected={selectedSensory.filter((n) => n !== "Sensory Profile 2")}
-                        instruments={instruments}
-                        setInstruments={setInstruments}
-                        configs={config.defaultInstruments}
-                      />
-                    )}
-                  </>
-                )
+              {selectedLanguage.length > 0 && (
+                <>
+                  {selectedLanguage.includes("CELF-5") && (
+                    <DomainPanel title="CELF-5" domains={CELF5_DOMAINS} valueMap={celf} setValueMap={setCELF} />
+                  )}
+                  {selectedLanguage.filter((n) => n !== "CELF-5").length > 0 && (
+                    <GenericInstrumentPanel
+                      selected={selectedLanguage.filter((n) => n !== "CELF-5")}
+                      instruments={instruments}
+                      setInstruments={setInstruments}
+                      configs={config.defaultInstruments}
+                    />
+                  )}
+                </>
               )}
 
-              {activeTab === 5 && (
-                selectedLanguage.length === 0 ? (
-                  <button type="button" className="btn" onClick={() => setActiveTab(0)}>
-                    Select an assessment
-                  </button>
-                ) : (
-                  <>
-                    {selectedLanguage.includes("CELF-5") && (
-                      <DomainPanel title="CELF-5" domains={CELF5_DOMAINS} valueMap={celf} setValueMap={setCELF} />
-                    )}
-                    {selectedLanguage.filter((n) => n !== "CELF-5").length > 0 && (
-                      <GenericInstrumentPanel
-                        selected={selectedLanguage.filter((n) => n !== "CELF-5")}
-                        instruments={instruments}
-                        setInstruments={setInstruments}
-                        configs={config.defaultInstruments}
-                      />
-                    )}
-                  </>
-                )
-              )}
+              <div id="history-section">
+                <HistoryPanel
+                  history={history}
+                  setHistory={setHistory}
+                  observation={observation}
+                  setObservation={setObservation}
+                />
+              </div>
 
-              {activeTab === 6 && (
-                <div id="history-section">
-                  <HistoryPanel
-                    history={history}
-                    setHistory={setHistory}
-                    observation={observation}
-                    setObservation={setObservation}
-                  />
-                </div>
-              )}
+              <DiffPanel diff={diff} setDiff={setDiff} />
+            </section>
+          )}
 
-              {activeTab === 7 && <DiffPanel diff={diff} setDiff={setDiff} />}
-
-              {activeTab === 8 && (
+          {activeTab === 1 && (
+            <div className="layout">
+              <section className="stack stack--lg">
                 <ReportPanel
                   model={model}
                   supportEstimate={supportEstimate}
@@ -656,11 +609,8 @@ export default function App() {
                   config={config}
                   client={client}
                 />
-              )}
-            </section>
-
-            {/* RIGHT: summary */}
-            <section className="stack stack--lg">
+              </section>
+              <section className="stack stack--lg">
                 <SummaryPanel
                   model={model}
                   config={config}
@@ -676,6 +626,7 @@ export default function App() {
                 />
               </section>
             </div>
+          )}
           </>
         ) : condition === "FASD" ? (
           <div className="stack stack--lg">
