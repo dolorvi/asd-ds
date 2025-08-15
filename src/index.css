@@ -53,7 +53,8 @@ body{
 }
 h1{font-size:24px}
 h2{font-size:18px}
-label,.title,.subtitle,.section-title,.card-title,h1,h2,h3,h4,h5,h6{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Removed global text truncation to allow labels and headings to wrap naturally */
+/* label,.title,.subtitle,.section-title,.card-title,h1,h2,h3,h4,h5,h6{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} */
 a,button{transition:color var(--t-fast) var(--ease),background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
 /* neutral control baseline */
 button,input,select{height:44px;padding:0 var(--space-inset);font-size:16px;border-radius:var(--radius-sm)}
