@@ -36,7 +36,7 @@ export function GenericInstrumentPanel({
       {items.map((i) => (
         <Card key={i.name} title={i.name}>
           <Row justify="between" align="center">
-            <label style={{ flex: 1 }}>
+            <label style={{ flex: 1 }} title={getFieldLabel(i.name)}>
               {getFieldLabel(i.name)}:
               <input
                 type="number"
@@ -61,7 +61,7 @@ export function GenericInstrumentPanel({
               if (!showBand) return null;
               const label = cfg.bandLabel || "Band";
               return (
-                <label style={{ flex: 1 }}>
+                <label style={{ flex: 1 }} title={label}>
                   {label}:
                   {cfg.bandOptions ? (
                     <select

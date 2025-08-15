@@ -391,15 +391,15 @@ export default function App() {
         <MinDatasetProgress items={minDatasetItems} />
       </div>
       <Card title="Client">
-        <div className="row row--wrap" style={{ gap: 8 }}>
-          <label style={{ flex: 1 }}>
+        <div className="row row--wrap" style={{ gap: "var(--space-inset)" }}>
+          <label style={{ flex: 1 }} title="Name">
             Name
             <input
               value={client.name}
               onChange={(e) => setClient({ ...client, name: e.target.value })}
             />
           </label>
-          <label style={{ width: 100 }}>
+          <label style={{ width: 100 }} title="Age">
             Age
             <input
               type="number"

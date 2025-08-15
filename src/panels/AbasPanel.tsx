@@ -23,8 +23,8 @@ export function AbasPanel({
           return (
             <section key={d.key} className="card">
               <div className="stack stack--sm">
-                <label>
-                  <div className="card-title">{d.label}</div>
+                <label title={d.label}>
+                  <div className="card-title" title={d.label}>{d.label}</div>
                   <select
                     value={sel}
                     onChange={(e)=>setValueMap(s=>({ ...s, [d.key]: { ...s[d.key], severity: e.target.value }}))}

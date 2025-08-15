@@ -16,7 +16,7 @@ export function FacialGrowthPanel({ state, setState }:{
   return (
     <Card title="Facial & Growth">
       <div className="stack stack--md">
-        <label>
+        <label title="Sentinel features">
           Sentinel features
           <select
             value={state.sentinel_features_count}
@@ -30,7 +30,7 @@ export function FacialGrowthPanel({ state, setState }:{
           </select>
         </label>
 
-        <label>
+        <label title="PFL percentile">
           PFL percentile
           <input
             type="number"
@@ -39,7 +39,7 @@ export function FacialGrowthPanel({ state, setState }:{
           />
         </label>
 
-        <label>
+        <label title="Philtrum rank">
           Philtrum rank
           <input
             type="number"
@@ -48,7 +48,7 @@ export function FacialGrowthPanel({ state, setState }:{
           />
         </label>
 
-        <label>
+        <label title="Upper lip thin rank">
           Upper lip thin rank
           <input
             type="number"
@@ -57,7 +57,7 @@ export function FacialGrowthPanel({ state, setState }:{
           />
         </label>
 
-        <label className="row" style={{gap:8,alignItems:"center"}}>
+        <label className="row" style={{gap:"var(--space-inset)",alignItems:"center"}} title="Growth deficiency (≤10th %ile)">
           <input
             type="checkbox"
             checked={state.growth_deficiency}

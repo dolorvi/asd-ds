@@ -31,7 +31,7 @@ export function HistoryPanel({
     <div className="stack stack--lg">
       <Card title="History quick checklist">
         <div className="stack stack--sm">
-          <label>
+          <label className="row row--center" title="Onset <3y">
             <input
               type="checkbox"
               checked={history.earlyOnset}
@@ -39,7 +39,7 @@ export function HistoryPanel({
             />
             Onset {'<'}3y
           </label>
-          <label>
+          <label className="row row--center" title="Regression">
             <input
               type="checkbox"
               checked={history.regression}
@@ -47,7 +47,7 @@ export function HistoryPanel({
             />
             Regression
           </label>
-          <label>
+          <label className="row row--center" title="Early social signs">
             <input
               type="checkbox"
               checked={history.earlySocial}
@@ -55,7 +55,7 @@ export function HistoryPanel({
             />
             Early social signs
           </label>
-          <label>
+          <label className="row row--center" title="Early RRB">
             <input
               type="checkbox"
               checked={history.earlyRRB}
@@ -63,7 +63,7 @@ export function HistoryPanel({
             />
             Early RRB
           </label>
-          <label>
+          <label className="row row--center" title="Cross-setting">
             <input
               type="checkbox"
               checked={history.crossContextImpairment}
@@ -71,7 +71,7 @@ export function HistoryPanel({
             />
             Cross-setting
           </label>
-          <label>
+          <label className="row row--center" title="Family history">
             <input
               type="checkbox"
               checked={history.familyHistory}
@@ -84,14 +84,14 @@ export function HistoryPanel({
 
       <Card title="Developmental History">
         <div className="stack stack--sm">
-          <label>
-            <div className="card-title">Developmental concerns</div>
+          <label title="Developmental concerns">
+            <div className="card-title" title="Developmental concerns">Developmental concerns</div>
             <textarea
               value={history.developmentalConcerns}
               onChange={(e) => updateHistory("developmentalConcerns", e.target.value)}
             />
           </label>
-          <label>
+          <label className="row row--center" title="Masking indicators">
             <input
               type="checkbox"
               checked={history.maskingIndicators}
@@ -99,8 +99,8 @@ export function HistoryPanel({
             />
             Masking indicators
           </label>
-          <label className="stack stack--xs">
-            <div className="card-title">Verbal fluency</div>
+          <label className="stack stack--sm" title="Verbal fluency">
+            <div className="card-title" title="Verbal fluency">Verbal fluency</div>
             <select
               value={history.verbalFluency}
               onChange={(e) => updateHistory("verbalFluency", e.target.value)}
@@ -117,10 +117,10 @@ export function HistoryPanel({
       </Card>
 
       <Card title="Clinician Observation" helper="Direct observation carries the highest weight.">
-        <div className="grid grid--sm" style={{ marginBottom: 16 }}>
+        <div className="grid grid--sm" style={{ marginBottom: "var(--space-gap)" }}>
           {["A1", "A2", "A3", "B1", "B2", "B3", "B4"].map((k) => (
-            <label key={k} className="stack stack--xs">
-              <div className="card-title">{k}</div>
+            <label key={k} className="stack stack--sm" title={k}>
+              <div className="card-title" title={k}>{k}</div>
               <select
                 value={observation[k]}
                 onChange={(e) => updateObservation(k, Number(e.target.value))}
@@ -134,8 +134,8 @@ export function HistoryPanel({
             </label>
           ))}
         </div>
-        <label className="stack stack--xs">
-          <div className="card-title">Notes</div>
+        <label className="stack stack--sm" title="Notes">
+          <div className="card-title" title="Notes">Notes</div>
           <textarea
             value={observation.notes}
             onChange={(e) => updateObservation("notes", e.target.value)}

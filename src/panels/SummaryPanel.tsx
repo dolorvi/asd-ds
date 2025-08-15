@@ -101,7 +101,7 @@ export function SummaryPanel({
   };
   return (
     <aside className="summary" id="summary-section" style={{position:"sticky", top:0}}>
-      <div className="print-only small" style={{marginBottom:8}}>Generated {timestamp} • Version {version}</div>
+      <div className="print-only small" style={{marginBottom:"var(--space-inset)"}}>Generated {timestamp} • Version {version}</div>
       <Card title="Summary">
         <Stack>
           <div className="chip-row" role="group" aria-label="Pathways">
@@ -111,7 +111,7 @@ export function SummaryPanel({
                 type="button"
                 className={"chip" + (p.included ? " chip--active" : "")}
                 aria-pressed={p.included}
-                title={p.status}
+                title={`${p.name} — ${p.status}`}
                 onClick={() => toggleInclude(p.name)}
               >
                 {p.included && (
@@ -130,7 +130,7 @@ export function SummaryPanel({
           <div>
             <div style={{fontSize:32,fontWeight:800}}>{(model.p*100).toFixed(1)}%</div>
             <div className="small">Overall ASD likelihood</div>
-            <label className="small row" style={{gap:8,alignItems:"center"}}>
+            <label className="small row row--center" style={{gap:"var(--space-inset)"}} title="Threshold">
               <span>Threshold:</span>
               <select
                 value={config.certaintyThreshold}
@@ -148,17 +148,17 @@ export function SummaryPanel({
               ? <span className="badge badge--ok">Above threshold — proceed</span>
               : <span className="badge badge--warn">Below threshold — consider more data</span>}
           </div>
-          <div className="row" style={{gap:8,alignItems:"center"}}>
+          <div className="row" style={{gap:"var(--space-inset)",alignItems:"center"}}>
             <div className="card" style={{textAlign:"center",flex:1}}>{supportEstimate}</div>
             <span className="badge">{confidence} confidence</span>
           </div>
           {(history.maskingIndicators || history.verbalFluency) && (
             <div className="chip-row">
               {history.maskingIndicators && (
-                <span className="chip chip--active" role="status" aria-label="Masking">Masking</span>
+                <span className="chip chip--active" role="status" aria-label="Masking" title="Masking">Masking</span>
               )}
               {history.verbalFluency && (
-                <span className="chip chip--active" role="status" aria-label={history.verbalFluency}>{history.verbalFluency}</span>
+                <span className="chip chip--active" role="status" aria-label={history.verbalFluency} title={history.verbalFluency}>{history.verbalFluency}</span>
               )}
             </div>
           )}
@@ -191,7 +191,7 @@ export function SummaryPanel({
               </ul>
             </div>
           )}
-          <div className="row" style={{gap:8}}>
+          <div className="row" style={{gap:"var(--space-inset)"}}>
             <label style={{flex:1}}>
               <select defaultValue="" onChange={handleExport} title="Export options">
                 <option value="" disabled>

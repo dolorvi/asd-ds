@@ -28,8 +28,8 @@ export function Header({
     <header className="topbar">
       <div className="row row--between row--center row--wrap">
         <div className="stack stack--sm">
-          <h1 className="title">{title}</h1>
-          {subtitle ? <div className="subtitle">{subtitle}</div> : null}
+          <h1 className="title" title={title}>{title}</h1>
+          {subtitle ? <div className="subtitle" title={subtitle}>{subtitle}</div> : null}
           <div className="print-only small">Generated {timestamp} • Version {version}</div>
         </div>
 
@@ -62,7 +62,7 @@ export function Card({ title, right, helper, children }:{
     <section className="card">
       {(title || right) && (
         <div className="card__bar">
-          {title ? <h2 className="section-title">{title}</h2> : <span/>}
+          {title ? <h2 className="section-title" title={title}>{title}</h2> : <span/>}
           {right}
         </div>
       )}
@@ -76,7 +76,7 @@ export function Card({ title, right, helper, children }:{
 export function Field({ label, children }:{ label: string; children: React.ReactNode }) {
   return (
     <div className="control">
-      <label className="small">{label}</label>
+      <label className="small" title={label}>{label}</label>
       {children}
     </div>
   );
@@ -103,7 +103,7 @@ export function ChipGroup({
   getColor?: (label:string)=>string;
 }) {
   return (
-    <div className="row row--wrap">
+    <div className="chip-row">
       {options.map((opt) => {
         const active = value === opt;
         const bg = active && getColor ? getColor(opt) : undefined;
@@ -115,6 +115,7 @@ export function ChipGroup({
           style={bg ? { background: bg, color: "var(--text)" } : undefined}
           aria-pressed={active}
           aria-label={opt}
+          title={opt}
         >
           {opt}
         </button>

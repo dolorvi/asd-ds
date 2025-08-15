@@ -28,6 +28,7 @@ export function MinDatasetProgress({ items }: { items: MinDatasetItem[] }) {
             className={"chip" + (item.met ? " chip--active" : "")}
             aria-pressed={item.met}
             aria-label={item.label}
+            title={item.label}
             onClick={() => scrollTo(item.targetId)}
           >
             {item.label}

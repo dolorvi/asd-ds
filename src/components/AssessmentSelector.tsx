@@ -110,7 +110,7 @@ export function AssessmentSelector({
         onChange={(e) => setSearch(e.target.value)}
         autoFocus
       />
-      <div className="row row--wrap" style={{ gap: 8 }}>
+      <div className="chip-row">
         {FILTERS.map((f) => (
           <button
             key={f}
@@ -129,7 +129,7 @@ export function AssessmentSelector({
           const alreadyAdded = assessments.some((a) => a.selected === o.name);
           const key = `${o.domain}__${o.name}`;
           return (
-            <label key={key} className="row row--between assessment-item">
+            <label key={key} className="row row--between assessment-item" title={o.name}>
               <span style={{ flex: 1 }}>
                 {o.name}
                 {alreadyAdded && <span className="small"> ✓</span>}
@@ -146,8 +146,8 @@ export function AssessmentSelector({
           );
         })}
       </div>
-      <div className="row row--between" style={{ marginTop: 8 }}>
-        <label className="row row--center" style={{ gap: 4 }}>
+      <div className="row row--between" style={{ marginTop: "var(--space-gap)" }}>
+        <label className="row row--center" style={{ gap: "var(--space-inset)" }} title="Show ineligible">
           <input
             type="checkbox"
             checked={showIneligible}
@@ -156,7 +156,7 @@ export function AssessmentSelector({
           />
           <span className="small">Show ineligible</span>
         </label>
-        <div className="row" style={{ gap: 8 }}>
+        <div className="row" style={{ gap: "var(--space-inset)" }}>
           <button
             type="button"
             className="btn"

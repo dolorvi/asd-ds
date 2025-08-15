@@ -112,7 +112,7 @@ export function AssessmentPanel({
         {selections.map((a) => (
           <div key={a.index} className="assessment-card">
             <div className="assessment-card__header">
-              <span className="card-title">{a.selected || "Select"}</span>
+              <span className="card-title" title={a.selected || "Select"}>{a.selected || "Select"}</span>
               <button
                 type="button"
                 className={`badge${a.primary ? " badge--ok" : ""}`}
