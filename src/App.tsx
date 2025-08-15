@@ -159,14 +159,59 @@ export default function App() {
 
   // ---------- assessment selections ----------
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
-    { domain: "Autism questionnaires", options: ["ASRS", "SRS-2", "GARS", "CARS", "AQ"] },
-    { domain: "Autism observations", options: ["MIGDAS", "ADOS"] },
+    {
+      domain: "Autism questionnaires",
+      options: ["ASRS", "SRS-2", "GARS", "CARS", "AQ", "ADOS", "ADI-R"],
+    },
+    { domain: "Autism observations", options: ["MIGDAS", "ADOS", "CARS"] },
     { domain: "Autism interviews", options: ["ADI-R"] },
     { domain: "Adaptive questionnaires", options: ["ABAS3", "Vineland"] },
-    { domain: "Executive function questionnaires", options: ["BRIEF2", "BDEFS"] },
+    {
+      domain: "Executive function questionnaires",
+      options: [
+        "BRIEF2",
+        "BDEFS",
+        "Conners-4",
+        "Conners-3",
+        "Conners-EC",
+        "Conners CBRS",
+        "Vanderbilt ADHD Rating Scales",
+        "CPT-3",
+        "D-KEFS",
+        "NEPSY-II (Inhibition)",
+        "NEPSY-II (Statue)",
+      ],
+    },
     { domain: "Intellectual assessment", options: ["WISC", "WPPSI", "WAIS"] },
     { domain: "Language assessment", options: ["CELF5"] },
-    { domain: "Sensory Assessment", options: ["Sensory profile 2"] },
+    {
+      domain: "Sensory Assessment",
+      options: [
+        "Sensory profile 2",
+        "MIGDAS",
+        "ADOS",
+        "CARS",
+        "SRS-2",
+        "GARS",
+        "AQ",
+      ],
+    },
+    { domain: "Academic assessment", options: ["WIAT-III"] },
+    {
+      domain: "Memory assessment",
+      options: ["WRAML2", "CMS", "CVLT-C", "NEPSY-II (Memory for Designs)"] },
+    {
+      domain: "Motor/Visuospatial assessment",
+      options: [
+        "Beery VMI",
+        "BOT-2",
+        "NEPSY-II (Visuomotor)",
+        "NEPSY-II (Statue)",
+        "WISC-V Visual Spatial Index",
+      ],
+    },
+    { domain: "History", options: ["History Profile", "ADI-R"] },
+    { domain: "FASD Core", options: ["Exposure (PAE)", "Facial/Growth"] },
   ]);
 
   const NAME_MAP: Record<string, string> = {
@@ -180,6 +225,8 @@ export default function App() {
     WAIS: "WISC/WAIS/WPPSI",
     "Sensory profile 2": "Sensory Profile 2",
     CELF5: "CELF-5",
+    GARS: "GARS-3",
+    CARS: "CARS-2",
   };
 
   const getSelectedNames = useCallback(
