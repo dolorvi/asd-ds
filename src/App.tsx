@@ -623,7 +623,6 @@ export default function App() {
               </section>
             </div>
           )}
-        </>
 
         <Footer version={VERSION} ruleHash={ruleHash} />
         <AiChat />
