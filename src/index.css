@@ -118,6 +118,10 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .assessment-placeholder{padding:4px;border:2px dashed var(--border);border-radius:6px;text-align:center;color:var(--muted)}
 .text-danger{color:color-mix(in hsl,var(--tone-danger) 60%,black 40%)}
 
+.overlay{position:fixed;inset:0;display:flex;justify-content:center;align-items:flex-start;padding-top:10vh;z-index:200}
+.overlay__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.4)}
+.overlay__content{position:relative;z-index:1}
+
 .assessment-selector{background:var(--elev);border:1px solid var(--border);border-radius:6px;padding:8px}
 .assessment-list{max-height:200px;overflow:auto}
 .assessment-item{padding:4px 0}
