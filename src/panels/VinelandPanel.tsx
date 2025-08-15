@@ -25,8 +25,8 @@ export function VinelandPanel({
             <section key={d.key} className="card">
               <div className="stack stack--sm">
                 <div className="row row--between row--center">
-                  <div className="card-title">{d.label}</div>
-                  {sel && <span className="chip" style={{ background:getBandColor(sel, "goodHigh"), color:"#0b1220" }}>{sel}</span>}
+                  <div className="card-title" title={d.label}>{d.label}</div>
+                  {sel && <span className="chip" style={{ background:getBandColor(sel, "goodHigh"), color:"#0b1220" }} title={sel}>{sel}</span>}
                 </div>
                 <ChipGroup
                   options={options}

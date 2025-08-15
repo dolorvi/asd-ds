@@ -23,14 +23,14 @@ export function DiffPanel({
     <Card title="Comorbidity">
       <div className="stack stack--sm">
         {items.map((item) => (
-          <label key={item.key} className="row" style={{ alignItems: "center", gap: 4 }}>
+          <label key={item.key} className="row" style={{ alignItems: "center", gap: "var(--space-inset)" }} title={item.label}>
             <input
               type="checkbox"
               checked={!!diff[item.key]}
               onChange={(e) => update(item.key, e.target.checked)}
             />
             {item.label}
-            <span title={item.tip} style={{ marginLeft: 4 }}>?</span>
+            <span title={item.tip} style={{ marginLeft: "var(--space-inset)" }}>?</span>
           </label>
         ))}
       </div>

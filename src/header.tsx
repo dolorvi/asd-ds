@@ -31,9 +31,9 @@ export function Header({
 }: HeaderProps) {
   return (
     <header className="topbar">
-      <div className="row" style={{ alignItems: "center", gap: 8 }}>
-        <h1 className="title">{title}</h1>
-        {subtitle && <span className="subtitle small">{subtitle}</span>}
+      <div className="row" style={{ alignItems: "center", gap: "var(--space-inset)" }}>
+        <h1 className="title" title={title}>{title}</h1>
+        {subtitle && <span className="subtitle small" title={subtitle}>{subtitle}</span>}
 
         <div style={{ flex: 1 }} />
 
@@ -55,7 +55,7 @@ export function Header({
           })}
         </div>
 
-        <div className="row" style={{ gap: 8 }}>
+        <div className="row" style={{ gap: "var(--space-inset)" }}>
           <label>
             <select
               defaultValue=""

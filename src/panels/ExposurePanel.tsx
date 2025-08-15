@@ -31,7 +31,7 @@ export function ExposurePanel({ state, setState }:{
   return (
     <Card title="Exposure">
       <div className="stack stack--md">
-        <label>
+        <label title="Prenatal alcohol exposure">
           Prenatal alcohol exposure
           <select
             value={state.pae_level}
@@ -47,9 +47,9 @@ export function ExposurePanel({ state, setState }:{
 
         <fieldset>
           <legend className="small">Timing</legend>
-          <div className="row row--wrap" style={{ gap: 8 }}>
+          <div className="chip-row">
             {TIMING.map((t) => (
-              <label key={t.key} className="chip" style={{ cursor: "pointer" }}>
+              <label key={t.key} className="chip" style={{ cursor: "pointer" }} title={t.label}>
                 <input
                   type="checkbox"
                   checked={state.timing.includes(t.key)}
@@ -63,9 +63,9 @@ export function ExposurePanel({ state, setState }:{
 
         <fieldset>
           <legend className="small">Source</legend>
-          <div className="row row--wrap" style={{ gap: 8 }}>
+          <div className="chip-row">
             {SOURCE.map((t) => (
-              <label key={t.key} className="chip" style={{ cursor: "pointer" }}>
+              <label key={t.key} className="chip" style={{ cursor: "pointer" }} title={t.label}>
                 <input
                   type="checkbox"
                   checked={state.source.includes(t.key)}

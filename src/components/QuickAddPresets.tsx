@@ -44,8 +44,8 @@ export function QuickAddPresets({
   };
 
   return (
-    <div className="pill-row" style={{ marginBottom: "8px" }}>
-      <button type="button" className="pill" onClick={() => handlePreset("observation")}>Observation</button>
+    <div className="chip-row" style={{ marginBottom: "8px" }}>
+      <button type="button" className="chip" onClick={() => handlePreset("observation")}>Observation</button>
     </div>
   );
 }

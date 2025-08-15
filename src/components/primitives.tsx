@@ -20,7 +20,7 @@ export const Card = ({ title, right, helper, children }:{
   <section className="card">
     {(title || right) && (
       <div className="card__bar">
-        {title ? <h2 className="section-title">{title}</h2> : <span/>}
+        {title ? <h2 className="section-title" title={title}>{title}</h2> : <span/>}
         {right}
       </div>
     )}
@@ -44,6 +44,7 @@ export const Chip = ({
     className={`chip ${active ? "chip--active":""}`}
     style={active ? { background: activeBg, color: activeColor } : undefined}
     aria-pressed={active}
+    title={typeof children === "string" ? children : undefined}
     {...props}
   >
     {children}

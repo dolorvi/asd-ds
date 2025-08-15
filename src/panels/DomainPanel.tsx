@@ -19,8 +19,8 @@ export function DomainPanel({
         {domains.map((d) => (
           <section key={d.key} className="card">
             <div className="stack stack--sm">
-              <label>
-                <div className="card-title">{d.label}</div>
+                <label title={d.label}>
+                  <div className="card-title" title={d.label}>{d.label}</div>
                 <select
                   value={valueMap[d.key]?.severity || ""}
                   onChange={(e) =>
