@@ -20,9 +20,9 @@ import {
   CELF5_DOMAINS,
   FASD_NEURO_DOMAINS,
 } from "./data/testData";
-import type { Config, SeverityState, Condition, AssessmentSelection, ClientProfile } from "./types";
+import type { Config, SeverityState, AssessmentSelection, ClientProfile } from "./types";
 
-import { Header, Footer, ConditionSelector } from "./components/ui";
+import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
 import { SrsPanel } from "./panels/SrsPanel";
 import { AsrsPanel } from "./panels/AsrsPanel";
@@ -45,8 +45,6 @@ export default function App() {
   useClickSound();
   const VERSION = "v0.6";
   const [exportTimestamp, setExportTimestamp] = useState("");
-  // ---------- condition ----------
-  const [condition, setCondition] = useState<Condition>("ASD");
 
   // ---------- core state ----------
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
@@ -290,7 +288,6 @@ export default function App() {
         version={VERSION}
         timestamp={exportTimestamp}
       />
-      <ConditionSelector condition={condition} onChange={setCondition} />
       <Card title="Client">
         <div className="row row--wrap" style={{ gap: 8 }}>
           <label style={{ flex: 1 }}>
@@ -314,74 +311,72 @@ export default function App() {
         </div>
       </Card>
 
-      {condition === "ASD" ? (
-        <>
-          <div className="stack stack--lg">
-            {devOpen && (
-              <Card>
-                <div className="row">
-                  <select id="fixtureSelect">
-                    {CANONICAL_CASES.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.id} — {c.title}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={() => {
-                      const selEl = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
-                      const sel = selEl ? CANONICAL_CASES.find((c) => c.id === selEl.value) : undefined;
-                      if (!sel) return;
+      <div className="stack stack--lg">
+        {devOpen && (
+          <Card>
+            <div className="row">
+              <select id="fixtureSelect">
+                {CANONICAL_CASES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.id} — {c.title}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={() => {
+                  const selEl = document.getElementById("fixtureSelect") as HTMLSelectElement | null;
+                  const sel = selEl ? CANONICAL_CASES.find((c) => c.id === selEl.value) : undefined;
+                  if (!sel) return;
 
-                      setSRS2((prev) => {
-                        const next = { ...prev } as SeverityState;
-                        if (sel.srs2)
-                          Object.entries(sel.srs2).forEach(
-                            ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
-                          );
-                        return next;
-                      });
+                  setSRS2((prev) => {
+                    const next = { ...prev } as SeverityState;
+                    if (sel.srs2)
+                      Object.entries(sel.srs2).forEach(
+                        ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                      );
+                    return next;
+                  });
 
-                      setABAS((prev) => {
-                        const next = { ...prev } as SeverityState;
-                        if (sel.abas3)
-                          Object.entries(sel.abas3).forEach(
-                            ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
-                          );
-                        return next;
-                      });
+                  setABAS((prev) => {
+                    const next = { ...prev } as SeverityState;
+                    if (sel.abas3)
+                      Object.entries(sel.abas3).forEach(
+                        ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                      );
+                    return next;
+                  });
 
-                      setWISC((prev) => {
-                        const next = { ...prev } as SeverityState;
-                        if (sel.wisc)
-                          Object.entries(sel.wisc).forEach(
-                            ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
-                          );
-                        return next;
-                      });
+                  setWISC((prev) => {
+                    const next = { ...prev } as SeverityState;
+                    if (sel.wisc)
+                      Object.entries(sel.wisc).forEach(
+                        ([k, v]) => (next[k] = { ...(next[k] || {}), severity: v as string }),
+                      );
+                    return next;
+                  });
 
-                      if (sel.migdas) setMIGDAS({ consistency: sel.migdas.consistency, notes: sel.migdas.notes });
+                  if (sel.migdas) setMIGDAS({ consistency: sel.migdas.consistency, notes: sel.migdas.notes });
 
-                      setHistory((h) => ({
-                        ...h,
-                        developmentalConcerns: "Auto-filled for fixture; replace with clinical history.",
-                        earlyOnset: !!sel.flags?.earlyOnset,
-                        crossContextImpairment: !!sel.flags?.crossContextImpairment,
-                        maskingIndicators: !!sel.flags?.masking,
-                      }));
-                    }}
-                  >
-                    Load
-                  </button>
-                  <div className="small">Dev fixtures for sanity-checks. (Label-only)</div>
-                </div>
-              </Card>
-            )}
-            <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
-          </div>
+                  setHistory((h) => ({
+                    ...h,
+                    developmentalConcerns: "Auto-filled for fixture; replace with clinical history.",
+                    earlyOnset: !!sel.flags?.earlyOnset,
+                    crossContextImpairment: !!sel.flags?.crossContextImpairment,
+                    maskingIndicators: !!sel.flags?.masking,
+                  }));
+                }}
+              >
+                Load
+              </button>
+              <div className="small">Dev fixtures for sanity-checks. (Label-only)</div>
+            </div>
+          </Card>
+        )}
+        <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
+      </div>
 
-          {activeTab === 0 && (
-            <section className="stack stack--lg">
+      {activeTab === 0 && (
+        <section className="stack stack--lg">
               <div id="asd-inst-section">
                 <AssessmentSelector
                   assessments={assessments}
@@ -587,6 +582,7 @@ export default function App() {
               </div>
 
               <DiffPanel diff={diff} setDiff={setDiff} />
+              <FasdPanel valueMap={fasdNeuro} setValueMap={setFasdNeuro} />
             </section>
           )}
 
@@ -627,16 +623,7 @@ export default function App() {
               </section>
             </div>
           )}
-          </>
-        ) : condition === "FASD" ? (
-          <div className="stack stack--lg">
-            <FasdPanel valueMap={fasdNeuro} setValueMap={setFasdNeuro} />
-          </div>
-        ) : (
-          <Card title={`${condition} assessments`}>
-            Assessments for {condition} will be added soon.
-          </Card>
-        )}
+        </>
 
         <Footer version={VERSION} ruleHash={ruleHash} />
         <AiChat />

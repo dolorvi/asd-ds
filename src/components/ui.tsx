@@ -1,5 +1,4 @@
 import React from "react";
-import type { Condition } from "../types";
 
 /* -------------------- Header -------------------- */
 export type HeaderProps = {
@@ -52,42 +51,6 @@ export function Header({
         </div>
       </div>
     </header>
-  );
-}
-
-const CONDITIONS: Condition[] = ["ASD", "ADHD", "ID", "FASD"];
-const CONDITION_TITLES: Record<Condition, string> = {
-  ASD: "Autism Spectrum Disorder",
-  ADHD: "Attention-Deficit/Hyperactivity Disorder",
-  ID: "Intellectual Disability",
-  FASD: "Fetal Alcohol Spectrum Disorder",
-};
-
-export function ConditionSelector({
-  condition,
-  onChange,
-}: {
-  condition: Condition;
-  onChange: (c: Condition) => void;
-}) {
-  return (
-    <div
-      className="row row--wrap"
-      style={{ justifyContent: "center", gap: 8, margin: "8px 0" }}
-    >
-      {CONDITIONS.map((c) => (
-        <button
-          key={c}
-          className={`chip ${condition === c ? "chip--active" : ""}`}
-          onClick={() => onChange(c)}
-          title={CONDITION_TITLES[c]}
-          aria-label={CONDITION_TITLES[c]}
-          aria-pressed={condition === c}
-        >
-          {c}
-        </button>
-      ))}
-    </div>
   );
 }
 
