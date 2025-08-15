@@ -16,6 +16,7 @@ export function AssessmentPanel({
     .filter((a) => a.domain === domain);
 
   const options = items[0]?.options || [];
+  const selections = items.filter((a) => a.selected);
 
   const [pickerValue, setPickerValue] = useState("");
   const [pickerError, setPickerError] = useState("");
@@ -103,12 +104,12 @@ export function AssessmentPanel({
           {pickerError || "Choose a tool to add it below."}
         </p>
         <hr className="assessment-divider" />
-        {items.length === 0 && (
+        {selections.length === 0 && (
           <div className="assessment-placeholder">
-            No assessments added — select one above.
+            Add an assessment to start.
           </div>
         )}
-        {items.map((a) => (
+        {selections.map((a) => (
           <div key={a.index} className="assessment-card">
             <div className="assessment-card__header">
               <span className="card-title">{a.selected || "Select"}</span>
@@ -143,15 +144,13 @@ export function AssessmentPanel({
               </label>
             </div>
             <div className="assessment-card__footer">
-              {items.length > 1 && (
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => removeAssessment(a.index)}
-                >
-                  × Remove
-                </button>
-              )}
+              <button
+                type="button"
+                className="btn"
+                onClick={() => removeAssessment(a.index)}
+              >
+                × Remove
+              </button>
             </div>
           </div>
         ))}

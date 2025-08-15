@@ -159,14 +159,14 @@ export default function App() {
 
   // ---------- assessment selections ----------
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
-    { domain: "Autism questionnaires", options: ["ASRS", "SRS-2", "GARS", "CARS", "AQ"], selected: "SRS-2", primary: true },
-    { domain: "Autism observations", options: ["MIGDAS", "ADOS"], selected: "MIGDAS", primary: true },
-    { domain: "Autism interviews", options: ["ADI-R"], selected: "ADI-R", primary: true },
-    { domain: "Adaptive questionnaires", options: ["ABAS3", "Vineland"], selected: "ABAS3", primary: true },
-    { domain: "Executive function questionnaires", options: ["BRIEF2", "BDEFS"], selected: "BRIEF2", primary: true },
-    { domain: "Intellectual assessment", options: ["WISC", "WPPSI", "WAIS"], selected: "WISC", primary: true },
-    { domain: "Language assessment", options: ["CELF5"], selected: "CELF5", primary: true },
-    { domain: "Sensory Assessment", options: ["Sensory profile 2"], selected: "Sensory profile 2", primary: true },
+    { domain: "Autism questionnaires", options: ["ASRS", "SRS-2", "GARS", "CARS", "AQ"] },
+    { domain: "Autism observations", options: ["MIGDAS", "ADOS"] },
+    { domain: "Autism interviews", options: ["ADI-R"] },
+    { domain: "Adaptive questionnaires", options: ["ABAS3", "Vineland"] },
+    { domain: "Executive function questionnaires", options: ["BRIEF2", "BDEFS"] },
+    { domain: "Intellectual assessment", options: ["WISC", "WPPSI", "WAIS"] },
+    { domain: "Language assessment", options: ["CELF5"] },
+    { domain: "Sensory Assessment", options: ["Sensory profile 2"] },
   ]);
 
   const NAME_MAP: Record<string, string> = {

@@ -41,7 +41,7 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
           delta_pct: { severe: 4, moderate: 2, typical: -2 },
         },
         {
-          name: "Special interests/narrow focus",
+          name: "Special interests / narrow focus",
           direction: "high",
           delta_pct: { severe: 4, moderate: 2, typical: -2 },
         },
@@ -81,7 +81,7 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
           delta_pct: { severe: 6, moderate: 4, typical: -3 },
         },
         {
-          name: "RRB / Sensory (body/object use, change, taste/smell/touch, activity)",
+          name: "RRB / Sensory cluster",
           direction: "high",
           delta_pct: { severe: 6, moderate: 3, typical: -3 },
         },
@@ -121,7 +121,7 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
       cap_pct: 8,
       subscales: [
         {
-          name: "Social/Communication",
+          name: "Social / Communication",
           direction: "high",
           delta_pct: { severe: 3, moderate: 2, typical: -2 },
         },
@@ -206,22 +206,22 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
       cap_pct: 10,
       subscales: [
         {
-          name: "Socialization",
+          name: "Socialization (low score)",
           direction: "low",
           delta_pct: { severe: 5, moderate: 3, typical: -3 },
         },
         {
-          name: "Communication",
+          name: "Communication (low score)",
           direction: "low",
           delta_pct: { severe: 4, moderate: 2, typical: -2 },
         },
         {
-          name: "Daily Living Skills",
+          name: "Daily Living Skills (low score)",
           direction: "low",
           delta_pct: { severe: 2, moderate: 1, typical: -1 },
         },
         {
-          name: "Motor (if applicable)",
+          name: "Motor (low score, if applicable)",
           direction: "low",
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
@@ -231,22 +231,22 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
       cap_pct: 8,
       subscales: [
         {
-          name: "Social",
+          name: "Social (low)",
           direction: "low",
           delta_pct: { severe: 4, moderate: 2, typical: -2 },
         },
         {
-          name: "Communication",
+          name: "Communication (low)",
           direction: "low",
           delta_pct: { severe: 3, moderate: 2, typical: -2 },
         },
         {
-          name: "Self-Direction",
+          name: "Self-Direction (low)",
           direction: "low",
           delta_pct: { severe: 2, moderate: 1, typical: -1 },
         },
         {
-          name: "Daily Living / Practical",
+          name: "Daily Living / Practical (low)",
           direction: "low",
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
@@ -261,19 +261,19 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
           delta_pct: { severe: 3, moderate: 2, typical: -2 },
         },
         {
-          name: "Initiate",
+          name: "Working Memory",
           direction: "high",
-          delta_pct: { severe: 2, moderate: 1, typical: -1 },
+          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
         {
-          name: "Plan/Organize",
+          name: "Plan / Organize",
           direction: "high",
           delta_pct: { severe: 1, moderate: 1, typical: -0.5 },
         },
         {
-          name: "Working Memory",
+          name: "Initiate",
           direction: "high",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+          delta_pct: { severe: 2, moderate: 1, typical: -1 },
         },
         {
           name: "Self-Monitor / Task-Monitor",
@@ -291,7 +291,7 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
       cap_pct: 4,
       subscales: [
         {
-          name: "Organization and Problem-Solving",
+          name: "Organization & Problem-Solving",
           direction: "high",
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
@@ -321,27 +321,27 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
       cap_pct: 5,
       rules: [
         {
-          name: "Processing Speed Index (PSI)",
+          name: "Processing Speed Index low",
           direction: "low",
           delta_pct: { severe: 3, moderate: 2, typical: -1 },
         },
         {
-          name: "Coding (subtest)",
+          name: "Working Memory Index low",
+          direction: "low",
+          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+        },
+        {
+          name: "Visual Spatial / Fluid Reasoning low",
+          direction: "low",
+          delta_pct: { severe: 0.5, moderate: 0.25, typical: -0.25 },
+        },
+        {
+          name: "Comprehension low",
           direction: "low",
           delta_pct: { severe: 2, moderate: 1, typical: -0.5 },
         },
         {
-          name: "Symbol Search (subtest)",
-          direction: "low",
-          delta_pct: { severe: 2, moderate: 1, typical: -0.5 },
-        },
-        {
-          name: "Comprehension (VCI subtest)",
-          direction: "low",
-          delta_pct: { severe: 2, moderate: 1, typical: -0.5 },
-        },
-        {
-          name: "Discrepancy: Visual-Spatial or Fluid Reasoning ≥15 points above Verbal Comprehension",
+          name: "Discrepancy: VS/FR ≫ VCI (≥15 pts)",
           direction: "high",
           delta_pct: { severe: 2, moderate: 1, typical: 0 },
         },
@@ -351,7 +351,7 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
       cap_pct: 5,
       subscales: [
         {
-          name: "Pragmatics Profile / Observational",
+          name: "Pragmatics / Observational",
           direction: "low",
           delta_pct: { severe: 3, moderate: 2, typical: -1 },
         },
@@ -366,7 +366,7 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
         {
-          name: "Formulated Sentences / Recalling Sentences / Word Classes (combined)",
+          name: "Formulated / Recalling Sentences / Word Classes",
           direction: "low",
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
@@ -376,29 +376,29 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
       cap_pct: 6,
       quadrants: [
         {
-          name: "Sensitivity",
+          name: "Sensitivity (quadrant)",
           direction: "high",
           delta_pct: { severe: 1.5, moderate: 1, typical: -0.5 },
         },
         {
-          name: "Avoiding",
+          name: "Avoiding (quadrant)",
           direction: "high",
           delta_pct: { severe: 1.5, moderate: 1, typical: -0.5 },
         },
         {
-          name: "Seeking",
+          name: "Seeking (quadrant)",
           direction: "high",
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
         {
-          name: "Registration",
+          name: "Registration (quadrant)",
           direction: "high",
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
       ],
       modalities: [
         {
-          name: "Auditory / Tactile / Visual / Vestibular / Oral",
+          name: "Modalities (Auditory/Visual/Tactile/Vestibular/Oral)",
           direction: "high",
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
