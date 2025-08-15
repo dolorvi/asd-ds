@@ -47,7 +47,7 @@ export type InstrumentEntry = {
 
 export type Config = {
   prior: number;
-  certaintyThreshold: 0.8 | 0.9 | 0.99;
+  certaintyThreshold: 0.4 | 0.5 | 0.6 | 0.8 | 0.9 | 0.99;
   domainWeights: Record<CriterionKey | AltKey, number>;
   minDataset: MinDatasetRules;
   defaultInstruments: InstrumentConfig[];
