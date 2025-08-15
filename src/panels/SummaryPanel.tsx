@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Stack } from "../components/primitives";
+import ConditionGlyph from "../components/ConditionGlyph";
+import EvidenceRadar from "../components/EvidenceRadar";
+import TernaryMap from "../components/TernaryMap";
 import type { MinDatasetItem } from "../components/MinDatasetProgress";
 import type { Condition } from "../types";
 
@@ -16,6 +19,7 @@ export function SummaryPanel({
   onThresholdChange,
   history,
   pathwayCandidates,
+  evidence,
 }:{
   model: any;
   config: any;
@@ -29,6 +33,7 @@ export function SummaryPanel({
   onThresholdChange: (v: any) => void;
   history: { maskingIndicators: boolean; verbalFluency: string };
   pathwayCandidates: Record<Condition, boolean>;
+  evidence: Record<string, number>;
 }) {
   const handleExport = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value;
@@ -40,7 +45,11 @@ export function SummaryPanel({
   const unmet = minDatasetItems.filter((i) => !i.met);
   const percent = Math.round((met / minDatasetItems.length) * 100);
 
-  const drivers = (model.drivers || []).slice(0,3);
+  const [drivers, setDrivers] = useState<any[]>([]);
+  useEffect(() => {
+    setDrivers(model.drivers || []);
+  }, [model.drivers]);
+  const topDrivers = drivers.slice(0,3);
   const suggestionFor = (label: string) => {
     if (label === "Adaptive measure") return "Add an Adaptive measure (Vineland/ABAS)";
     if (label === "ASD instrument") return "Add an ASD instrument (e.g., ADOS-2, CARS)";
@@ -52,6 +61,8 @@ export function SummaryPanel({
   const hasInstrumentMix = minDatasetItems.find((i) => i.label.includes("instrument") && i.met);
   const confidence =
     percent === 100 ? "High" : percent >= 50 && hasInstrumentMix ? "Medium" : "Low";
+
+  const included = pathways.filter((p) => p.included);
 
   type PathwayState = {
     name: Condition;
@@ -66,6 +77,12 @@ export function SummaryPanel({
     { name: "ID", included: false, status: pathwayCandidates.ID ? "Candidate" : "Inactive" },
   ]);
   const [primary, setPrimary] = useState<Condition>("ASD");
+  const colorMap: Record<Condition, string> = {
+    ASD: "#2563eb",
+    ADHD: "#f59e0b",
+    FASD: "#8b5cf6",
+    ID: "#14b8a6",
+  };
 
   useEffect(() => {
     setPathways((prev) =>
@@ -104,6 +121,19 @@ export function SummaryPanel({
       <div className="print-only small" style={{marginBottom:"var(--space-inset)"}}>Generated {timestamp} • Version {version}</div>
       <Card title="Summary">
         <Stack>
+          <div className="row">
+            {included.map((p) => (
+              <ConditionGlyph
+                key={p.name}
+                label={p.name}
+                color={colorMap[p.name]}
+                posteriorPct={p.name === "ASD" ? model.p : 0}
+                completenessPct={percent / 100}
+                confidence={confidence}
+                badges={[p.status]}
+              />
+            ))}
+          </div>
           <div className="chip-row" role="group" aria-label="Pathways">
             {pathways.map((p) => (
               <button
@@ -165,15 +195,23 @@ export function SummaryPanel({
           {history.maskingIndicators && (
             <div className="small">Weights adjusted for masking</div>
           )}
-          {drivers.length > 0 && (
+          {topDrivers.length > 0 && (
             <div>
               <div className="small">Top contributors</div>
               <ul className="small" style={{paddingLeft:16}} aria-label="Top drivers">
-                {drivers.map((d: any) => (
+                {topDrivers.map((d: any) => (
                   <li key={d.name}>{d.name} {d.delta >=0 ? "+" : ""}{d.delta.toFixed(0)}%</li>
                 ))}
               </ul>
             </div>
+          )}
+          <EvidenceRadar domainScores={evidence} />
+          {included.length === 3 && (
+            <TernaryMap
+              asd={model.p}
+              adhd={0}
+              fasd={0}
+            />
           )}
           <div className="stack stack--sm">
             <div className="row row--between small">

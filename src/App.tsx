@@ -731,6 +731,7 @@ export default function App() {
                   onThresholdChange={handleThresholdChange}
                   history={history}
                   pathwayCandidates={pathwayCandidates}
+                  evidence={evidence}
                 />
               </section>
             </div>
