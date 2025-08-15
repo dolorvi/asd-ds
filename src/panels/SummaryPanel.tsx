@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Stack } from "../components/primitives";
 import type { MinDatasetItem } from "../components/MinDatasetProgress";
 import type { Condition } from "../types";
@@ -15,6 +15,7 @@ export function SummaryPanel({
   minDatasetItems,
   onThresholdChange,
   history,
+  pathwayCandidates,
 }:{
   model: any;
   config: any;
@@ -27,6 +28,7 @@ export function SummaryPanel({
   minDatasetItems: MinDatasetItem[];
   onThresholdChange: (v: any) => void;
   history: { maskingIndicators: boolean; verbalFluency: string };
+  pathwayCandidates: Record<Condition, boolean>;
 }) {
   const handleExport = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value;
@@ -59,11 +61,24 @@ export function SummaryPanel({
 
   const [pathways, setPathways] = useState<PathwayState[]>([
     { name: "ASD", included: true, status: "Active" },
-    { name: "ADHD", included: false, status: "Inactive" },
-    { name: "FASD", included: false, status: "Inactive" },
-    { name: "ID", included: false, status: "Inactive" },
+    { name: "ADHD", included: false, status: pathwayCandidates.ADHD ? "Candidate" : "Inactive" },
+    { name: "FASD", included: false, status: pathwayCandidates.FASD ? "Candidate" : "Inactive" },
+    { name: "ID", included: false, status: pathwayCandidates.ID ? "Candidate" : "Inactive" },
   ]);
   const [primary, setPrimary] = useState<Condition>("ASD");
+
+  useEffect(() => {
+    setPathways((prev) =>
+      prev.map((p) => ({
+        ...p,
+        status: p.included
+          ? "Active"
+          : pathwayCandidates[p.name as Condition]
+          ? "Candidate"
+          : "Inactive",
+      }))
+    );
+  }, [pathwayCandidates]);
 
   const toggleInclude = (name: Condition) => {
     setPathways((prev) => {
