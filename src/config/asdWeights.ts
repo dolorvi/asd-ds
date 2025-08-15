@@ -7,66 +7,71 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
     max_negative_from_differentials_pct: 25,
   },
   instruments: {
-    "ADOS-2": {
-      cap_pct: 30,
-      subscales: [
-        {
-          name: "Social Affect (SA)",
-          direction: "high",
-          delta_pct: { severe: 18, moderate: 10, typical: -9 },
-        },
-        {
-          name: "Restricted/Repetitive Behaviors (RRB)",
-          direction: "high",
-          delta_pct: { severe: 12, moderate: 6, typical: -6 },
-        },
-      ],
-    },
-    "MIGDAS-2": {
-      cap_pct: 20,
-      subscales: [
-        {
-          name: "Social reciprocity differences",
-          direction: "high",
-          delta_pct: { severe: 7, moderate: 4, typical: -4 },
-        },
-        {
-          name: "Communication style (idiosyncratic/pragmatic)",
-          direction: "high",
-          delta_pct: { severe: 5, moderate: 3, typical: -3 },
-        },
-        {
-          name: "Sensory interests/differences",
-          direction: "high",
-          delta_pct: { severe: 4, moderate: 2, typical: -2 },
-        },
-        {
-          name: "Special interests / narrow focus",
-          direction: "high",
-          delta_pct: { severe: 4, moderate: 2, typical: -2 },
-        },
-      ],
-    },
-    "ADI-R": {
-      cap_pct: 20,
-      subscales: [
-        {
-          name: "A. Social interaction",
-          direction: "high",
-          delta_pct: { severe: 10, moderate: 6, typical: -5 },
-        },
-        {
-          name: "B. Communication",
-          direction: "high",
-          delta_pct: { severe: 6, moderate: 4, typical: -3 },
-        },
-        {
-          name: "C. RRB",
-          direction: "high",
-          delta_pct: { severe: 6, moderate: 3, typical: -3 },
-        },
-      ],
-    },
+      "ADOS-2": {
+        cap_pct: 35,
+        subscales: [
+          {
+            name: "Social Affect (SA)",
+            direction: "high",
+            delta_pct: { severe: 20, moderate: 10, typical: -10 },
+          },
+          {
+            name: "Restricted/Repetitive Behaviors (RRB)",
+            direction: "high",
+            delta_pct: { severe: 15, moderate: 7.5, typical: -7.5 },
+          },
+        ],
+      },
+      "MIGDAS-2": {
+        cap_pct: 40,
+        subscales: [
+          {
+            name: "Social reciprocity differences",
+            direction: "high",
+            delta_pct: { severe: 11, moderate: 5.5, typical: -5.5 },
+          },
+          {
+            name: "Communication style (idiosyncratic/pragmatic)",
+            direction: "high",
+            delta_pct: { severe: 11, moderate: 5.5, typical: -5.5 },
+          },
+          {
+            name: "Sensory interests/differences",
+            direction: "high",
+            delta_pct: { severe: 9, moderate: 4.5, typical: -4.5 },
+          },
+          {
+            name: "Special interests / narrow focus",
+            direction: "high",
+            delta_pct: { severe: 9, moderate: 4.5, typical: -4.5 },
+          },
+        ],
+      },
+      "ADI-R": {
+        cap_pct: 28,
+        subscales: [
+          {
+            name: "A. Social interaction",
+            direction: "high",
+            delta_pct: { severe: 10, moderate: 5, typical: -5 },
+          },
+          {
+            name: "B. Communication",
+            direction: "high",
+            delta_pct: { severe: 6, moderate: 3, typical: -3 },
+          },
+          {
+            name: "C. Restricted/Repetitive Behaviors",
+            direction: "high",
+            delta_pct: { severe: 6, moderate: 3, typical: -3 },
+          },
+          {
+            name: "D. Developmental Period",
+            direction: "high",
+            delta_pct: { severe: 6, moderate: 3, typical: -3 },
+          },
+        ],
+      },
     "CARS-2": {
       cap_pct: 20,
       subscales: [
@@ -137,13 +142,13 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
         },
       ],
     },
-    "GARS-3": {
-      cap_pct: 5,
-      subscales: [
-        {
-          name: "Restrictive/Repetitive Behaviors",
-          direction: "high",
-          delta_pct: { severe: 2, moderate: 1, typical: -1 },
+      "GARS-3": {
+        cap_pct: 9,
+        subscales: [
+          {
+            name: "Restrictive/Repetitive Behaviors",
+            direction: "high",
+            delta_pct: { severe: 2, moderate: 1, typical: -1 },
         },
         {
           name: "Social Interaction",
@@ -172,13 +177,13 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
         },
       ],
     },
-    AQ: {
-      cap_pct: 5,
-      subscales: [
-        {
-          name: "Social Skill",
-          direction: "high",
-          delta_pct: { severe: 2, moderate: 1, typical: -1 },
+      AQ: {
+        cap_pct: 9,
+        subscales: [
+          {
+            name: "Social Skill",
+            direction: "high",
+            delta_pct: { severe: 2, moderate: 1, typical: -1 },
         },
         {
           name: "Attention Switching",
@@ -201,14 +206,14 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
       ],
-    },
-    "Vineland-3": {
-      cap_pct: 10,
-      subscales: [
-        {
-          name: "Socialization (low score)",
-          direction: "low",
-          delta_pct: { severe: 5, moderate: 3, typical: -3 },
+      },
+      "Vineland-3": {
+        cap_pct: 12,
+        subscales: [
+          {
+            name: "Socialization (low score)",
+            direction: "low",
+            delta_pct: { severe: 5, moderate: 3, typical: -3 },
         },
         {
           name: "Communication (low score)",
@@ -227,13 +232,13 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
         },
       ],
     },
-    "ABAS-3": {
-      cap_pct: 8,
-      subscales: [
-        {
-          name: "Social (low)",
-          direction: "low",
-          delta_pct: { severe: 4, moderate: 2, typical: -2 },
+      "ABAS-3": {
+        cap_pct: 10,
+        subscales: [
+          {
+            name: "Social (low)",
+            direction: "low",
+            delta_pct: { severe: 4, moderate: 2, typical: -2 },
         },
         {
           name: "Communication (low)",
@@ -252,13 +257,13 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
         },
       ],
     },
-    "BRIEF-2": {
-      cap_pct: 5,
-      subscales: [
-        {
-          name: "Shift (cognitive flexibility)",
-          direction: "high",
-          delta_pct: { severe: 3, moderate: 2, typical: -2 },
+      "BRIEF-2": {
+        cap_pct: 8.5,
+        subscales: [
+          {
+            name: "Shift (cognitive flexibility)",
+            direction: "high",
+            delta_pct: { severe: 3, moderate: 2, typical: -2 },
         },
         {
           name: "Working Memory",
@@ -287,13 +292,13 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
         },
       ],
     },
-    BDEFS: {
-      cap_pct: 4,
-      subscales: [
-        {
-          name: "Organization & Problem-Solving",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+      BDEFS: {
+        cap_pct: 6,
+        subscales: [
+          {
+            name: "Organization & Problem-Solving",
+            direction: "high",
+            delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
         {
           name: "Time Management",
@@ -317,43 +322,38 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
         },
       ],
     },
-    "WISC-V_WPPSI-IV_WAIS-IV": {
-      cap_pct: 5,
-      rules: [
-        {
-          name: "Processing Speed Index low",
-          direction: "low",
-          delta_pct: { severe: 3, moderate: 2, typical: -1 },
-        },
-        {
-          name: "Working Memory Index low",
-          direction: "low",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
-        },
-        {
-          name: "Visual Spatial / Fluid Reasoning low",
-          direction: "low",
-          delta_pct: { severe: 0.5, moderate: 0.25, typical: -0.25 },
-        },
-        {
-          name: "Comprehension low",
-          direction: "low",
-          delta_pct: { severe: 2, moderate: 1, typical: -0.5 },
-        },
-        {
-          name: "Discrepancy: VS/FR ≫ VCI (≥15 pts)",
-          direction: "high",
-          delta_pct: { severe: 2, moderate: 1, typical: 0 },
-        },
-      ],
-    },
-    "CELF-5": {
-      cap_pct: 5,
-      subscales: [
-        {
-          name: "Pragmatics / Observational",
-          direction: "low",
-          delta_pct: { severe: 3, moderate: 2, typical: -1 },
+      "WISC-V_WPPSI-IV_WAIS-IV": {
+        cap_pct: 6.5,
+        rules: [
+          {
+            name: "Processing Speed Index low",
+            direction: "low",
+            delta_pct: { severe: 3, moderate: 2, typical: -1 },
+          },
+          {
+            name: "Working Memory Index low",
+            direction: "low",
+            delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+          },
+          {
+            name: "Visual Spatial / Fluid Reasoning low",
+            direction: "low",
+            delta_pct: { severe: 0.5, moderate: 0.25, typical: -0.25 },
+          },
+          {
+            name: "Comprehension low",
+            direction: "low",
+            delta_pct: { severe: 2, moderate: 1, typical: -0.5 },
+          },
+        ],
+      },
+      "CELF-5": {
+        cap_pct: 7,
+        subscales: [
+          {
+            name: "Pragmatics / Observational",
+            direction: "low",
+            delta_pct: { severe: 3, moderate: 2, typical: -1 },
         },
         {
           name: "Understanding Spoken Paragraphs",
@@ -372,14 +372,14 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
         },
       ],
     },
-    "Sensory Profile 2": {
-      cap_pct: 6,
-      quadrants: [
-        {
-          name: "Sensitivity (quadrant)",
-          direction: "high",
-          delta_pct: { severe: 1.5, moderate: 1, typical: -0.5 },
-        },
+      "Sensory Profile 2": {
+        cap_pct: 5,
+        quadrants: [
+          {
+            name: "Sensitivity (quadrant)",
+            direction: "high",
+            delta_pct: { severe: 1.5, moderate: 1, typical: -0.5 },
+          },
         {
           name: "Avoiding (quadrant)",
           direction: "high",
@@ -390,19 +390,12 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
           direction: "high",
           delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
-        {
-          name: "Registration (quadrant)",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
-        },
-      ],
-      modalities: [
-        {
-          name: "Modalities (Auditory/Visual/Tactile/Vestibular/Oral)",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
-        },
-      ],
-    },
+          {
+            name: "Registration (quadrant)",
+            direction: "high",
+            delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+          },
+        ],
+      },
   },
 };
