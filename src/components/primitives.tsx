@@ -50,12 +50,13 @@ export const Chip = ({
   </button>
 );
 
-export const Tabs = ({ tabs, active, onSelect }:{
-  tabs: string[]; active: number; onSelect: (i:number)=>void
+export const Tabs = ({ tabs, active, onSelect, right }:{
+  tabs: string[]; active: number; onSelect: (i:number)=>void; right?: React.ReactNode;
 }) => (
   <div className="tabbar">
     {tabs.map((t,i)=>(
       <button key={t} className={`tab ${i===active?"tab--active":""}`} onClick={()=>onSelect(i)}>{t}</button>
     ))}
+    {right}
   </div>
 );

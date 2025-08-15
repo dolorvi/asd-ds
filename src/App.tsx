@@ -29,7 +29,7 @@ import { AsrsPanel } from "./panels/AsrsPanel";
 import { AbasPanel } from "./panels/AbasPanel";
 import { SummaryPanel } from "./panels/SummaryPanel";
 import { VinelandPanel } from "./panels/VinelandPanel";
-import { AssessmentSelector } from "./components/AssessmentSelector";
+import { AssessmentPalette } from "./components/AssessmentPalette";
 import { MinDatasetProgress } from "./components/MinDatasetProgress";
 import { ReportPanel } from "./panels/ReportPanel";
 import { GenericInstrumentPanel } from "./panels/GenericInstrumentPanel";
@@ -54,6 +54,18 @@ export default function App() {
   const TABS = ["Assessment", "Impression and Summary"] as const;
   const [activeTab, setActiveTab] = useState(0);
   const [devOpen, setDevOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const [srs2, setSRS2] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
   const [srs2Teacher, setSRS2Teacher] = useState<SeverityState>(() => initSeverityState(config.srs2Domains));
@@ -415,17 +427,24 @@ export default function App() {
             </div>
           </Card>
         )}
-        <Tabs tabs={TABS as unknown as string[]} active={activeTab} onSelect={setActiveTab} />
+        <Tabs
+          tabs={TABS as unknown as string[]}
+          active={activeTab}
+          onSelect={setActiveTab}
+          right={
+            <button
+              type="button"
+              className="btn btn--sm"
+              onClick={() => setPaletteOpen(true)}
+            >
+              + Add
+            </button>
+          }
+        />
       </div>
 
       {activeTab === 0 && (
         <section className="stack stack--lg">
-              <div id="asd-inst-section">
-                <AssessmentSelector
-                  assessments={assessments}
-                  setAssessments={setAssessments}
-                />
-              </div>
               <div id="adaptive-measure-section" />
               {hasSrs && (
                 <>
@@ -672,6 +691,12 @@ export default function App() {
 
         <Footer version={VERSION} ruleHash={ruleHash} />
         <AiChat />
+        <AssessmentPalette
+          open={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          assessments={assessments}
+          setAssessments={setAssessments}
+        />
       </Container>
     );
   }

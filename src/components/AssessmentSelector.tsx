@@ -2,55 +2,64 @@ import React, { useMemo, useState } from "react";
 import type { AssessmentSelection } from "../types";
 
 const CATEGORY_MAP: Record<string, string> = {
-  "Autism questionnaires": "Questionnaires",
-  "Autism observations": "Observation",
-  "Autism interviews": "Interview",
+  "Autism questionnaires": "Social",
+  "Autism observations": "Observation/Interview",
+  "Autism interviews": "Observation/Interview",
   "Adaptive questionnaires": "Adaptive",
-  "Executive function questionnaires": "Executive",
-  "Intellectual assessment": "Intellectual",
+  "Executive function questionnaires": "EF/Attention",
+  "Intellectual assessment": "Cognitive",
   "Language assessment": "Language",
-  "Sensory Assessment": "Sensory",
+  "Sensory Assessment": "RRB/Sensory",
 };
 
 const FILTERS = [
   "All",
-  "Questionnaires",
-  "Observation",
-  "Interview",
-  "Adaptive",
-  "Executive",
-  "Intellectual",
+  "Observation/Interview",
+  "Social",
+  "RRB/Sensory",
   "Language",
-  "Sensory",
+  "EF/Attention",
+  "Cognitive",
+  "Adaptive",
+  "Academic",
+  "Memory",
+  "Motor/Visuospatial",
+  "History",
+  "Comorbidity",
+  "FASD Core",
 ] as const;
 
 const PRESETS: Record<string, string[]> = {
   core: ["SRS-2", "ADOS", "ADI-R", "Vineland"],
   questionnaires: ["SRS-2", "ASRS", "ABAS3", "BRIEF2"],
+  fasd: ["FASD"],
 };
 
 export function AssessmentSelector({
   assessments,
   setAssessments,
+  onDone,
 }: {
   assessments: AssessmentSelection[];
   setAssessments: (
     fn: (arr: AssessmentSelection[]) => AssessmentSelection[],
   ) => void;
+  onDone?: () => void;
 }) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [showIneligible, setShowIneligible] = useState(false);
 
   const allOptions = useMemo(() => {
     const seen = new Set<string>();
-    const opts: { name: string; category: string; domain: string }[] = [];
+    const opts: { name: string; category: string; domain: string; eligible?: boolean }[] = [];
     assessments.forEach((a) => {
       const category = CATEGORY_MAP[a.domain];
       a.options.forEach((opt) => {
         if (category && !seen.has(opt)) {
           seen.add(opt);
-          opts.push({ name: opt, category, domain: a.domain });
+          opts.push({ name: opt, category, domain: a.domain, eligible: true });
         }
       });
     });
@@ -60,7 +69,8 @@ export function AssessmentSelector({
   const filtered = allOptions.filter((o) => {
     const matchesFilter = filter === "All" || o.category === filter;
     const matchesSearch = o.name.toLowerCase().includes(search.toLowerCase());
-    return matchesFilter && matchesSearch;
+    const show = showIneligible || o.eligible !== false;
+    return matchesFilter && matchesSearch && show;
   });
 
   const toggle = (name: string) => {
@@ -87,6 +97,7 @@ export function AssessmentSelector({
       });
     });
     setSelected(new Set());
+    onDone?.();
   };
 
   const handlePreset = (key: keyof typeof PRESETS) => {
@@ -104,6 +115,7 @@ export function AssessmentSelector({
         placeholder="Search assessments..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        autoFocus
       />
       <div className="row row--wrap" style={{ gap: 8 }}>
         {FILTERS.map((f) => (
@@ -135,37 +147,53 @@ export function AssessmentSelector({
         </button>
       </div>
       <div className="assessment-list stack">
-        {filtered.map((o) => (
-          <label key={o.name} className="row row--between assessment-item">
-            <span style={{ flex: 1 }}>{o.name}</span>
-            <span className="small" style={{ width: 120 }}>
-              {o.category}
-            </span>
-            <input
-              type="checkbox"
-              checked={selected.has(o.name)}
-              onChange={() => toggle(o.name)}
-              aria-label={`Select ${o.name}`}
-            />
-          </label>
-        ))}
+        {filtered.map((o) => {
+          const alreadyAdded = assessments.some((a) => a.selected === o.name);
+          return (
+            <label key={o.name} className="row row--between assessment-item">
+              <span style={{ flex: 1 }}>
+                {o.name}
+                {alreadyAdded && <span className="small"> ✓</span>}
+              </span>
+              <span className="small" style={{ width: 120 }}>{o.category}</span>
+              <input
+                type="checkbox"
+                checked={selected.has(o.name)}
+                onChange={() => toggle(o.name)}
+                aria-label={`Select ${o.name}`}
+                disabled={alreadyAdded}
+              />
+            </label>
+          );
+        })}
       </div>
       <div className="row row--between" style={{ marginTop: 8 }}>
-        <button
-          type="button"
-          className="btn"
-          onClick={() => setSelected(new Set())}
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          className="btn btn--accent"
-          onClick={handleAdd}
-          disabled={selected.size === 0}
-        >
-          Add selected ({selected.size})
-        </button>
+        <label className="row row--center" style={{ gap: 4 }}>
+          <input
+            type="checkbox"
+            checked={showIneligible}
+            onChange={(e) => setShowIneligible(e.target.checked)}
+            aria-label="Show ineligible"
+          />
+          <span className="small">Show ineligible</span>
+        </label>
+        <div className="row" style={{ gap: 8 }}>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => setSelected(new Set())}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn--accent"
+            onClick={handleAdd}
+            disabled={selected.size === 0}
+          >
+            Add selected ({selected.size})
+          </button>
+        </div>
       </div>
     </div>
   );
