@@ -84,33 +84,47 @@ export const DEFAULT_CONFIG: Config = {
     { name: "Sensory Profile 2", scoreField: "standard", thresholds: [] },
     { name: "CELF-5", scoreField: "index", thresholds: [] },
     { name: "AQ", scoreField: "raw", thresholds: [] },
+    { name: "Conners-4", scoreField: "t", thresholds: [] },
+    { name: "Conners-3", scoreField: "t", thresholds: [] },
+    { name: "Conners-EC", scoreField: "t", thresholds: [] },
+    { name: "Conners CBRS", scoreField: "t", thresholds: [] },
+    { name: "Vanderbilt ADHD Rating Scales", scoreField: "score", thresholds: [] },
+    { name: "CPT-3", scoreField: "t", thresholds: [] },
+    { name: "D-KEFS", scoreField: "scaled", thresholds: [] },
+    { name: "NEPSY-II (Inhibition)", scoreField: "scaled", thresholds: [] },
+    { name: "NEPSY-II (Statue)", scoreField: "scaled", thresholds: [] },
+    { name: "WIAT-III", scoreField: "standard", thresholds: [] },
+    { name: "WRAML2", scoreField: "standard", thresholds: [] },
+    { name: "CMS", scoreField: "standard", thresholds: [] },
+    { name: "CVLT-C", scoreField: "standard", thresholds: [] },
+    { name: "BOT-3", scoreField: "standard", thresholds: [] },
   ],
 
   // ----- SRS-2 domains (label-only -> evidence deltas) -----
   srs2Domains: SRS2_DOMAINS.map((d) => {
     const m: Record<string, InstrumentBandMap> = {};
     if (d.key === "srs_awareness") {
-      m.Average = { A1: -0.20 };
+      m["Within Normal Limits"] = { A1: -0.20 };
       m.Mild = { A1: -0.05 };
       m.Moderate = { A1: 0.60 };
       m.Severe = { A1: 1.10 };
     } else if (d.key === "srs_cognition") {
-      m.Average = { A2: -0.20 };
+      m["Within Normal Limits"] = { A2: -0.20 };
       m.Mild = { A2: -0.05 };
       m.Moderate = { A2: 0.60 };
       m.Severe = { A2: 1.10 };
     } else if (d.key === "srs_communication") {
-      m.Average = { A3: -0.20 };
+      m["Within Normal Limits"] = { A3: -0.20 };
       m.Mild = { A3: -0.05 };
       m.Moderate = { A3: 0.60 };
       m.Severe = { A3: 1.10 };
     } else if (d.key === "srs_motivation") {
-      m.Average = { A1: -0.05, A3: -0.05 };
+      m["Within Normal Limits"] = { A1: -0.05, A3: -0.05 };
       m.Mild = { A1: -0.02, A3: -0.02 };
       m.Moderate = { A1: 0.25, A3: 0.25 };
       m.Severe = { A1: 0.50, A3: 0.50 };
     } else if (d.key === "srs_rrb") {
-      m.Average = { B2: -0.15, B3: -0.15 };
+      m["Within Normal Limits"] = { B2: -0.15, B3: -0.15 };
       m.Mild = { B2: -0.05, B3: -0.05 };
       m.Moderate = { B2: 0.50, B3: 0.50 };
       m.Severe = { B2: 0.90, B3: 0.90 };

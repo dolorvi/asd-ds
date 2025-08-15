@@ -62,8 +62,6 @@ export function SummaryPanel({
   const confidence =
     percent === 100 ? "High" : percent >= 50 && hasInstrumentMix ? "Medium" : "Low";
 
-  const included = pathways.filter((p) => p.included);
-
   type PathwayState = {
     name: Condition;
     included: boolean;
@@ -76,6 +74,7 @@ export function SummaryPanel({
     { name: "FASD", included: false, status: pathwayCandidates.FASD ? "Candidate" : "Inactive" },
     { name: "ID", included: false, status: pathwayCandidates.ID ? "Candidate" : "Inactive" },
   ]);
+  const included = pathways.filter((p) => p.included);
   const [primary, setPrimary] = useState<Condition>("ASD");
   const colorMap: Record<Condition, string> = {
     ASD: "#2563eb",

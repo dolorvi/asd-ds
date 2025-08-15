@@ -204,7 +204,7 @@ export default function App() {
       domain: "Motor/Visuospatial assessment",
       options: [
         "Beery VMI",
-        "BOT-2",
+        "BOT-3",
         "NEPSY-II (Visuomotor)",
         "NEPSY-II (Statue)",
         "WISC-V Visual Spatial Index",
