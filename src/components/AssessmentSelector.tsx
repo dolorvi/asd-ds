@@ -10,6 +10,11 @@ const CATEGORY_MAP: Record<string, string> = {
   "Intellectual assessment": "Cognitive",
   "Language assessment": "Language",
   "Sensory Assessment": "RRB/Sensory",
+  "Academic assessment": "Academic",
+  "Memory assessment": "Memory",
+  "Motor/Visuospatial assessment": "Motor/Visuospatial",
+  "History": "History",
+  "FASD Core": "FASD Core",
 };
 
 const FILTERS = [
@@ -29,11 +34,7 @@ const FILTERS = [
   "FASD Core",
 ] as const;
 
-const PRESETS: Record<string, string[]> = {
-  core: ["SRS-2", "ADOS", "ADI-R", "Vineland"],
-  questionnaires: ["SRS-2", "ASRS", "ABAS3", "BRIEF2"],
-  fasd: ["FASD"],
-};
+// Preset groups were removed to simplify instrument selection.
 
 export function AssessmentSelector({
   assessments,
@@ -52,13 +53,11 @@ export function AssessmentSelector({
   const [showIneligible, setShowIneligible] = useState(false);
 
   const allOptions = useMemo(() => {
-    const seen = new Set<string>();
     const opts: { name: string; category: string; domain: string; eligible?: boolean }[] = [];
     assessments.forEach((a) => {
       const category = CATEGORY_MAP[a.domain];
       a.options.forEach((opt) => {
-        if (category && !seen.has(opt)) {
-          seen.add(opt);
+        if (category) {
           opts.push({ name: opt, category, domain: a.domain, eligible: true });
         }
       });
@@ -73,17 +72,19 @@ export function AssessmentSelector({
     return matchesFilter && matchesSearch && show;
   });
 
-  const toggle = (name: string) => {
+  const toggle = (name: string, domain: string) => {
+    const key = `${domain}__${name}`;
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
-      else next.add(name);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   };
 
   const handleAdd = () => {
-    selected.forEach((name) => {
+    const uniqueNames = Array.from(new Set(Array.from(selected).map((k) => k.split("__")[1])));
+    uniqueNames.forEach((name) => {
       const meta = allOptions.find((o) => o.name === name);
       if (!meta) return;
       setAssessments((arr) => {
@@ -98,14 +99,6 @@ export function AssessmentSelector({
     });
     setSelected(new Set());
     onDone?.();
-  };
-
-  const handlePreset = (key: keyof typeof PRESETS) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      PRESETS[key].forEach((name) => next.add(name));
-      return next;
-    });
   };
 
   return (
@@ -130,27 +123,13 @@ export function AssessmentSelector({
           </button>
         ))}
       </div>
-      <div className="pill-row" style={{ marginBottom: 8 }}>
-        <button
-          type="button"
-          className="pill"
-          onClick={() => handlePreset("core")}
-        >
-          Core pack
-        </button>
-        <button
-          type="button"
-          className="pill"
-          onClick={() => handlePreset("questionnaires")}
-        >
-          Questionnaire pack
-        </button>
-      </div>
+      {/* Preset buttons removed per requirements */}
       <div className="assessment-list stack">
         {filtered.map((o) => {
           const alreadyAdded = assessments.some((a) => a.selected === o.name);
+          const key = `${o.domain}__${o.name}`;
           return (
-            <label key={o.name} className="row row--between assessment-item">
+            <label key={key} className="row row--between assessment-item">
               <span style={{ flex: 1 }}>
                 {o.name}
                 {alreadyAdded && <span className="small"> ✓</span>}
@@ -158,8 +137,8 @@ export function AssessmentSelector({
               <span className="small" style={{ width: 120 }}>{o.category}</span>
               <input
                 type="checkbox"
-                checked={selected.has(o.name)}
-                onChange={() => toggle(o.name)}
+                checked={selected.has(key)}
+                onChange={() => toggle(o.name, o.domain)}
                 aria-label={`Select ${o.name}`}
                 disabled={alreadyAdded}
               />

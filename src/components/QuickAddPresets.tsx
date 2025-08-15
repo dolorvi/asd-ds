@@ -13,8 +13,6 @@ const INSTRUMENT_DOMAIN: Record<string, string> = {
 };
 
 const PRESETS: Record<string, string[]> = {
-  core: ["SRS-2", "ADOS", "ADI-R", "Vineland"],
-  questionnaires: ["SRS-2", "ASRS", "ABAS3", "BRIEF2"],
   observation: ["ADOS", "MIGDAS"],
 };
 
@@ -47,8 +45,6 @@ export function QuickAddPresets({
 
   return (
     <div className="pill-row" style={{ marginBottom: "8px" }}>
-      <button type="button" className="pill" onClick={() => handlePreset("core")}>Core pack</button>
-      <button type="button" className="pill" onClick={() => handlePreset("questionnaires")}>Questionnaires</button>
       <button type="button" className="pill" onClick={() => handlePreset("observation")}>Observation</button>
     </div>
   );
