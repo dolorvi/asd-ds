@@ -20,7 +20,7 @@ import {
   CELF5_DOMAINS,
   FASD_NEURO_DOMAINS,
 } from "./data/testData";
-import type { Config, SeverityState, AssessmentSelection, ClientProfile } from "./types";
+import type { Config, SeverityState, AssessmentSelection, ClientProfile, Condition } from "./types";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -38,6 +38,8 @@ import { HistoryPanel } from "./panels/HistoryPanel";
 import { DiffPanel } from "./panels/DiffPanel";
 import { AiChat } from "./components/AiChat";
 import { FasdPanel } from "./panels/FasdPanel";
+import { ExposurePanel, type ExposureState } from "./panels/ExposurePanel";
+import { FacialGrowthPanel, type FacialGrowthState } from "./panels/FacialGrowthPanel";
 
 const initSeverityState = (domains: { key: string }[]): SeverityState =>
   Object.fromEntries(domains.map((d) => [d.key, { score: undefined, severity: "" }])) as SeverityState;
@@ -70,6 +72,14 @@ export default function App() {
   const [sensory, setSensory] = useState<SeverityState>(() => initSeverityState(SENSORY_PROFILE_DOMAINS));
   const [celf, setCELF] = useState<SeverityState>(() => initSeverityState(CELF5_DOMAINS));
   const [fasdNeuro, setFasdNeuro] = useState<SeverityState>(() => initSeverityState(FASD_NEURO_DOMAINS));
+  const [exposure, setExposure] = useState<ExposureState>({ pae_level: "", timing: [], source: [] });
+  const [facial, setFacial] = useState<FacialGrowthState>({
+    sentinel_features_count: 0,
+    pfl_percentile: "",
+    philtrum_rank: "",
+    upper_lip_thin_rank: "",
+    growth_deficiency: false,
+  });
 
   const [migdas, setMIGDAS] = useState({
     consistency: (MIGDAS_CONSISTENCY[0] as (typeof MIGDAS_CONSISTENCY)[number]) || "unclear",
@@ -190,6 +200,35 @@ export default function App() {
   const selectedExecutive = getSelectedNames("Executive function questionnaires");
   const selectedSensory = getSelectedNames("Sensory Assessment");
   const selectedLanguage = getSelectedNames("Language assessment");
+
+  const pathwayCandidates = useMemo(() => {
+    const asd = assessments.some((a) =>
+      ["ADOS", "CARS", "ADI-R", "SRS-2"].includes(a.selected || ""),
+    );
+    const adhd = assessments.some((a) => {
+      const sel = a.selected || "";
+      return ["Conners-4", "Conners-3", "Conners-EC", "Vanderbilt", "CPT-3", "BRIEF2", "BRIEF", "BDEFS"].some(
+        (k) => sel.toLowerCase().includes(k.toLowerCase()),
+      );
+    });
+    const fasd =
+      !!exposure.pae_level ||
+      exposure.timing.length > 0 ||
+      exposure.source.length > 0 ||
+      facial.sentinel_features_count > 0 ||
+      facial.pfl_percentile !== "" ||
+      facial.philtrum_rank !== "" ||
+      facial.upper_lip_thin_rank !== "" ||
+      facial.growth_deficiency;
+    const hasAdaptive = assessments.some(
+      (a) => a.domain === "Adaptive questionnaires" && a.selected,
+    );
+    const hasIQ = assessments.some(
+      (a) => a.domain === "Intellectual assessment" && a.selected,
+    );
+    const id = hasAdaptive && hasIQ && !!diff.globalID;
+    return { ASD: asd, ADHD: adhd, FASD: fasd, ID: id } as Record<Condition, boolean>;
+  }, [assessments, exposure, facial, diff]);
 
   // ---------- prior via age band ----------
   const age = Number(client.age) || 0;
@@ -586,6 +625,8 @@ export default function App() {
               </div>
 
               <DiffPanel diff={diff} setDiff={setDiff} />
+              <ExposurePanel state={exposure} setState={setExposure} />
+              <FacialGrowthPanel state={facial} setState={setFacial} />
               <FasdPanel valueMap={fasdNeuro} setValueMap={setFasdNeuro} />
             </section>
           )}
@@ -623,6 +664,7 @@ export default function App() {
                   minDatasetItems={minDatasetItems}
                   onThresholdChange={handleThresholdChange}
                   history={history}
+                  pathwayCandidates={pathwayCandidates}
                 />
               </section>
             </div>
