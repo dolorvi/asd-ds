@@ -205,7 +205,7 @@ export default function App() {
     {
       domain: "Executive function questionnaires",
       options: [
-        "BRIEF2",
+        "BRIEF-2",
         "BDEFS",
         "Conners-4",
         "Conners-EC",
@@ -238,7 +238,8 @@ export default function App() {
     Vineland: "Vineland-3",
     MIGDAS: "MIGDAS-2",
     ADOS: "ADOS-2",
-    BRIEF2: "BRIEF-2",
+    "BRIEF2": "BRIEF-2",
+    "BRIEF-2": "BRIEF-2",
     WISC: "WISC/WAIS/WPPSI",
     WPPSI: "WISC/WAIS/WPPSI",
     WAIS: "WISC/WAIS/WPPSI",
@@ -283,7 +284,7 @@ export default function App() {
     );
     const adhd = assessments.some((a) => {
       const sel = a.selected || "";
-      return ["Conners-4", "Conners-EC", "Vanderbilt", "BRIEF2", "BRIEF", "BDEFS"].some(
+      return ["Conners-4", "Conners-EC", "Vanderbilt", "BRIEF-2", "BRIEF", "BDEFS"].some(
         (k) => sel.toLowerCase().includes(k.toLowerCase()),
       );
     });
