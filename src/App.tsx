@@ -252,6 +252,7 @@ export default function App() {
       domain: "Executive function questionnaires",
       options: [
         "BRIEF-2",
+        "BRIEF-2 (v2)",
         "BDEFS",
         "Conners-4",
         "Conners-EC",
@@ -285,6 +286,7 @@ export default function App() {
     MIGDAS: "MIGDAS-2",
     ADOS: "ADOS-2",
     "BRIEF-2": "BRIEF-2",
+    "BRIEF-2 (v2)": "BRIEF-2 (v2)",
     WISC: "WISC/WAIS/WPPSI",
     WPPSI: "WISC/WAIS/WPPSI",
     WAIS: "WISC/WAIS/WPPSI",
@@ -322,6 +324,7 @@ export default function App() {
   const selectedExecutive = getSelectedNames("Executive function questionnaires");
   const selectedSensory = getSelectedNames("Sensory Assessment");
   const selectedLanguage = getSelectedNames("Language assessment");
+  const briefName = selectedExecutive.find((n) => n.startsWith("BRIEF-2"));
 
   const pathwayCandidates = useMemo(() => {
     const asd = assessments.some((a) =>
@@ -329,7 +332,7 @@ export default function App() {
     );
     const adhd = assessments.some((a) => {
       const sel = a.selected || "";
-      return ["Conners-4", "Conners-EC", "Vanderbilt", "BRIEF-2", "BRIEF", "BDEFS"].some(
+      return ["Conners-4", "Conners-EC", "Vanderbilt", "BRIEF-2", "BRIEF-2 (v2)", "BRIEF", "BDEFS"].some(
         (k) => sel.toLowerCase().includes(k.toLowerCase()),
       );
     });
@@ -821,29 +824,33 @@ export default function App() {
 
               {selectedExecutive.length > 0 && (
                 <>
-                  {selectedExecutive.includes("BRIEF-2") && isBriefAge && (
-                    <>
-                      <DomainPanel
-                        title="BRIEF-2 Parent"
-                        domains={BRIEF2_DOMAINS}
-                        valueMap={briefParent}
-                        setValueMap={setBRIEFParent}
-                        highlightMap={briefHighlight}
-                      />
-                      {isSchoolAge && (
+                  {selectedExecutive.some((n) => n.startsWith("BRIEF-2")) &&
+                    isBriefAge && (
+                      <>
                         <DomainPanel
-                          title="BRIEF-2 Teacher"
+                          title={`${briefName} Parent`}
                           domains={BRIEF2_DOMAINS}
-                          valueMap={briefTeacher}
-                          setValueMap={setBRIEFTeacher}
+                          valueMap={briefParent}
+                          setValueMap={setBRIEFParent}
                           highlightMap={briefHighlight}
                         />
-                      )}
-                    </>
-                  )}
-                  {selectedExecutive.filter((n) => n !== "BRIEF-2").length > 0 && (
+                        {isSchoolAge && (
+                          <DomainPanel
+                            title={`${briefName} Teacher`}
+                            domains={BRIEF2_DOMAINS}
+                            valueMap={briefTeacher}
+                            setValueMap={setBRIEFTeacher}
+                            highlightMap={briefHighlight}
+                          />
+                        )}
+                      </>
+                    )}
+                  {selectedExecutive.filter((n) => !n.startsWith("BRIEF-2"))
+                    .length > 0 && (
                     <GenericInstrumentPanel
-                      selected={selectedExecutive.filter((n) => n !== "BRIEF-2")}
+                      selected={selectedExecutive.filter(
+                        (n) => !n.startsWith("BRIEF-2"),
+                      )}
                       instruments={instruments}
                       setInstruments={setInstruments}
                       configs={config.defaultInstruments}
