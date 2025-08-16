@@ -9,7 +9,6 @@ const INSTRUMENT_DOMAIN: Record<string, string> = {
   "ADI-R": "Autism interviews",
   Vineland: "Adaptive questionnaires",
   ABAS3: "Adaptive questionnaires",
-  BRIEF2: "Executive function questionnaires",
   "BRIEF-2": "Executive function questionnaires",
 };
 

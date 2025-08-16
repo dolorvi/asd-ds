@@ -8,7 +8,6 @@ const NAME_MAP: Record<string, string> = {
   Vineland: "Vineland-3",
   MIGDAS: "MIGDAS-2",
   ADOS: "ADOS-2",
-  BRIEF2: "BRIEF-2",
   "BRIEF-2": "BRIEF-2",
   WISC: "WISC/WAIS/WPPSI",
   WPPSI: "WISC/WAIS/WPPSI",
