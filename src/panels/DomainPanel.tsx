@@ -18,36 +18,42 @@ export function DomainPanel({
   return (
     <Card title={title}>
       <div className="grid grid--sm">
-        {domains.map((d) => (
-          <section key={d.key} className="card">
-            <div className="stack stack--sm">
+        {domains.map((d) => {
+          const sel = valueMap[d.key]?.severity || "";
+          const wt = highlightMap?.[d.key]?.[sel] ?? 0;
+          const tone =
+            wt >= 5
+              ? "tone-warn"
+              : wt >= 3 || wt <= -5
+              ? "tone-danger"
+              : undefined;
+          return (
+            <section key={d.key} className="card">
+              <div className="stack stack--sm">
                 <label title={d.label}>
                   <div className="card-title" title={d.label}>{d.label}</div>
-                <select
-                  value={valueMap[d.key]?.severity || ""}
-                  className={
-                    highlightMap && Math.abs(highlightMap[d.key]?.[valueMap[d.key]?.severity || ""] || 0) >= 3
-                      ? "tone-danger"
-                      : undefined
-                  }
-                  onChange={(e) =>
-                    setValueMap((s) => ({
-                      ...s,
-                      [d.key]: { ...s[d.key], severity: e.target.value },
-                    }))
-                  }
-                >
-                  <option value="">Select</option>
-                  {d.severities.map((sev) => (
-                    <option key={sev} value={sev}>
-                      {sev}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </section>
-        ))}
+                  <select
+                    value={sel}
+                    className={tone}
+                    onChange={(e) =>
+                      setValueMap((s) => ({
+                        ...s,
+                        [d.key]: { ...s[d.key], severity: e.target.value },
+                      }))
+                    }
+                  >
+                    <option value="">Select</option>
+                    {d.severities.map((sev) => (
+                      <option key={sev} value={sev}>
+                        {sev}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </section>
+          );
+        })}
       </div>
     </Card>
   );
