@@ -7,31 +7,38 @@ export function AsrsPanel({
   domains,
   asrs,
   setASRS,
+  highlightMap,
 }:{
   title: string;
   domains:{key:string;label:string;severities:string[]}[];
   asrs:SeverityState;
   setASRS:(fn:(s:SeverityState)=>SeverityState)=>void;
+  highlightMap?: Record<string, Record<string, number>>;
 }) {
   return (
     <Card title={title}>
       <div className="grid grid--sm">
-        {domains.map(d=>(
-          <section key={d.key} className="card">
-            <div className="stack stack--sm">
+        {domains.map(d=>{
+          const sel = asrs[d.key]?.severity || "";
+          const danger = highlightMap && Math.abs(highlightMap[d.key]?.[sel] || 0) >= 3;
+          return (
+            <section key={d.key} className="card">
+              <div className="stack stack--sm">
                 <label title={d.label}>
                   <div className="card-title" title={d.label}>{d.label}</div>
-                <select
-                  value={asrs[d.key]?.severity || ""}
-                  onChange={(e)=>setASRS(s=>({ ...s, [d.key]: { ...s[d.key], severity: e.target.value }}))}
-                >
-                  <option value="">Select</option>
-                  {d.severities.map(sev => <option key={sev} value={sev}>{sev}</option>)}
-                </select>
-              </label>
-            </div>
-          </section>
-        ))}
+                  <select
+                    value={sel}
+                    className={danger ? "tone-danger" : undefined}
+                    onChange={(e)=>setASRS(s=>({ ...s, [d.key]: { ...s[d.key], severity: e.target.value }}))}
+                  >
+                    <option value="">Select</option>
+                    {d.severities.map(sev => <option key={sev} value={sev}>{sev}</option>)}
+                  </select>
+                </label>
+              </div>
+            </section>
+          );
+        })}
       </div>
     </Card>
   );
