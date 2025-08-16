@@ -131,12 +131,14 @@ export function ReportPanel({
       : "";
     const contextNote =
       " Clinical interpretation should consider developmental history and individual context.";
+    const recommendationText =
+      " Regular monitoring and periodic reassessment are recommended to track progress and adjust supports as needed.";
     const assessmentsText = lines.length
       ? `Assessments:\n${lines.map((l) => `- ${l}`).join("\n")}\n\n`
       : "";
     const intro = client.name || client.age ? `${client.name || "Client"}, Age ${client.age || "N/A"}\n\n` : "";
     const summary = testList
-      ? `${early}Multiple tests completed including ${testList} ${presence}. ${support}${impactText}.${difficultyText}${contextNote}`
+      ? `${early}Multiple tests completed including ${testList} ${presence}. ${support}${impactText}.${difficultyText}${contextNote}${recommendationText}`
       : "Insufficient data for report.";
     return `${intro}${assessmentsText}${summary}`;
   }, [
