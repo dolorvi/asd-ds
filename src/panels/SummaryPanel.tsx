@@ -127,8 +127,6 @@ export function SummaryPanel({
                 label={p.name}
                 color={colorMap[p.name]}
                 posteriorPct={p.name === "ASD" ? model.p : 0}
-                completenessPct={percent / 100}
-                confidence={confidence}
                 badges={[p.status]}
               />
             ))}
