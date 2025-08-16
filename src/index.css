@@ -56,7 +56,7 @@ h2{font-size:18px}
 label,.title,.subtitle,.section-title,.card-title,h1,h2,h3,h4,h5,h6{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 a,button{transition:color var(--t-fast) var(--ease),background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
 /* neutral control baseline */
-button,input,select{height:44px;padding:0 var(--space-inset);font-size:16px;border-radius:var(--radius-sm)}
+button,input,select{height:44px;padding:0 var(--space-inset);font-size:16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--panel)}
 button{background:transparent;color:inherit;border:1px solid transparent;font-weight:600;cursor:pointer;min-width:44px}
 button:hover{transform:translateY(-1px) scale(1.02)}
 button:active{transform:scale(0.97)}

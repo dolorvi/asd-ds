@@ -21,8 +21,9 @@ export function DomainPanel({
         {domains.map((d) => {
           const sel = valueMap[d.key]?.severity || "";
           const wt = highlightMap?.[d.key]?.[sel] ?? 0;
+          const isHighest = sel !== "" && d.severities[d.severities.length - 1] === sel;
           const tone =
-            wt >= 5
+            isHighest && wt >= 5
               ? "tone-warn"
               : wt >= 3 || wt <= -5
               ? "tone-danger"

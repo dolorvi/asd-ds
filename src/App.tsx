@@ -59,7 +59,7 @@ export default function App() {
 
   // ---------- core state ----------
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
-  const TABS = ["Assessment", "Impression and Summary"] as const;
+  const TABS = ["Assessment", "History Checklist", "Impression and Summary"] as const;
   const [activeTab, setActiveTab] = useState(0);
   const [devOpen, setDevOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -897,15 +897,6 @@ export default function App() {
                 </>
               )}
 
-              <div id="history-section">
-                <HistoryPanel
-                  history={history}
-                  setHistory={setHistory}
-                  observation={observation}
-                  setObservation={setObservation}
-                />
-              </div>
-
               <DiffPanel diff={diff} setDiff={setDiff} />
               <ExposurePanel state={exposure} setState={setExposure} />
               <FacialGrowthPanel state={facial} setState={setFacial} />
@@ -914,6 +905,17 @@ export default function App() {
           )}
 
           {activeTab === 1 && (
+            <section className="stack stack--lg" id="history-section">
+              <HistoryPanel
+                history={history}
+                setHistory={setHistory}
+                observation={observation}
+                setObservation={setObservation}
+              />
+            </section>
+          )}
+
+          {activeTab === 2 && (
             <div className="layout">
               <section className="stack stack--lg">
                 <ReportPanel
