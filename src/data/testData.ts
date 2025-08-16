@@ -53,11 +53,6 @@ export const ASRS_DOMAINS: DomainLabelConfig[] = [
 export const GENERIC_SEVERITIES = ["Average", "Mild", "Moderate", "Severe"] as const;
 
 export const ADOS2_SEVERITIES = ["Minimal", "Low", "Moderate", "High"] as const;
-export const CARS2_SEVERITIES = [
-  "Minimal-to-no symptoms",
-  "Mild-to-moderate",
-  "Severe",
-] as const;
 export const MIGDAS_SEVERITIES = [
   "Not consistent",
   "Partially consistent",
@@ -68,20 +63,13 @@ export const ADIR_SEVERITIES = [
   "Borderline",
   "Meets algorithm",
 ] as const;
-export const GARS3_SEVERITIES = ["Average", "Elevated"] as const;
 export const AQ_SEVERITIES = ["Below threshold", "At-or-above threshold"] as const;
 export const CELF5_SEVERITIES = ["Very Low", "Low", "Below Average", "Average", "Above Average"] as const;
 export const BRIEF2_SEVERITIES = ["Within Normal Limits", "Elevated", "Very Elevated"] as const;
 export const BDEFS_SEVERITIES = ["Average", "Moderately Deficient", "Severe"] as const;
 export const CONNERS_SEVERITIES = ["Average", "Elevated", "Very Elevated"] as const;
 export const VANDERBILT_SEVERITIES = ["No", "Yes"] as const;
-export const CPT3_SEVERITIES = ["Not Elevated", "Borderline", "Clinical"] as const;
-export const DKEFS_SEVERITIES = ["Well Below", "Below", "Low Average", "Average", "Above"] as const;
-export const NEPSY_SEVERITIES = ["Below Expected", "Borderline", "Expected"] as const;
 export const WIAT3_SEVERITIES = ["Very Low", "Low", "Below Average", "Average", "Above Average", "Very High"] as const;
-export const WRAML2_SEVERITIES = ["Very Low", "Low", "Low-Average", "Average", "High"] as const;
-export const CMS_SEVERITIES = ["Below Average", "Average", "Above Average"] as const;
-export const CVLTC_SEVERITIES = ["Below Expected", "Expected", "Above Expected"] as const;
 export const BOT3_SEVERITIES = ["Well-Below Average", "Below Average", "Average", "Above Average"] as const;
 
 // ----------------------------- WISC (VCI/VSI/FRI/WMI/PSI) -----------------------------
@@ -129,31 +117,6 @@ export const VINELAND_DOMAINS: DomainLabelConfig[] = [
 ];
 
 // ----------------------------- Additional Autism Questionnaires -----------------------------
-export const GARS3_DOMAINS: DomainLabelConfig[] = [
-  { key: "gars_rrb",         label: "Restrictive/Repetitive Behaviors", severities: GARS3_SEVERITIES },
-  { key: "gars_social",      label: "Social Interaction",               severities: GARS3_SEVERITIES },
-  { key: "gars_communication", label: "Communication",                  severities: GARS3_SEVERITIES },
-  { key: "gars_emotional",   label: "Emotional Responses",              severities: GARS3_SEVERITIES },
-  { key: "gars_cognitive",   label: "Cognitive Style",                  severities: GARS3_SEVERITIES },
-  { key: "gars_speech",      label: "Maladaptive Speech",               severities: GARS3_SEVERITIES },
-];
-
-export const CARS2_DOMAINS: DomainLabelConfig[] = [
-  { key: "cars_relating",      label: "Relating to People",      severities: CARS2_SEVERITIES },
-  { key: "cars_emotion",       label: "Emotional Response",      severities: CARS2_SEVERITIES },
-  { key: "cars_body_use",      label: "Body Use",                severities: CARS2_SEVERITIES },
-  { key: "cars_object_use",    label: "Object Use",              severities: CARS2_SEVERITIES },
-  { key: "cars_adaptation",    label: "Adaptation to Change",    severities: CARS2_SEVERITIES },
-  { key: "cars_listening",     label: "Listening Response",      severities: CARS2_SEVERITIES },
-  { key: "cars_visual",        label: "Visual Response",         severities: CARS2_SEVERITIES },
-  { key: "cars_taste_smell",   label: "Taste/Smell/Touch",       severities: CARS2_SEVERITIES },
-  { key: "cars_fear",          label: "Fear/Nervousness",        severities: CARS2_SEVERITIES },
-  { key: "cars_verbal",        label: "Verbal Communication",    severities: CARS2_SEVERITIES },
-  { key: "cars_nonverbal",     label: "Nonverbal Communication", severities: CARS2_SEVERITIES },
-  { key: "cars_activity",      label: "Activity Level",          severities: CARS2_SEVERITIES },
-  { key: "cars_intellectual",  label: "Intellectual Response",   severities: CARS2_SEVERITIES },
-  { key: "cars_general",       label: "General Impressions",     severities: CARS2_SEVERITIES },
-];
 
 export const AQ_DOMAINS: DomainLabelConfig[] = [
   { key: "aq_social",     label: "Social Skill",         severities: AQ_SEVERITIES },
@@ -225,58 +188,11 @@ export const VANDERBILT_DOMAINS: DomainLabelConfig[] = [
   { key: "vanderbilt_impairment", label: "Performance Impairment", severities: VANDERBILT_SEVERITIES },
 ];
 
-export const CPT3_DOMAINS: DomainLabelConfig[] = [
-  { key: "cpt_detectability", label: "Detectability", severities: CPT3_SEVERITIES },
-  { key: "cpt_omissions", label: "Omissions", severities: CPT3_SEVERITIES },
-  { key: "cpt_commissions", label: "Commissions", severities: CPT3_SEVERITIES },
-  { key: "cpt_perseverations", label: "Perseverations", severities: CPT3_SEVERITIES },
-  { key: "cpt_hit_rt", label: "Hit RT", severities: CPT3_SEVERITIES },
-  { key: "cpt_hit_rt_se", label: "Hit RT SE", severities: CPT3_SEVERITIES },
-  { key: "cpt_variability", label: "Variability", severities: CPT3_SEVERITIES },
-  { key: "cpt_hrt_isi", label: "HRT ISI", severities: CPT3_SEVERITIES },
-  { key: "cpt_hrt_block", label: "HRT Block Change", severities: CPT3_SEVERITIES },
-];
-
-export const DKEFS_DOMAINS: DomainLabelConfig[] = [
-  { key: "dkefs_trails", label: "Trail Making", severities: DKEFS_SEVERITIES },
-  { key: "dkefs_color_word", label: "Color-Word Interference", severities: DKEFS_SEVERITIES },
-  { key: "dkefs_fluency", label: "Verbal Fluency", severities: DKEFS_SEVERITIES },
-];
-
-export const NEPSY_EF_DOMAINS: DomainLabelConfig[] = [
-  { key: "nepsy_inhibition", label: "Inhibition", severities: NEPSY_SEVERITIES },
-  { key: "nepsy_statue", label: "Statue", severities: NEPSY_SEVERITIES },
-];
-
 export const WIAT3_DOMAINS: DomainLabelConfig[] = [
   { key: "wiat_reading", label: "Reading", severities: WIAT3_SEVERITIES },
   { key: "wiat_math", label: "Mathematics", severities: WIAT3_SEVERITIES },
   { key: "wiat_written", label: "Written Expression", severities: WIAT3_SEVERITIES },
   { key: "wiat_oral", label: "Oral Language", severities: WIAT3_SEVERITIES },
-];
-
-export const WRAML2_DOMAINS: DomainLabelConfig[] = [
-  { key: "wraml_verbal", label: "Verbal Memory", severities: WRAML2_SEVERITIES },
-  { key: "wraml_visual", label: "Visual Memory", severities: WRAML2_SEVERITIES },
-  { key: "wraml_attention", label: "Attention/Concentration", severities: WRAML2_SEVERITIES },
-  { key: "wraml_general", label: "General Memory", severities: WRAML2_SEVERITIES },
-  { key: "wraml_working", label: "Working Memory", severities: WRAML2_SEVERITIES },
-];
-
-export const CMS_DOMAINS: DomainLabelConfig[] = [
-  { key: "cms_verbal_immediate", label: "Verbal Immediate", severities: CMS_SEVERITIES },
-  { key: "cms_verbal_delayed", label: "Verbal Delayed", severities: CMS_SEVERITIES },
-  { key: "cms_visual_immediate", label: "Visual Immediate", severities: CMS_SEVERITIES },
-  { key: "cms_visual_delayed", label: "Visual Delayed", severities: CMS_SEVERITIES },
-  { key: "cms_attention", label: "Attention/Concentration", severities: CMS_SEVERITIES },
-  { key: "cms_learning", label: "Learning", severities: CMS_SEVERITIES },
-];
-
-export const CVLTC_DOMAINS: DomainLabelConfig[] = [
-  { key: "cvlt_learning", label: "Trials 1-5 Learning", severities: CVLTC_SEVERITIES },
-  { key: "cvlt_short_delay", label: "Short Delay Free Recall", severities: CVLTC_SEVERITIES },
-  { key: "cvlt_long_delay", label: "Long Delay Free Recall", severities: CVLTC_SEVERITIES },
-  { key: "cvlt_recognition", label: "Recognition", severities: CVLTC_SEVERITIES },
 ];
 
 export const BOT3_DOMAINS: DomainLabelConfig[] = [

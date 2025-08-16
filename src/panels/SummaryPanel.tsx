@@ -52,7 +52,7 @@ export function SummaryPanel({
   const topDrivers = drivers.slice(0,3);
   const suggestionFor = (label: string) => {
     if (label === "Adaptive measure") return "Add an Adaptive measure (Vineland/ABAS)";
-    if (label === "ASD instrument") return "Add an ASD instrument (e.g., ADOS-2, CARS)";
+    if (label === "ASD instrument") return "Add an ASD instrument (e.g., ADOS-2)";
     if (label === "History") return "Gather developmental history";
     if (label.startsWith("≥")) return "Increase instrument count";
     return `Add ${label}`;

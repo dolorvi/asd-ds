@@ -72,26 +72,6 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
           },
         ],
       },
-    "CARS-2": {
-      cap_pct: 20,
-      subscales: [
-        {
-          name: "Relating to people / Emotional response",
-          direction: "high",
-          delta_pct: { severe: 8, moderate: 5, typical: -5 },
-        },
-        {
-          name: "Communication (verbal & nonverbal)",
-          direction: "high",
-          delta_pct: { severe: 6, moderate: 4, typical: -3 },
-        },
-        {
-          name: "RRB / Sensory cluster",
-          direction: "high",
-          delta_pct: { severe: 6, moderate: 3, typical: -3 },
-        },
-      ],
-    },
     "SRS-2": {
       cap_pct: 15,
       subscales: [
@@ -139,41 +119,6 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
           name: "Self-Regulation",
           direction: "high",
           delta_pct: { severe: 2, moderate: 1, typical: -1 },
-        },
-      ],
-    },
-      "GARS-3": {
-        cap_pct: 9,
-        subscales: [
-          {
-            name: "Restrictive/Repetitive Behaviors",
-            direction: "high",
-            delta_pct: { severe: 2, moderate: 1, typical: -1 },
-        },
-        {
-          name: "Social Interaction",
-          direction: "high",
-          delta_pct: { severe: 2, moderate: 1, typical: -1 },
-        },
-        {
-          name: "Communication",
-          direction: "high",
-          delta_pct: { severe: 2, moderate: 1, typical: -1 },
-        },
-        {
-          name: "Emotional Responses",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 1, typical: -0.5 },
-        },
-        {
-          name: "Cognitive Style",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
-        },
-        {
-          name: "Maladaptive Speech",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
         },
       ],
     },
