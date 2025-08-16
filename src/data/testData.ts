@@ -52,7 +52,7 @@ export const ASRS_DOMAINS: DomainLabelConfig[] = [
 // Generic severities for instruments without published bands
 export const GENERIC_SEVERITIES = ["Average", "Mild", "Moderate", "Severe"] as const;
 
-export const ADOS2_SEVERITIES = ["Minimal", "Low", "Moderate", "High"] as const;
+export const ADOS2_SEVERITIES = ["Non-spectrum", "Autism"] as const;
 export const MIGDAS_SEVERITIES = [
   "Not consistent",
   "Partially consistent",

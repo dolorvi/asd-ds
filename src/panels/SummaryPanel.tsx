@@ -20,6 +20,7 @@ export function SummaryPanel({
   history,
   pathwayCandidates,
   evidence,
+  conditionPercents,
 }:{
   model: any;
   config: any;
@@ -34,6 +35,7 @@ export function SummaryPanel({
   history: { maskingIndicators: boolean; verbalFluency: string };
   pathwayCandidates: Record<Condition, boolean>;
   evidence: Record<string, number>;
+  conditionPercents: Record<Condition, number>;
 }) {
   const handleExport = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const v = e.target.value;
@@ -121,16 +123,16 @@ export function SummaryPanel({
       <Card title="Summary">
         <Stack>
           <div className="row">
-            {included.map((p) => (
-              <ConditionGlyph
-                key={p.name}
-                label={p.name}
-                color={colorMap[p.name]}
-                posteriorPct={p.name === "ASD" ? model.p : 0}
-                badges={[p.status]}
-              />
-            ))}
-          </div>
+          {included.map((p) => (
+            <ConditionGlyph
+              key={p.name}
+              label={p.name}
+              color={colorMap[p.name]}
+              posteriorPct={Math.max(0, conditionPercents[p.name]) / 100}
+              badges={[p.status]}
+            />
+          ))}
+        </div>
           <div className="chip-row" role="group" aria-label="Pathways">
             {pathways.map((p) => (
               <button
