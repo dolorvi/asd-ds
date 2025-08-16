@@ -78,6 +78,7 @@ export const DEFAULT_CONFIG: Config = {
     { name: "ABAS-3", scoreField: "composite", thresholds: [] },
     { name: "WISC/WAIS/WPPSI", scoreField: "index", thresholds: [] },
     { name: "BRIEF-2", scoreField: "t", thresholds: [] },
+    { name: "BRIEF-2 (v2)", scoreField: "t", thresholds: [] },
     { name: "BDEFS", scoreField: "t", thresholds: [] },
     { name: "Sensory Profile 2", scoreField: "standard", thresholds: [] },
     { name: "CELF-5", scoreField: "index", thresholds: [] },

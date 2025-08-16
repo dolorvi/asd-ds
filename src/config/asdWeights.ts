@@ -209,34 +209,69 @@ export const ASD_WEIGHTS_V1: ASDWeightConfig = {
             name: "Shift (cognitive flexibility)",
             direction: "high",
             delta_pct: { severe: 3, moderate: 2, typical: -2 },
-        },
-        {
-          name: "Working Memory",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
-        },
-        {
-          name: "Plan / Organize",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 1, typical: -0.5 },
-        },
-        {
-          name: "Initiate",
-          direction: "high",
-          delta_pct: { severe: 2, moderate: 1, typical: -1 },
-        },
-        {
-          name: "Self-Monitor / Task-Monitor",
-          direction: "high",
-          delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
-        },
-        {
-          name: "Inhibit / Emotional Control / Organization of Materials",
-          direction: "high",
-          delta_pct: { severe: 0.5, moderate: 0.5, typical: -0.25 },
-        },
-      ],
-    },
+          },
+          {
+            name: "Working Memory",
+            direction: "high",
+            delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+          },
+          {
+            name: "Plan / Organize",
+            direction: "high",
+            delta_pct: { severe: 1, moderate: 1, typical: -0.5 },
+          },
+          {
+            name: "Initiate",
+            direction: "high",
+            delta_pct: { severe: 2, moderate: 1, typical: -1 },
+          },
+          {
+            name: "Self-Monitor / Task-Monitor",
+            direction: "high",
+            delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+          },
+          {
+            name: "Inhibit / Emotional Control / Organization of Materials",
+            direction: "high",
+            delta_pct: { severe: 0.5, moderate: 0.5, typical: -0.25 },
+          },
+        ],
+      },
+      "BRIEF-2 (v2)": {
+        cap_pct: 8.5,
+        subscales: [
+          {
+            name: "Shift (cognitive flexibility)",
+            direction: "high",
+            delta_pct: { severe: 3, moderate: 2, typical: -2 },
+          },
+          {
+            name: "Working Memory",
+            direction: "high",
+            delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+          },
+          {
+            name: "Plan / Organize",
+            direction: "high",
+            delta_pct: { severe: 1, moderate: 1, typical: -0.5 },
+          },
+          {
+            name: "Initiate",
+            direction: "high",
+            delta_pct: { severe: 2, moderate: 1, typical: -1 },
+          },
+          {
+            name: "Self-Monitor / Task-Monitor",
+            direction: "high",
+            delta_pct: { severe: 1, moderate: 0.5, typical: -0.5 },
+          },
+          {
+            name: "Inhibit / Emotional Control / Organization of Materials",
+            direction: "high",
+            delta_pct: { severe: 0.5, moderate: 0.5, typical: -0.25 },
+          },
+        ],
+      },
       BDEFS: {
         cap_pct: 6,
         subscales: [

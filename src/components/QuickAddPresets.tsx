@@ -10,6 +10,7 @@ const INSTRUMENT_DOMAIN: Record<string, string> = {
   Vineland: "Adaptive questionnaires",
   ABAS3: "Adaptive questionnaires",
   "BRIEF-2": "Executive function questionnaires",
+  "BRIEF-2 (v2)": "Executive function questionnaires",
 };
 
 const PRESETS: Record<string, string[]> = {

@@ -104,6 +104,16 @@ export const ASSESSMENT_INFO: Record<string, AssessmentInfo> = {
     notes:
       "T-scores have mean = 50 (SD = 10) and yield a Global Executive Composite; scores \u226565 indicate clinical concern.",
   },
+  brief2v2: {
+    name: "BRIEF-2 (v2) (Behavior Rating Inventory of Executive Function, 2nd Edition)",
+    domains: [
+      "Behavioral Regulation Index",
+      "Emotional Regulation Index",
+      "Cognitive Regulation Index",
+    ],
+    notes:
+      "T-scores have mean = 50 (SD = 10) and yield a Global Executive Composite; scores \u226565 indicate clinical concern.",
+  },
   bdefs: {
     name: "BDEFS (Barkley Deficits in Executive Functioning Scale)",
     domains: [
