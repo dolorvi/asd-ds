@@ -20,7 +20,13 @@ export function AsrsPanel({
       <div className="grid grid--sm">
         {domains.map(d=>{
           const sel = asrs[d.key]?.severity || "";
-          const danger = highlightMap && Math.abs(highlightMap[d.key]?.[sel] || 0) >= 3;
+          const wt = highlightMap?.[d.key]?.[sel] ?? 0;
+          const tone =
+            wt >= 5
+              ? "tone-warn"
+              : wt >= 3 || wt <= -5
+              ? "tone-danger"
+              : undefined;
           return (
             <section key={d.key} className="card">
               <div className="stack stack--sm">
@@ -28,7 +34,7 @@ export function AsrsPanel({
                   <div className="card-title" title={d.label}>{d.label}</div>
                   <select
                     value={sel}
-                    className={danger ? "tone-danger" : undefined}
+                    className={tone}
                     onChange={(e)=>setASRS(s=>({ ...s, [d.key]: { ...s[d.key], severity: e.target.value }}))}
                   >
                     <option value="">Select</option>

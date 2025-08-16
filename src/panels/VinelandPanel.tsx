@@ -23,9 +23,15 @@ export function VinelandPanel({
       <div className="grid grid--sm">
         {domains.map(d=>{
           const sel = valueMap[d.key] || "";
-          const danger = highlightMap && Math.abs(highlightMap[d.key]?.[sel] || 0) >= 3;
+          const wt = highlightMap?.[d.key]?.[sel] ?? 0;
+          const tone =
+            wt >= 5
+              ? "tone-warn"
+              : wt >= 3 || wt <= -5
+              ? "tone-danger"
+              : "";
           return (
-            <section key={d.key} className={"card" + (danger ? " tone-danger" : "") }>
+            <section key={d.key} className={"card" + (tone ? ` ${tone}` : "") }>
               <div className="stack stack--sm">
                 <div className="row row--between row--center">
                   <div className="card-title" title={d.label}>{d.label}</div>

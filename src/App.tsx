@@ -166,8 +166,10 @@ export default function App() {
       Object.entries(domains).forEach(([domain, sevMap]) => {
         if (!result[domain]) result[domain] = {};
         Object.entries(sevMap).forEach(([sev, wt]) => {
-          const abs = Math.abs(wt);
-          result[domain][sev] = Math.max(result[domain][sev] || 0, abs);
+          const current = result[domain][sev];
+          if (current === undefined || Math.abs(wt) > Math.abs(current)) {
+            result[domain][sev] = wt;
+          }
         });
       });
     });
