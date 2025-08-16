@@ -54,14 +54,18 @@ export function AssessmentSelector({
 
   const allOptions = useMemo(() => {
     const opts: { name: string; category: string; domain: string; eligible?: boolean }[] = [];
-    assessments.forEach((a) => {
-      const category = CATEGORY_MAP[a.domain];
-      a.options.forEach((opt) => {
-        if (category) {
-          opts.push({ name: opt, category, domain: a.domain, eligible: true });
-        }
+    // Only include base domain definitions (those without a selected instrument)
+    // so that adding an assessment doesn't duplicate options and break filtering.
+    assessments
+      .filter((a) => !a.selected)
+      .forEach((a) => {
+        const category = CATEGORY_MAP[a.domain];
+        a.options.forEach((opt) => {
+          if (category) {
+            opts.push({ name: opt, category, domain: a.domain, eligible: true });
+          }
+        });
       });
-    });
     return opts;
   }, [assessments]);
 
