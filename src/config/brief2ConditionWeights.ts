@@ -1,0 +1,48 @@
+import type { Condition } from "../types";
+
+export const BRIEF2_CONDITION_WEIGHTS: Record<Condition, Record<string, Record<string, number>>> = {
+  ASD: {
+    brief_inhibition: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_self_monitor: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_shift: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_emotional: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_initiate: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_working_memory: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_plan_organize: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_task_monitor: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_materials: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+  },
+  FASD: {
+    brief_inhibition: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_self_monitor: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_shift: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_emotional: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_initiate: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_working_memory: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_plan_organize: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_task_monitor: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_materials: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+  },
+  ADHD: {
+    brief_inhibition: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_self_monitor: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_shift: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_emotional: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_initiate: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_working_memory: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_plan_organize: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_task_monitor: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_materials: { Average: 0, "Mildly Elevated": 1, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+  },
+  ID: {
+    brief_inhibition: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_self_monitor: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_shift: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_emotional: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_initiate: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_working_memory: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_plan_organize: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_task_monitor: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+    brief_materials: { Average: 0, "Mildly Elevated": 0, "Potentially Clinically Elevated": 1, "Clinically Elevated": 1 },
+  },
+};

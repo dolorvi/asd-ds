@@ -23,6 +23,7 @@ import { ADOS2_CONDITION_WEIGHTS } from "./config/ados2ConditionWeights";
 import { ADIR_CONDITION_WEIGHTS } from "./config/adirConditionWeights";
 import { SRS2_CONDITION_WEIGHTS } from "./config/srs2ConditionWeights";
 import { VINELAND_CONDITION_WEIGHTS } from "./config/vinelandConditionWeights";
+import { BRIEF2_CONDITION_WEIGHTS } from "./config/brief2ConditionWeights";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -81,7 +82,8 @@ export default function App() {
   const [ados, setADOS] = useState<SeverityState>(() => initSeverityState(ADOS2_DOMAINS));
   const [migdasDomains, setMigdasDomains] = useState<SeverityState>(() => initSeverityState(MIGDAS_DOMAINS));
   const [adir, setADIR] = useState<SeverityState>(() => initSeverityState(ADIR_DOMAINS));
-  const [brief, setBRIEF] = useState<SeverityState>(() => initSeverityState(BRIEF2_DOMAINS));
+  const [briefParent, setBRIEFParent] = useState<SeverityState>(() => initSeverityState(BRIEF2_DOMAINS));
+  const [briefTeacher, setBRIEFTeacher] = useState<SeverityState>(() => initSeverityState(BRIEF2_DOMAINS));
   const [sensory, setSensory] = useState<SeverityState>(() => initSeverityState(SENSORY_PROFILE_DOMAINS));
   const [celf, setCELF] = useState<SeverityState>(() => initSeverityState(CELF5_DOMAINS));
   const [fasdNeuro, setFasdNeuro] = useState<SeverityState>(() => initSeverityState(FASD_NEURO_DOMAINS));
@@ -180,6 +182,7 @@ export default function App() {
   const adirHighlight = useMemo(() => buildHighlightMap(ADIR_CONDITION_WEIGHTS), []);
   const srsHighlight = useMemo(() => buildHighlightMap(SRS2_CONDITION_WEIGHTS), []);
   const vinelandHighlight = useMemo(() => buildHighlightMap(VINELAND_CONDITION_WEIGHTS), []);
+  const briefHighlight = useMemo(() => buildHighlightMap(BRIEF2_CONDITION_WEIGHTS), []);
 
   // ---------- assessment selections ----------
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
@@ -310,14 +313,23 @@ export default function App() {
   }, [age]);
 
   const isSchoolAge = age < 18;
+  const isBriefAge = age >= 5 && age <= 18;
 
   useEffect(() => {
     if (!isSchoolAge) {
       setSRS2Teacher(() => initSeverityState(config.srs2Domains));
       setASRSTeacher(() => initSeverityState(config.asrsDomains));
       setABASTeacher(() => initSeverityState(config.abasDomains));
+      setBRIEFTeacher(() => initSeverityState(BRIEF2_DOMAINS));
     }
   }, [isSchoolAge, config.srs2Domains, config.asrsDomains, config.abasDomains]);
+
+  useEffect(() => {
+    if (!isBriefAge) {
+      setBRIEFParent(() => initSeverityState(BRIEF2_DOMAINS));
+      setBRIEFTeacher(() => initSeverityState(BRIEF2_DOMAINS));
+    }
+  }, [isBriefAge]);
 
 
   // ---------- engine ----------
@@ -409,10 +421,32 @@ export default function App() {
         ];
         if (typeof weight === "number") sum += weight;
       });
+      Object.entries(briefParent).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = BRIEF2_CONDITION_WEIGHTS[cond][domain]?.[
+          severity as
+            | "Average"
+            | "Mildly Elevated"
+            | "Potentially Clinically Elevated"
+            | "Clinically Elevated"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
+      Object.entries(briefTeacher).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = BRIEF2_CONDITION_WEIGHTS[cond][domain]?.[
+          severity as
+            | "Average"
+            | "Mildly Elevated"
+            | "Potentially Clinically Elevated"
+            | "Clinically Elevated"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
       totals[cond] = sum;
     });
     return totals;
-  }, [ados, adir, srs2, srs2Teacher, vineland]);
+  }, [ados, adir, srs2, srs2Teacher, vineland, briefParent, briefTeacher]);
 
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {
@@ -688,8 +722,25 @@ export default function App() {
 
               {selectedExecutive.length > 0 && (
                 <>
-                  {selectedExecutive.includes("BRIEF-2") && (
-                    <DomainPanel title="BRIEF-2" domains={BRIEF2_DOMAINS} valueMap={brief} setValueMap={setBRIEF} />
+                  {selectedExecutive.includes("BRIEF-2") && isBriefAge && (
+                    <>
+                      <DomainPanel
+                        title="BRIEF-2 Parent"
+                        domains={BRIEF2_DOMAINS}
+                        valueMap={briefParent}
+                        setValueMap={setBRIEFParent}
+                        highlightMap={briefHighlight}
+                      />
+                      {isSchoolAge && (
+                        <DomainPanel
+                          title="BRIEF-2 Teacher"
+                          domains={BRIEF2_DOMAINS}
+                          valueMap={briefTeacher}
+                          setValueMap={setBRIEFTeacher}
+                          highlightMap={briefHighlight}
+                        />
+                      )}
+                    </>
                   )}
                   {selectedExecutive.filter((n) => n !== "BRIEF-2").length > 0 && (
                     <GenericInstrumentPanel
