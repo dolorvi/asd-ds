@@ -24,6 +24,7 @@ import { ADIR_CONDITION_WEIGHTS } from "./config/adirConditionWeights";
 import { SRS2_CONDITION_WEIGHTS } from "./config/srs2ConditionWeights";
 import { VINELAND_CONDITION_WEIGHTS } from "./config/vinelandConditionWeights";
 import { BRIEF2_CONDITION_WEIGHTS } from "./config/brief2ConditionWeights";
+import { SENSORY_PROFILE_CONDITION_WEIGHTS } from "./config/sensoryProfileConditionWeights";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -183,6 +184,10 @@ export default function App() {
   const srsHighlight = useMemo(() => buildHighlightMap(SRS2_CONDITION_WEIGHTS), []);
   const vinelandHighlight = useMemo(() => buildHighlightMap(VINELAND_CONDITION_WEIGHTS), []);
   const briefHighlight = useMemo(() => buildHighlightMap(BRIEF2_CONDITION_WEIGHTS), []);
+  const sensoryHighlight = useMemo(
+    () => buildHighlightMap(SENSORY_PROFILE_CONDITION_WEIGHTS),
+    [],
+  );
 
   // ---------- assessment selections ----------
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
@@ -443,10 +448,22 @@ export default function App() {
         ];
         if (typeof weight === "number") sum += weight;
       });
+      Object.entries(sensory).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = SENSORY_PROFILE_CONDITION_WEIGHTS[cond][domain]?.[
+          severity as
+            | "Much Less Than Others"
+            | "Less Than Others"
+            | "Just Like the Majority"
+            | "More Than Others"
+            | "Much More Than Others"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
       totals[cond] = sum;
     });
     return totals;
-  }, [ados, adir, srs2, srs2Teacher, vineland, briefParent, briefTeacher]);
+  }, [ados, adir, srs2, srs2Teacher, vineland, briefParent, briefTeacher, sensory]);
 
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {
@@ -761,6 +778,7 @@ export default function App() {
                       domains={SENSORY_PROFILE_DOMAINS}
                       valueMap={sensory}
                       setValueMap={setSensory}
+                      highlightMap={sensoryHighlight}
                     />
                   )}
                   {selectedSensory.filter((n) => n !== "Sensory Profile 2").length > 0 && (

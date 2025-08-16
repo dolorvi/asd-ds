@@ -3,6 +3,19 @@ import type { SeverityState, Config, AssessmentSelection, ClientProfile } from "
 import { Card } from "../components/primitives";
 import { ASSESSMENT_INFO } from "../data/assessmentInfo";
 
+const NAME_MAP: Record<string, string> = {
+  ABAS3: "ABAS-3",
+  Vineland: "Vineland-3",
+  MIGDAS: "MIGDAS-2",
+  ADOS: "ADOS-2",
+  BRIEF2: "BRIEF-2",
+  WISC: "WISC/WAIS/WPPSI",
+  WPPSI: "WISC/WAIS/WPPSI",
+  WAIS: "WISC/WAIS/WPPSI",
+  "Sensory profile 2": "Sensory Profile 2",
+  CELF5: "CELF-5",
+};
+
 export function ReportPanel({
   model,
   supportEstimate,
@@ -80,14 +93,15 @@ export function ReportPanel({
       lines.push(`${ASSESSMENT_INFO.migdas2.name}: Consistency ${migdas.consistency}`);
 
     instruments.forEach((i) => {
-      if (i.name === "Vineland-3" && (abasParent || abasTeach)) return;
-      if (i.name === "ASRS" && (asrsParent || asrsTeach)) return;
+      const name = NAME_MAP[i.name] || i.name;
+      if (name === "Vineland-3" && (abasParent || abasTeach)) return;
+      if (name === "ASRS" && (asrsParent || asrsTeach)) return;
       if (i.value !== undefined || (i.band && i.band.trim() !== ""))
-        lines.push(`${i.name}: ${i.value !== undefined ? i.value : i.band}`);
+        lines.push(`${name}: ${i.value !== undefined ? i.value : i.band}`);
     });
 
     assessments.forEach((a) => {
-      if (a.selected) lines.push(a.selected);
+      if (a.selected) lines.push(NAME_MAP[a.selected] || a.selected);
     });
 
     const testList = lines.map((l) => l.split(":")[0]).join(", ");
