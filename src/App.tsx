@@ -21,6 +21,7 @@ import {
 import type { Config, SeverityState, AssessmentSelection, ClientProfile, Condition } from "./types";
 import { ADOS2_CONDITION_WEIGHTS } from "./config/ados2ConditionWeights";
 import { ADIR_CONDITION_WEIGHTS } from "./config/adirConditionWeights";
+import { SRS2_CONDITION_WEIGHTS } from "./config/srs2ConditionWeights";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -362,10 +363,24 @@ export default function App() {
         ];
         if (typeof weight === "number") sum += weight;
       });
+      Object.entries(srs2).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = SRS2_CONDITION_WEIGHTS[cond][domain]?.[
+          severity as "Average" | "Mild" | "Moderate" | "Severe"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
+      Object.entries(srs2Teacher).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = SRS2_CONDITION_WEIGHTS[cond][domain]?.[
+          severity as "Average" | "Mild" | "Moderate" | "Severe"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
       totals[cond] = sum;
     });
     return totals;
-  }, [ados, adir]);
+  }, [ados, adir, srs2, srs2Teacher]);
 
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {

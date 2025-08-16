@@ -23,7 +23,7 @@ export interface DomainLabelConfig {
 
 // ----------------------------- Autism Questionnaires -----------------------------
 export const SRS2_SEVERITIES = [
-  "Within Normal Limits",
+  "Average",
   "Mild",
   "Moderate",
   "Severe",

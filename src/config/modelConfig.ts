@@ -94,27 +94,27 @@ export const DEFAULT_CONFIG: Config = {
   srs2Domains: SRS2_DOMAINS.map((d) => {
     const m: Record<string, InstrumentBandMap> = {};
     if (d.key === "srs_awareness") {
-      m["Within Normal Limits"] = { A1: -0.20 };
+      m["Average"] = { A1: -0.20 };
       m.Mild = { A1: -0.05 };
       m.Moderate = { A1: 0.60 };
       m.Severe = { A1: 1.10 };
     } else if (d.key === "srs_cognition") {
-      m["Within Normal Limits"] = { A2: -0.20 };
+      m["Average"] = { A2: -0.20 };
       m.Mild = { A2: -0.05 };
       m.Moderate = { A2: 0.60 };
       m.Severe = { A2: 1.10 };
     } else if (d.key === "srs_communication") {
-      m["Within Normal Limits"] = { A3: -0.20 };
+      m["Average"] = { A3: -0.20 };
       m.Mild = { A3: -0.05 };
       m.Moderate = { A3: 0.60 };
       m.Severe = { A3: 1.10 };
     } else if (d.key === "srs_motivation") {
-      m["Within Normal Limits"] = { A1: -0.05, A3: -0.05 };
+      m["Average"] = { A1: -0.05, A3: -0.05 };
       m.Mild = { A1: -0.02, A3: -0.02 };
       m.Moderate = { A1: 0.25, A3: 0.25 };
       m.Severe = { A1: 0.50, A3: 0.50 };
     } else if (d.key === "srs_rrb") {
-      m["Within Normal Limits"] = { B2: -0.15, B3: -0.15 };
+      m["Average"] = { B2: -0.15, B3: -0.15 };
       m.Mild = { B2: -0.05, B3: -0.05 };
       m.Moderate = { B2: 0.50, B3: 0.50 };
       m.Severe = { B2: 0.90, B3: 0.90 };
