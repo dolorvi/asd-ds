@@ -19,6 +19,7 @@ import {
   FASD_NEURO_DOMAINS,
 } from "./data/testData";
 import type { Config, SeverityState, AssessmentSelection, ClientProfile, Condition } from "./types";
+import { ADOS2_CONDITION_WEIGHTS } from "./config/ados2ConditionWeights";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -343,6 +344,20 @@ export default function App() {
   const handleThresholdChange = (v: any) => {
     setConfig((c) => ({ ...c, certaintyThreshold: parseFloat(v) }));
   };
+
+  const conditionPercents = useMemo(() => {
+    const totals: Record<Condition, number> = { ASD: 0, ADHD: 0, FASD: 0, ID: 0 };
+    (Object.keys(totals) as Condition[]).forEach((cond) => {
+      let sum = 0;
+      Object.entries(ados).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = ADOS2_CONDITION_WEIGHTS[cond][domain]?.[severity as "Non-spectrum" | "Autism"];
+        if (typeof weight === "number") sum += weight;
+      });
+      totals[cond] = sum;
+    });
+    return totals;
+  }, [ados]);
 
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {
@@ -703,6 +718,7 @@ export default function App() {
                   history={history}
                   pathwayCandidates={pathwayCandidates}
                   evidence={evidence}
+                  conditionPercents={conditionPercents}
                 />
               </section>
             </div>
