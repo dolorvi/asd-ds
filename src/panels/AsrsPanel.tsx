@@ -24,7 +24,7 @@ export function AsrsPanel({
           const tone =
             wt >= 5
               ? "tone-warn"
-              : wt >= 3 || wt <= -5
+              : sel === "Very Elevated" || wt >= 3 || wt <= -5
               ? "tone-danger"
               : undefined;
           return (

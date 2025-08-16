@@ -157,7 +157,7 @@ export function SummaryPanel({
             ))}
           </div>
           <div>
-            <div style={{fontSize:32,fontWeight:800}}>{(model.p*100).toFixed(1)}%</div>
+            <div style={{fontSize:32,fontWeight:800}}>{(model.p*100).toFixed(1)}</div>
             <div className="small">Overall ASD likelihood</div>
             <label className="small row row--center" style={{gap:"var(--space-inset)"}} title="Threshold">
               <span>Threshold:</span>
