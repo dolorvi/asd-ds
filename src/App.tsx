@@ -9,8 +9,6 @@ import {
   ABAS3_SEVERITIES as ABAS_SEVERITIES,
   VINELAND_SEVERITIES,
   VINELAND_DOMAINS,
-  GARS3_DOMAINS,
-  CARS2_DOMAINS,
   AQ_DOMAINS,
   ADOS2_DOMAINS,
   MIGDAS_DOMAINS,
@@ -74,8 +72,6 @@ export default function App() {
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
   const [abasTeacher, setABASTeacher] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
-  const [gars, setGARS] = useState<SeverityState>(() => initSeverityState(GARS3_DOMAINS));
-  const [cars, setCARS] = useState<SeverityState>(() => initSeverityState(CARS2_DOMAINS));
   const [aq, setAQ] = useState<SeverityState>(() => initSeverityState(AQ_DOMAINS));
   const [ados, setADOS] = useState<SeverityState>(() => initSeverityState(ADOS2_DOMAINS));
   const [migdasDomains, setMigdasDomains] = useState<SeverityState>(() => initSeverityState(MIGDAS_DOMAINS));
@@ -161,9 +157,9 @@ export default function App() {
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
     {
       domain: "Autism questionnaires",
-      options: ["ASRS", "SRS-2", "GARS", "CARS", "AQ", "ADOS", "ADI-R"],
+      options: ["ASRS", "SRS-2", "AQ"],
     },
-    { domain: "Autism observations", options: ["MIGDAS", "ADOS", "CARS"] },
+    { domain: "Autism observations", options: ["MIGDAS", "ADOS"] },
     { domain: "Autism interviews", options: ["ADI-R"] },
     { domain: "Adaptive questionnaires", options: ["ABAS3", "Vineland"] },
     {
@@ -172,14 +168,9 @@ export default function App() {
         "BRIEF2",
         "BDEFS",
         "Conners-4",
-        "Conners-3",
         "Conners-EC",
         "Conners CBRS",
         "Vanderbilt ADHD Rating Scales",
-        "CPT-3",
-        "D-KEFS",
-        "NEPSY-II (Inhibition)",
-        "NEPSY-II (Statue)",
       ],
     },
     { domain: "Intellectual assessment", options: ["WISC", "WPPSI", "WAIS"] },
@@ -189,25 +180,13 @@ export default function App() {
       options: [
         "Sensory profile 2",
         "MIGDAS",
-        "ADOS",
-        "CARS",
-        "SRS-2",
-        "GARS",
-        "AQ",
       ],
     },
     { domain: "Academic assessment", options: ["WIAT-III"] },
     {
-      domain: "Memory assessment",
-      options: ["WRAML2", "CMS", "CVLT-C", "NEPSY-II (Memory for Designs)"] },
-    {
       domain: "Motor/Visuospatial assessment",
       options: [
-        "Beery VMI",
         "BOT-3",
-        "NEPSY-II (Visuomotor)",
-        "NEPSY-II (Statue)",
-        "WISC-V Visual Spatial Index",
       ],
     },
     { domain: "History", options: ["History Profile", "ADI-R"] },
@@ -225,8 +204,6 @@ export default function App() {
     WAIS: "WISC/WAIS/WPPSI",
     "Sensory profile 2": "Sensory Profile 2",
     CELF5: "CELF-5",
-    GARS: "GARS-3",
-    CARS: "CARS-2",
   };
 
   const getSelectedNames = useCallback(
@@ -262,11 +239,11 @@ export default function App() {
 
   const pathwayCandidates = useMemo(() => {
     const asd = assessments.some((a) =>
-      ["ADOS", "CARS", "ADI-R", "SRS-2"].includes(a.selected || ""),
+      ["ADOS", "ADI-R", "SRS-2"].includes(a.selected || ""),
     );
     const adhd = assessments.some((a) => {
       const sel = a.selected || "";
-      return ["Conners-4", "Conners-3", "Conners-EC", "Vanderbilt", "CPT-3", "BRIEF2", "BRIEF", "BDEFS"].some(
+      return ["Conners-4", "Conners-EC", "Vanderbilt", "BRIEF2", "BRIEF", "BDEFS"].some(
         (k) => sel.toLowerCase().includes(k.toLowerCase()),
       );
     });
@@ -519,18 +496,12 @@ export default function App() {
                   )}
                 </>
               )}
-              {selectedAutismQs.includes("GARS") && (
-                <DomainPanel title="GARS-3" domains={GARS3_DOMAINS} valueMap={gars} setValueMap={setGARS} />
-              )}
-              {selectedAutismQs.includes("CARS") && (
-                <DomainPanel title="CARS-2" domains={CARS2_DOMAINS} valueMap={cars} setValueMap={setCARS} />
-              )}
               {selectedAutismQs.includes("AQ") && (
                 <DomainPanel title="AQ" domains={AQ_DOMAINS} valueMap={aq} setValueMap={setAQ} />
               )}
-              {selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "GARS", "CARS", "AQ"].includes(n)).length > 0 && (
+              {selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "AQ"].includes(n)).length > 0 && (
                 <GenericInstrumentPanel
-                  selected={selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "GARS", "CARS", "AQ"].includes(n))}
+                  selected={selectedAutismQs.filter((n) => !["SRS-2", "ASRS", "AQ"].includes(n))}
                   instruments={instruments}
                   setInstruments={setInstruments}
                   configs={config.defaultInstruments}

@@ -36,36 +36,6 @@ export const ASSESSMENT_INFO: Record<string, AssessmentInfo> = {
     notes:
       "Provides Total Score and DSM-5 Social Communication and Interaction vs. RRB subscales. Higher T-scores indicate greater severity.",
   },
-  gars3: {
-    name: "GARS-3 (Gilliam Autism Rating Scale, 3rd Edition)",
-    domains: [
-      "Restrictive, Repetitive Behaviors",
-      "Social Interaction",
-      "Social Communication",
-      "Emotional Responses",
-      "Cognitive Style",
-      "Maladaptive Speech",
-    ],
-    notes:
-      "Yields an Autism Index and probability classification (unlikely, possible, very likely).",
-  },
-  cars2: {
-    name: "CARS-2 (Childhood Autism Rating Scale, Second Edition)",
-    domains: [
-      "Relating to People",
-      "Emotional Response",
-      "Body Use",
-      "Object Use",
-      "Adaptation to Change",
-      "Visual Response",
-      "Listening Response",
-      "Taste, Smell, Touch",
-      "Verbal and Nonverbal Communication",
-      "Activity Level and Consistency",
-    ],
-    notes:
-      "Items rated 1–4; total scores 15–60 with classification: minimal-to-no symptoms (<30), mild-to-moderate (30–36.5), severe (\u226537).",
-  },
   aq: {
     name: "AQ (Autism-Spectrum Quotient)",
     domains: [
