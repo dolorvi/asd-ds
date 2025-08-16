@@ -153,5 +153,5 @@ export const SENSORY_PROFILE_CONDITION_WEIGHTS: Record<Condition, Record<string,
   return result;
 })();
 
-default export SENSORY_PROFILE_CONDITION_WEIGHTS;
+export default SENSORY_PROFILE_CONDITION_WEIGHTS;
 
