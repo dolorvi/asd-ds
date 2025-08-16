@@ -39,6 +39,7 @@ export const SRS2_DOMAINS: DomainLabelConfig[] = [
 
 export const ASRS_SEVERITIES = [
   "Average",
+  "Slightly Elevated",
   "Elevated",
   "Very Elevated",
 ] as const;

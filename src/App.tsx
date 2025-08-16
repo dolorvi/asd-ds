@@ -25,6 +25,10 @@ import { SRS2_CONDITION_WEIGHTS } from "./config/srs2ConditionWeights";
 import { VINELAND_CONDITION_WEIGHTS } from "./config/vinelandConditionWeights";
 import { BRIEF2_CONDITION_WEIGHTS } from "./config/brief2ConditionWeights";
 import { SENSORY_PROFILE_CONDITION_WEIGHTS } from "./config/sensoryProfileConditionWeights";
+import {
+  ASRS_CONDITION_WEIGHTS_2_5,
+  ASRS_CONDITION_WEIGHTS_6_18,
+} from "./config/asrsConditionWeights";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -318,6 +322,9 @@ export default function App() {
   }, [age]);
 
   const isSchoolAge = age < 18;
+
+  const asrsWeights = age < 6 ? ASRS_CONDITION_WEIGHTS_2_5 : ASRS_CONDITION_WEIGHTS_6_18;
+  const asrsHighlight = useMemo(() => buildHighlightMap(asrsWeights), [asrsWeights]);
   const isBriefAge = age >= 5 && age <= 18;
 
   useEffect(() => {
@@ -419,6 +426,28 @@ export default function App() {
         ];
         if (typeof weight === "number") sum += weight;
       });
+      Object.entries(asrs).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = asrsWeights[cond][domain]?.[
+          severity as
+            | "Average"
+            | "Slightly Elevated"
+            | "Elevated"
+            | "Very Elevated"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
+      Object.entries(asrsTeacher).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = asrsWeights[cond][domain]?.[
+          severity as
+            | "Average"
+            | "Slightly Elevated"
+            | "Elevated"
+            | "Very Elevated"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
       Object.entries(vineland).forEach(([domain, { severity }]) => {
         if (!severity) return;
         const weight = VINELAND_CONDITION_WEIGHTS[cond][domain]?.[
@@ -463,7 +492,7 @@ export default function App() {
       totals[cond] = sum;
     });
     return totals;
-  }, [ados, adir, srs2, srs2Teacher, vineland, briefParent, briefTeacher, sensory]);
+  }, [ados, adir, srs2, srs2Teacher, asrs, asrsTeacher, vineland, briefParent, briefTeacher, sensory, asrsWeights]);
 
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {
@@ -613,13 +642,20 @@ export default function App() {
               )}
               {hasAsrs && (
                 <>
-                  <AsrsPanel title="ASRS Parent" domains={config.asrsDomains} asrs={asrs} setASRS={setASRS} />
+                  <AsrsPanel
+                    title="ASRS Parent"
+                    domains={config.asrsDomains}
+                    asrs={asrs}
+                    setASRS={setASRS}
+                    highlightMap={asrsHighlight}
+                  />
                   {isSchoolAge && (
                     <AsrsPanel
                       title="ASRS Teacher"
                       domains={config.asrsDomains}
                       asrs={asrsTeacher}
                       setASRS={setASRSTeacher}
+                      highlightMap={asrsHighlight}
                     />
                   )}
                 </>
