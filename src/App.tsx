@@ -22,6 +22,7 @@ import type { Config, SeverityState, AssessmentSelection, ClientProfile, Conditi
 import { ADOS2_CONDITION_WEIGHTS } from "./config/ados2ConditionWeights";
 import { ADIR_CONDITION_WEIGHTS } from "./config/adirConditionWeights";
 import { SRS2_CONDITION_WEIGHTS } from "./config/srs2ConditionWeights";
+import { VINELAND_CONDITION_WEIGHTS } from "./config/vinelandConditionWeights";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -75,6 +76,7 @@ export default function App() {
   const [wisc, setWISC] = useState<SeverityState>(() => initSeverityState(config.wiscDomains));
   const [abas, setABAS] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
   const [abasTeacher, setABASTeacher] = useState<SeverityState>(() => initSeverityState(config.abasDomains));
+  const [vineland, setVineland] = useState<SeverityState>(() => initSeverityState(VINELAND_DOMAINS));
   const [aq, setAQ] = useState<SeverityState>(() => initSeverityState(AQ_DOMAINS));
   const [ados, setADOS] = useState<SeverityState>(() => initSeverityState(ADOS2_DOMAINS));
   const [migdasDomains, setMigdasDomains] = useState<SeverityState>(() => initSeverityState(MIGDAS_DOMAINS));
@@ -155,6 +157,27 @@ export default function App() {
   const [instruments, setInstruments] = useState(
     DEFAULT_CONFIG.defaultInstruments.map((i) => ({ name: i.name, value: undefined as number | undefined, band: "" })),
   );
+
+  const buildHighlightMap = (
+    weights: Record<Condition, Record<string, Record<string, number>>>
+  ) => {
+    const result: Record<string, Record<string, number>> = {};
+    Object.values(weights).forEach((domains) => {
+      Object.entries(domains).forEach(([domain, sevMap]) => {
+        if (!result[domain]) result[domain] = {};
+        Object.entries(sevMap).forEach(([sev, wt]) => {
+          const abs = Math.abs(wt);
+          result[domain][sev] = Math.max(result[domain][sev] || 0, abs);
+        });
+      });
+    });
+    return result;
+  };
+
+  const adosHighlight = useMemo(() => buildHighlightMap(ADOS2_CONDITION_WEIGHTS), []);
+  const adirHighlight = useMemo(() => buildHighlightMap(ADIR_CONDITION_WEIGHTS), []);
+  const srsHighlight = useMemo(() => buildHighlightMap(SRS2_CONDITION_WEIGHTS), []);
+  const vinelandHighlight = useMemo(() => buildHighlightMap(VINELAND_CONDITION_WEIGHTS), []);
 
   // ---------- assessment selections ----------
   const [assessments, setAssessments] = useState<AssessmentSelection[]>([
@@ -377,10 +400,17 @@ export default function App() {
         ];
         if (typeof weight === "number") sum += weight;
       });
+      Object.entries(vineland).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = VINELAND_CONDITION_WEIGHTS[cond][domain]?.[
+          severity as "Low" | "Moderately Low" | "Average" | "Moderately High" | "High"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
       totals[cond] = sum;
     });
     return totals;
-  }, [ados, adir, srs2, srs2Teacher]);
+  }, [ados, adir, srs2, srs2Teacher, vineland]);
 
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {
@@ -510,13 +540,20 @@ export default function App() {
               <div id="adaptive-measure-section" />
               {hasSrs && (
                 <>
-                  <SrsPanel title="SRS-2 Parent" domains={config.srs2Domains} srs2={srs2} setSRS2={setSRS2} />
+                  <SrsPanel
+                    title="SRS-2 Parent"
+                    domains={config.srs2Domains}
+                    srs2={srs2}
+                    setSRS2={setSRS2}
+                    highlightMap={srsHighlight}
+                  />
                   {isSchoolAge && (
                     <SrsPanel
                       title="SRS-2 Teacher"
                       domains={config.srs2Domains}
                       srs2={srs2Teacher}
                       setSRS2={setSRS2Teacher}
+                      highlightMap={srsHighlight}
                     />
                   )}
                 </>
@@ -546,7 +583,13 @@ export default function App() {
                 />
               )}
               {selectedAutismObs.includes("ADOS-2") && (
-                <DomainPanel title="ADOS-2" domains={ADOS2_DOMAINS} valueMap={ados} setValueMap={setADOS} />
+                <DomainPanel
+                  title="ADOS-2"
+                  domains={ADOS2_DOMAINS}
+                  valueMap={ados}
+                  setValueMap={setADOS}
+                  highlightMap={adosHighlight}
+                />
               )}
               {selectedAutismObs.includes("MIGDAS-2") && (
                 <DomainPanel title="MIGDAS-2" domains={MIGDAS_DOMAINS} valueMap={migdasDomains} setValueMap={setMigdasDomains} />
@@ -560,7 +603,13 @@ export default function App() {
                 />
               )}
               {selectedAutismInterviews.includes("ADI-R") && (
-                <DomainPanel title="ADI-R" domains={ADIR_DOMAINS} valueMap={adir} setValueMap={setADIR} />
+                <DomainPanel
+                  title="ADI-R"
+                  domains={ADIR_DOMAINS}
+                  valueMap={adir}
+                  setValueMap={setADIR}
+                  highlightMap={adirHighlight}
+                />
               )}
               {selectedAutismInterviews.filter((n) => n !== "ADI-R").length > 0 && (
                 <GenericInstrumentPanel
@@ -595,14 +644,12 @@ export default function App() {
                   )}
                   {hasVineland && (
                     <VinelandPanel
-                      title="Vineland-3 Composite"
-                      domains={config.vinelandDomains ?? VINELAND_DOMAINS}
+                      title="Vineland-3"
+                      domains={VINELAND_DOMAINS}
                       options={VINELAND_SEVERITIES}
-                      valueMap={{ vineland_composite: getInstrumentBand("Vineland-3") }}
-                      setValueMap={(fn) => {
-                        const next = fn({ vineland_composite: getInstrumentBand("Vineland-3") });
-                        setInstrumentBand("Vineland-3", next.vineland_composite || "");
-                      }}
+                      valueMap={vineland}
+                      setValueMap={setVineland}
+                      highlightMap={vinelandHighlight}
                     />
                   )}
                   {selectedAdaptive.filter((n) => !["ABAS-3", "Vineland-3"].includes(n)).length > 0 && (

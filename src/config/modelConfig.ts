@@ -1,5 +1,5 @@
 // src/config/modelConfig.ts
-import { SRS2_DOMAINS, ASRS_DOMAINS, WISC_DOMAINS, ABAS3_DOMAINS, SRS2_SEVERITIES, ASRS_SEVERITIES, WISC_SEVERITIES, ABAS3_SEVERITIES } from "../data/testData";
+import { SRS2_DOMAINS, ASRS_DOMAINS, WISC_DOMAINS, ABAS3_DOMAINS, VINELAND_DOMAINS, SRS2_SEVERITIES, ASRS_SEVERITIES, WISC_SEVERITIES, ABAS3_SEVERITIES } from "../data/testData";
 import type { Config, InstrumentBandMap } from "../types";
 
 // ---- Age-band priors (log-odds) ----
@@ -151,12 +151,10 @@ export const DEFAULT_CONFIG: Config = {
     },
   })),
 
-  vinelandDomains: [
-    {
-      key: "vineland_composite",
-      label: "Composite",
-      severities: [...VINELAND_SEVERITIES],
-      mapBySeverity: {}, // no direct mapping here; handled in useAsdEngine
-    },
-  ],
+  vinelandDomains: VINELAND_DOMAINS.map((d) => ({
+    key: d.key,
+    label: d.label,
+    severities: [...VINELAND_SEVERITIES],
+    mapBySeverity: {}, // domain impacts handled separately
+  })),
 };

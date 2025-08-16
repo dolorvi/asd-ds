@@ -8,18 +8,21 @@ export function AbasPanel({
   options,
   valueMap,
   setValueMap,
+  highlightMap,
 }:{
   title: string;
   domains: { key: string; label: string }[];
   options: string[];
   valueMap: SeverityState;
   setValueMap: (fn: (s: SeverityState) => SeverityState) => void;
+  highlightMap?: Record<string, Record<string, number>>;
 }) {
   return (
     <Card title={title}>
       <div className="grid grid--sm">
         {domains.map(d=>{
           const sel = valueMap[d.key]?.severity || "";
+          const danger = highlightMap && Math.abs(highlightMap[d.key]?.[sel] || 0) >= 3;
           return (
             <section key={d.key} className="card">
               <div className="stack stack--sm">
@@ -27,6 +30,7 @@ export function AbasPanel({
                   <div className="card-title" title={d.label}>{d.label}</div>
                   <select
                     value={sel}
+                    className={danger ? "tone-danger" : undefined}
                     onChange={(e)=>setValueMap(s=>({ ...s, [d.key]: { ...s[d.key], severity: e.target.value }}))}
                   >
                     <option value="">Select</option>
