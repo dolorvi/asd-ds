@@ -65,7 +65,12 @@ export const ADIR_SEVERITIES = [
 ] as const;
 export const AQ_SEVERITIES = ["Below threshold", "At-or-above threshold"] as const;
 export const CELF5_SEVERITIES = ["Very Low", "Low", "Below Average", "Average", "Above Average"] as const;
-export const BRIEF2_SEVERITIES = ["Within Normal Limits", "Elevated", "Very Elevated"] as const;
+export const BRIEF2_SEVERITIES = [
+  "Average",
+  "Mildly Elevated",
+  "Potentially Clinically Elevated",
+  "Clinically Elevated",
+] as const;
 export const BDEFS_SEVERITIES = ["Average", "Moderately Deficient", "Severe"] as const;
 export const CONNERS_SEVERITIES = ["Average", "Elevated", "Very Elevated"] as const;
 export const VANDERBILT_SEVERITIES = ["No", "Yes"] as const;
