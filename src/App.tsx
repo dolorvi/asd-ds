@@ -20,6 +20,7 @@ import {
 } from "./data/testData";
 import type { Config, SeverityState, AssessmentSelection, ClientProfile, Condition } from "./types";
 import { ADOS2_CONDITION_WEIGHTS } from "./config/ados2ConditionWeights";
+import { ADIR_CONDITION_WEIGHTS } from "./config/adirConditionWeights";
 
 import { Header, Footer } from "./components/ui";
 import { Container, Tabs, Card } from "./components/primitives";
@@ -354,10 +355,17 @@ export default function App() {
         const weight = ADOS2_CONDITION_WEIGHTS[cond][domain]?.[severity as "Non-spectrum" | "Autism"];
         if (typeof weight === "number") sum += weight;
       });
+      Object.entries(adir).forEach(([domain, { severity }]) => {
+        if (!severity) return;
+        const weight = ADIR_CONDITION_WEIGHTS[cond][domain]?.[
+          severity as "Below algorithm" | "Borderline" | "Meets algorithm"
+        ];
+        if (typeof weight === "number") sum += weight;
+      });
       totals[cond] = sum;
     });
     return totals;
-  }, [ados]);
+  }, [ados, adir]);
 
   // ---------- rule signature ----------
   const ruleHash = useMemo(() => {
